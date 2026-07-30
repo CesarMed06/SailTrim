@@ -2,6 +2,7 @@ import './App.css'
 import Hero from './components/Hero'
 import HowItWorks from './components/HowItWorks'
 import WindSelector from './components/WindSelector'
+import ConditionsPanel from './components/ConditionsPanel'
 import Footer from './components/Footer'
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
       <Hero />
       <HowItWorks />
       <WindSelector />
+      <ConditionsPanel />
       <Footer />
     </div>
   )
