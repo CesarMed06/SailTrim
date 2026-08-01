@@ -38,3 +38,19 @@ export interface ChatMessage {
 }
 
 export type AppMode = 'trim' | 'diagnostic'
+
+export interface ParsedWind {
+  direction: number
+  speedKnots: number
+  force: BeaufortForce
+  windAngle: WindAngle
+  isTrue: boolean
+  rawSentence: string
+}
+
+export interface NmeaFeedLine {
+  timestamp: number
+  raw: string
+  parsed: ParsedWind | null
+  error: string | null
+}
