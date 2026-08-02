@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import type { WindAngle } from '../types'
+import { useTrim } from '../context/TrimContext'
 import CompassRose from './CompassRose'
 
 function WindSelector() {
-  const [angle, setAngle] = useState<WindAngle>(45)
+  const { conditions, setWindAngle } = useTrim()
+  const angle = conditions.windAngle
 
   return (
     <section id="compass" className="relative py-24 px-4">
@@ -21,13 +22,13 @@ function WindSelector() {
         </div>
 
         <div className="bg-ocean-900/30 border border-ocean-800/30 rounded-3xl p-8 md:p-12">
-          <CompassRose angle={angle} onChange={setAngle} />
+          <CompassRose angle={angle} onChange={setWindAngle} />
 
           <div className="flex justify-center gap-3 mt-8 flex-wrap">
             {([0, 30, 45, 90, 135, 180] as WindAngle[]).map((preset) => (
               <button
                 key={preset}
-                onClick={() => setAngle(preset)}
+                onClick={() => setWindAngle(preset)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
                   angle === preset
                     ? 'bg-wind-500/20 border-wind-500/50 text-wind-300 shadow-lg shadow-wind-500/10'

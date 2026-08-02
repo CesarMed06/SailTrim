@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNmeaConnection } from '../hooks/useNmeaConnection'
 import { processFeedBuffer, generateFakeNmeaSentence, generateFakeSignalKDelta } from '../lib/nmea-parser'
 import { BEAUFORT_SCALE, WIND_ANGLE_LABELS } from '../lib/constants'
+import { useTrim } from '../context/TrimContext'
 import type { ParsedWind, NmeaFeedLine } from '../types'
 
 const SIM_INTERVAL_MS = 1500
@@ -23,6 +24,8 @@ function formatFeedLine(line: NmeaFeedLine): string {
 function NMEAPanel() {
   const { isConnected, isLoading, latestWind, feedLines, error, connect, disconnect } =
     useNmeaConnection()
+  const { setLiveWind } = useTrim()
+  const nmeaActiveRef = useRef(false)
 
   const [url, setUrl] = useState('ws://192.168.1.100:3000/signalk/v1/stream')
   const [isSimulating, setIsSimulating] = useState(false)
@@ -85,6 +88,20 @@ function NMEAPanel() {
   const displayFeed = isConnected ? feedLines : isSimulating ? simFeedLines : []
   const showInstruments = displayWind !== null
   const showFeed = displayFeed.length > 0
+
+  useEffect(() => {
+    if (displayWind) {
+      nmeaActiveRef.current = true
+      setLiveWind({
+        direction: displayWind.direction,
+        speedKnots: displayWind.speedKnots,
+        force: displayWind.force,
+      })
+    } else if (nmeaActiveRef.current) {
+      nmeaActiveRef.current = false
+      setLiveWind(null)
+    }
+  }, [displayWind, setLiveWind])
 
   const beaufort = displayWind ? BEAUFORT_SCALE[displayWind.force] : null
 

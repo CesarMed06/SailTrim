@@ -1,15 +1,12 @@
-import { useState } from 'react'
-import type { BoatType, BeaufortForce, ExperienceLevel } from '../types'
+import { useTrim } from '../context/TrimContext'
 import BoatTypeSelector from './BoatTypeSelector'
 import BeaufortPicker from './BeaufortPicker'
 import ExperienceToggle from './ExperienceToggle'
 import SeaStateSelector from './SeaStateSelector'
 
 function ConditionsPanel() {
-  const [boatType, setBoatType] = useState<BoatType>('monohull')
-  const [windForce, setWindForce] = useState<BeaufortForce>(3)
-  const [experience, setExperience] = useState<ExperienceLevel>('intermediate')
-  const [seaState, setSeaState] = useState<'calm' | 'moderate' | 'rough' | undefined>(undefined)
+  const { conditions, setBoatType, setWindForce, setExperience, setSeaState } = useTrim()
+  const { boatType, windForce, experience, seaState } = conditions
 
   return (
     <section id="conditions" className="relative py-24 px-4">
