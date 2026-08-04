@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTrim } from '../context/TrimContext'
 import { analyzeTrim, getApiKey, getEffectiveConditions } from '../lib/gemini'
+import { GlossaryInlineMd } from './GlossaryInlineMd'
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
@@ -12,42 +13,6 @@ function formatInterval(sec: number): string {
   return `${sec / 60} min`
 }
 
-function Italic({ text }: { text: string }) {
-  const parts = text.split(/\*([^*\n]+)\*/g)
-  return (
-    <>
-      {parts.map((part, i) => {
-        if (i % 2 === 1) {
-          return (
-            <em key={i} className="text-sail-400">
-              {part}
-            </em>
-          )
-        }
-        const cleaned = part.replace(/\*/g, '')
-        return cleaned ? <span key={i}>{cleaned}</span> : null
-      })}
-    </>
-  )
-}
-
-function InlineMarkdown({ text }: { text: string }) {
-  const parts = text.split(/\*\*(.+?)\*\*/g)
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 ? (
-          <strong key={i} className="text-white font-semibold">
-            {part}
-          </strong>
-        ) : (
-          <Italic key={i} text={part} />
-        ),
-      )}
-    </>
-  )
-}
-
 function MarkdownText({ text }: { text: string }) {
   return (
     <div className="space-y-3">
@@ -56,14 +21,14 @@ function MarkdownText({ text }: { text: string }) {
         if (line.startsWith('### ')) {
           return (
             <h4 key={i} className="text-base font-display font-semibold text-sail-300 pt-2">
-              <InlineMarkdown text={line.slice(4)} />
+              <GlossaryInlineMd text={line.slice(4)} />
             </h4>
           )
         }
         if (line.startsWith('## ')) {
           return (
             <h3 key={i} className="text-lg font-display font-bold text-cyan-300 pt-3 first:pt-0">
-              <InlineMarkdown text={line.slice(3)} />
+              <GlossaryInlineMd text={line.slice(3)} />
             </h3>
           )
         }
@@ -72,7 +37,7 @@ function MarkdownText({ text }: { text: string }) {
             <div key={i} className="flex gap-2.5 text-sail-500 leading-relaxed">
               <span className="text-cyan-500/70 shrink-0 mt-0.5">▸</span>
               <span>
-                <InlineMarkdown text={line.slice(2)} />
+                <GlossaryInlineMd text={line.slice(2)} />
               </span>
             </div>
           )
@@ -85,14 +50,14 @@ function MarkdownText({ text }: { text: string }) {
                 {numbered[1]}.
               </span>
               <span>
-                <InlineMarkdown text={numbered[2]} />
+                <GlossaryInlineMd text={numbered[2]} />
               </span>
             </div>
           )
         }
         return (
           <p key={i} className="text-sail-500 leading-relaxed">
-            <InlineMarkdown text={line} />
+            <GlossaryInlineMd text={line} />
           </p>
         )
       })}

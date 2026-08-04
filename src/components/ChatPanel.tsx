@@ -2,42 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTrim } from '../context/TrimContext'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { sendChatMessage, TONE_LABELS, type ChatEntry, type ChatTone } from '../lib/chat'
-
-function InlineMd({ text }: { text: string }) {
-  const parts = text.split(/\*\*(.+?)\*\*/g)
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 ? (
-          <strong key={i} className="text-white font-semibold">
-            {part}
-          </strong>
-        ) : (
-          <ItalicMd key={i} text={part} />
-        ),
-      )}
-    </>
-  )
-}
-
-function ItalicMd({ text }: { text: string }) {
-  const parts = text.split(/\*([^*\n]+)\*/g)
-  return (
-    <>
-      {parts.map((part, i) => {
-        if (i % 2 === 1) {
-          return (
-            <em key={i} className="text-sail-400">
-              {part}
-            </em>
-          )
-        }
-        const cleaned = part.replace(/\*/g, '')
-        return cleaned ? <span key={i}>{cleaned}</span> : null
-      })}
-    </>
-  )
-}
+import { GlossaryInlineMd } from './GlossaryInlineMd'
 
 function mergeNumberedLines(lines: string[]): string[] {
   const merged: string[] = []
@@ -67,14 +32,14 @@ function ChatMarkdown({ text }: { text: string }) {
         if (line.startsWith('### ')) {
           return (
             <h4 key={i} className="text-sm font-semibold text-sail-300 pt-1">
-              <InlineMd text={line.slice(4)} />
+              <GlossaryInlineMd text={line.slice(4)} />
             </h4>
           )
         }
         if (line.startsWith('## ')) {
           return (
             <h3 key={i} className="text-base font-bold text-cyan-300 pt-2 first:pt-0">
-              <InlineMd text={line.slice(3)} />
+              <GlossaryInlineMd text={line.slice(3)} />
             </h3>
           )
         }
@@ -83,7 +48,7 @@ function ChatMarkdown({ text }: { text: string }) {
             <div key={i} className="flex gap-2 text-sail-500 leading-relaxed">
               <span className="text-cyan-500/70 shrink-0 mt-0.5">▸</span>
               <span>
-                <InlineMd text={line.slice(2)} />
+                <GlossaryInlineMd text={line.slice(2)} />
               </span>
             </div>
           )
@@ -96,14 +61,14 @@ function ChatMarkdown({ text }: { text: string }) {
                 {numbered[1]}.
               </span>
               <span>
-                <InlineMd text={numbered[2]} />
+                <GlossaryInlineMd text={numbered[2]} />
               </span>
             </div>
           )
         }
         return (
           <p key={i} className="text-sail-500 leading-relaxed">
-            <InlineMd text={line} />
+            <GlossaryInlineMd text={line} />
           </p>
         )
       })}
@@ -198,6 +163,7 @@ function ChatPanel() {
   const chatRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const focusQueued = useRef(false)
+  const wasFullscreen = useRef(false)
 
   const effective = getEffectiveConditions(conditions, mode, liveWind)
 
@@ -264,13 +230,17 @@ function ChatPanel() {
     }
   }, [input])
 
+  const stripMarkdown = useCallback((text: string) => {
+    return text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1')
+  }, [])
+
   const handleSuggestion = useCallback(
     (q: string) => {
-      setInput(q)
+      setInput(stripMarkdown(q))
       setSuggestions([])
       focusQueued.current = true
     },
-    [],
+    [stripMarkdown],
   )
 
   const clearChat = useCallback(() => {
@@ -290,12 +260,13 @@ function ChatPanel() {
   }, [fullscreen])
 
   useEffect(() => {
-    if (!fullscreen) {
+    if (wasFullscreen.current && !fullscreen) {
       const el = document.getElementById('chat')
       if (el) {
         el.scrollIntoView({ behavior: 'instant', block: 'start' })
       }
     }
+    wasFullscreen.current = fullscreen
   }, [fullscreen])
 
   const hasMessages = messages.length > 0
@@ -386,7 +357,7 @@ function ChatPanel() {
 
       <div
         ref={chatRef}
-        className={`p-5 space-y-4 ${fullscreen ? 'flex-1 overflow-y-auto' : hasMessages ? 'h-[420px] overflow-y-auto' : 'min-h-[420px] flex items-center justify-center'}`}
+        className={`p-5 space-y-4 overflow-x-hidden ${fullscreen ? 'flex-1 overflow-y-auto' : hasMessages ? 'h-[420px] overflow-y-auto' : 'min-h-[420px] flex items-center justify-center'}`}
       >
         {!hasMessages && !loading && (
           <div className="flex flex-col items-center text-center gap-3">
@@ -476,7 +447,7 @@ function ChatPanel() {
                   : 'bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-300'
               }`}
             >
-              <InlineMd text={q} />
+              <GlossaryInlineMd text={q} />
             </button>
           ))}
         </div>
