@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTrim } from '../context/TrimContext'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
-import { sendChatMessage, TONE_LABELS, type ChatEntry, type ChatTone } from '../lib/chat'
+import { sendChatMessage, type ChatEntry, type ChatTone } from '../lib/chat'
 import { GlossaryInlineMd } from './GlossaryInlineMd'
 
 function mergeNumberedLines(lines: string[]): string[] {
@@ -84,23 +85,6 @@ const LOADING_DOTS = (
   </div>
 )
 
-const PLACEHOLDERS = [
-  '¿Cómo afecta el estado del mar al trimado?',
-  '¿Cuándo debo tomar un rizo?',
-  '¿Qué hago si el barco escora demasiado?',
-  '¿Cómo ajusto el traveller en ceñida?',
-  'Explica qué es el cunningham',
-  'Diferencia entre foque y genoa',
-]
-
-const DIAGNOSTIC_PLACEHOLDERS = [
-  'El barco escora mucho y no puedo ceñir',
-  'La vela mayor flamea en la baluma',
-  'Pierdo velocidad en las viradas',
-  'El timón está muy duro',
-  'Noto mucho derrape a través',
-]
-
 function MessageCopyButton({ text }: { text: string }) {
   const [done, setDone] = useState(false)
 
@@ -164,6 +148,7 @@ function ChatPanel() {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const focusQueued = useRef(false)
   const wasFullscreen = useRef(false)
+  const { t } = useTranslation()
 
   const effective = getEffectiveConditions(conditions, mode, liveWind)
 
@@ -185,7 +170,7 @@ function ChatPanel() {
 
     const apiKey = getApiKey()
     if (!apiKey) {
-      setError('Configura tu clave de Gemini en el panel de arriba para usar el chat.')
+      setError(t('chat.noKeyError'))
       return
     }
 
@@ -207,7 +192,7 @@ function ChatPanel() {
       setMessages((prev) => [...prev, { role: 'assistant', content }])
       setSuggestions(sug)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al contactar con el patrón IA')
+      setError(err instanceof Error ? err.message : t('chat.apiError'))
     } finally {
       setLoading(false)
     }
@@ -270,8 +255,20 @@ function ChatPanel() {
   }, [fullscreen])
 
   const hasMessages = messages.length > 0
-  const placeholders = diagnostic ? DIAGNOSTIC_PLACEHOLDERS : PLACEHOLDERS
-  const randomPlaceholder = placeholders[Math.floor(Math.random() * placeholders.length)]
+  const placeholderKey = diagnostic ? 'chat.diagnosticPlaceholders' : 'chat.placeholders'
+  const placeholders = useMemo(() => {
+    const arr = t(placeholderKey, { returnObjects: true }) as string[]
+    return Array.isArray(arr) ? arr : []
+  }, [t, placeholderKey])
+  const randomIdxRef = useRef(Math.floor(Math.random() * 6))
+  const randomPlaceholder = useMemo(() => {
+    const arr = placeholders
+    return arr.length > 0 ? arr[randomIdxRef.current % arr.length] || arr[0] : ''
+  }, [placeholders])
+  const toneLabels = useMemo(() => {
+    const labels = t('chat.tones', { returnObjects: true }) as Record<string, string>
+    return labels || {}
+  }, [t])
 
   const chatContent = (
     <>
@@ -284,7 +281,7 @@ function ChatPanel() {
                 !diagnostic ? colors.tab : 'text-sail-600 hover:text-sail-400'
               }`}
             >
-              💬 Consultas
+              {t('chat.consultas')}
             </button>
             <button
               onClick={() => setDiagnostic(true)}
@@ -292,17 +289,17 @@ function ChatPanel() {
                 diagnostic ? DIAGNOSTIC_COLORS.tab : 'text-sail-600 hover:text-sail-400'
               }`}
             >
-              🩺 ¿Qué está pasando?
+              {t('chat.diagnostic')}
             </button>
           </div>
 
           <select
             value={tone}
             onChange={(e) => setTone(e.target.value as ChatTone)}
-            aria-label="Tono del patrón"
+            aria-label={t('chat.toneLabel')}
             className="bg-ocean-950/70 border border-ocean-700/40 rounded-xl px-2.5 py-1.5 text-xs text-sail-400 focus:outline-none focus:border-cyan-500/40 transition-all"
           >
-            {Object.entries(TONE_LABELS).map(([key, label]) => (
+            {Object.entries(toneLabels).map(([key, label]) => (
               <option key={key} value={key} className="bg-ocean-900">
                 {label}
               </option>
@@ -313,9 +310,9 @@ function ChatPanel() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setFullscreen((f) => !f)}
-            aria-label={fullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            aria-label={fullscreen ? t('chat.exitFullscreen') : t('chat.fullscreen')}
             className="text-sail-600 hover:text-sail-300 text-xs transition-colors"
-            title={fullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            title={fullscreen ? t('chat.exitFullscreen') : t('chat.fullscreen')}
           >
             {fullscreen ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -337,10 +334,10 @@ function ChatPanel() {
           {hasMessages && (
             <button
               onClick={clearChat}
-              aria-label="Limpiar conversación"
+              aria-label={t('chat.clearAria')}
               className="text-sail-600 hover:text-red-400 text-xs font-medium transition-colors"
             >
-              🗑️ Limpiar
+              {t('chat.clearChat')}
             </button>
           )}
         </div>
@@ -350,7 +347,7 @@ function ChatPanel() {
         <div className="px-5 py-2.5 bg-amber-500/5 border-b border-amber-500/10 flex items-center gap-2">
           <span className="text-amber-400 text-sm">🩺</span>
           <p className="text-amber-300/80 text-xs">
-            Modo diagnóstico activo — describe un síntoma y el patrón te dirá qué falla y cómo arreglarlo.
+            {t('chat.diagnosticBanner')}
           </p>
         </div>
       )}
@@ -364,8 +361,8 @@ function ChatPanel() {
             <span className="text-4xl">{diagnostic ? '🩺' : '⛵'}</span>
             <p className="text-sail-600 text-sm max-w-xs">
               {diagnostic
-                ? 'Describe un síntoma y el patrón diagnosticará qué falla en el trimado.'
-                : 'Pregunta cualquier cosa sobre trimado, maniobras o tu barco. El patrón IA conoce tus condiciones actuales.'}
+                ? t('chat.emptyDiagnostic')
+                : t('chat.emptyConsultas')}
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-2">
               {placeholders.slice(0, 3).map((ph) => (
@@ -427,7 +424,7 @@ function ChatPanel() {
                 onClick={() => setError('')}
                 className="ml-3 text-red-300 hover:text-red-200 font-medium underline underline-offset-2"
               >
-                Ok
+                {t('chat.ok')}
               </button>
             </div>
           </div>
@@ -436,7 +433,7 @@ function ChatPanel() {
 
       {suggestions.length > 0 && (
         <div className={`px-5 py-3 border-t ${diagnostic ? 'border-amber-500/10 bg-amber-500/5' : 'border-ocean-800/20 bg-ocean-950/30'} flex flex-wrap items-center gap-2`}>
-          <span className="text-sail-700 text-xs shrink-0 mr-1">Sugerencias:</span>
+          <span className="text-sail-700 text-xs shrink-0 mr-1">{t('chat.suggestions')}</span>
           {suggestions.map((q, i) => (
             <button
               key={i}
@@ -466,7 +463,7 @@ function ChatPanel() {
         />
         <button
           onClick={send}
-          aria-label="Enviar mensaje"
+          aria-label={t('chat.sendAria')}
           disabled={!input.trim() || loading}
           className={`shrink-0 p-3 bg-gradient-to-br ${
             diagnostic
@@ -493,14 +490,13 @@ function ChatPanel() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <span className="text-wind-400 text-sm font-semibold tracking-widest uppercase">
-              Paso 4
+              {t('chat.step')}
             </span>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-white mt-4 mb-4">
-              Chat con el patrón
+              {t('chat.title')}
             </h2>
             <p className="text-sail-600 text-lg max-w-lg mx-auto">
-              Pregunta lo que quieras sobre trimado, maniobras o tu barco. El patrón IA responde
-              como si estuvieras a bordo.
+              {t('chat.subtitle')}
             </p>
           </div>
         </div>

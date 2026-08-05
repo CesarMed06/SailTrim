@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next'
 import type { SimulatedWind } from '../hooks/useWindSimulation'
-import { BEAUFORT_SCALE } from '../lib/constants'
 
 interface SimulationPanelProps {
   isRunning: boolean
@@ -8,7 +8,8 @@ interface SimulationPanelProps {
 }
 
 function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
-  const beaufort = BEAUFORT_SCALE[wind.force]
+  const { t } = useTranslation()
+  const beaufortInfo = t(`beaufort.${wind.force}`, { returnObjects: true }) as { label: string; description: string; windSpeed: string; seaState: string }
   const needleRotation = wind.direction
   const trendIcons: Record<SimulatedWind['trend'], string> = {
     steady: '→',
@@ -44,21 +45,21 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
               <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isRunning ? 'bg-cyan-400' : 'bg-sail-600'}`} />
             </span>
             <span className="text-cyan-400 text-xs font-semibold tracking-widest uppercase">
-              {isRunning ? 'Demo en vivo' : 'Modo demo'}
+              {isRunning ? t('simulation.running') : t('simulation.paused')}
             </span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mt-4 mb-4">
-            Simulación de viento
+            {t('simulation.title')}
           </h2>
           <p className="text-sail-600 text-lg max-w-lg mx-auto">
-            Datos de viento simulados en tiempo real. Actívalo para ver cómo se comportaría el sistema con instrumentos reales del barco.
+            {t('simulation.subtitle')}
           </p>
         </div>
 
         <div className="bg-ocean-900/30 border border-ocean-800/30 rounded-3xl p-6 md:p-10">
           <div className="flex items-center justify-between mb-8">
             <span className="text-sail-500 text-sm font-medium uppercase tracking-wider">
-              Panel de instrumentos
+              {t('simulation.title')}
             </span>
 
             <button
@@ -68,7 +69,7 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
                   ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 shadow-lg shadow-cyan-500/25'
                   : 'bg-ocean-800/70'
               }`}
-              aria-label={isRunning ? 'Detener simulación' : 'Iniciar simulación'}
+              aria-label={isRunning ? t('simulation.stop') : t('simulation.start')}
             >
               <span
                 className={`inline-block w-6 h-6 rounded-full bg-white shadow-md transform transition-all duration-500 ease-out ${
@@ -173,7 +174,7 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                   <span className="text-sail-600 text-xs uppercase tracking-wider font-medium mb-1 block">
-                    Dirección
+                    {t('simulation.direction')}
                   </span>
                   <div className="flex items-baseline gap-1">
                     <span className={`text-3xl font-mono font-bold transition-all duration-300 ${isRunning ? 'text-cyan-300' : 'text-sail-500'}`}>
@@ -188,7 +189,7 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
 
                 <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                   <span className="text-sail-600 text-xs uppercase tracking-wider font-medium mb-1 block">
-                    Velocidad
+                    {t('simulation.speed')}
                   </span>
                   <div className="flex items-baseline gap-1">
                     <span className={`text-3xl font-mono font-bold transition-all duration-300 ${isRunning ? 'text-cyan-300' : 'text-sail-500'}`}>
@@ -198,7 +199,7 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
                   </div>
                   {wind.gustKnots && (
                     <span className="text-amber-400 text-xs font-medium">
-                      ↗ Ráfaga +{wind.gustKnots.toFixed(1)} kn
+                      ↗ {t('simulation.variation')} +{wind.gustKnots.toFixed(1)} kn
                     </span>
                   )}
                 </div>
@@ -206,15 +207,15 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
 
               <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                 <span className="text-sail-600 text-xs uppercase tracking-wider font-medium mb-2 block">
-                  Escala Beaufort
+                  {t('simulation.beaufort')}
                 </span>
                 <div className="flex items-center gap-4">
                   <span className={`text-5xl font-display font-bold transition-all duration-300 ${isRunning ? 'text-white' : 'text-sail-500'}`}>
                     {wind.force}
                   </span>
                   <div>
-                    <p className="text-sail-300 font-semibold text-lg">{beaufort.label}</p>
-                    <p className="text-sail-600 text-sm">{beaufort.description}</p>
+                    <p className="text-sail-300 font-semibold text-lg">{beaufortInfo.label}</p>
+                    <p className="text-sail-600 text-sm">{beaufortInfo.description}</p>
                   </div>
                 </div>
               </div>
@@ -222,10 +223,10 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
               <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                 <div className="flex justify-between items-center">
                   <span className="text-sail-600 text-xs uppercase tracking-wider font-medium">
-                    Velocidad del viento
+                    {t('simulation.paused')}
                   </span>
                   <span className={`text-sm font-mono transition-colors duration-300 ${isRunning ? 'text-sail-300' : 'text-sail-600'}`}>
-                    {beaufort.windSpeed}
+                    {beaufortInfo.windSpeed}
                   </span>
                 </div>
               </div>
@@ -240,9 +241,9 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <span>
-                {isRunning
-                  ? 'Simulando datos de viento en tiempo real. Las variaciones imitan el comportamiento natural del viento en el mar.'
-                  : 'Activa la simulación para ver cómo funcionaría SailTrim con instrumentos reales del barco.'}
+                {              isRunning
+                ? 'Simulating real-time wind data. Variations mimic natural wind behavior at sea.'
+                : 'Enable the simulation to see how SailTrim would work with real boat instruments.'}
               </span>
             </div>
           </div>

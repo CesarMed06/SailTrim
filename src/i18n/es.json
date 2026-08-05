@@ -1,0 +1,295 @@
+{
+  "hero": {
+    "badge": "Asistente IA de trimado",
+    "title1": "Domina",
+    "title2": "el trimado",
+    "description": "Describe tu rumbo, viento y barco. La IA te guía en lenguaje marinero real sobre qué velas subir, cómo regularlas y por qué.",
+    "cta": "Comenzar a trimar",
+    "howItWorks": "Cómo funciona"
+  },
+  "howItWorks": {
+    "tagline": "Así de simple",
+    "title": "Cómo funciona",
+    "subtitle": "Tres pasos. Sin registros. Sin pagos. Solo tú, tu barco y la IA.",
+    "step1": {
+      "title": "Describe tu situación",
+      "desc": "Selecciona tipo de barco, fuerza del viento, ángulo de rumbo y tu nivel de experiencia."
+    },
+    "step2": {
+      "title": "La IA analiza y responde",
+      "desc": "Nuestro modelo de IA interpreta las condiciones y genera recomendaciones de trimado en lenguaje marinero."
+    },
+    "step3": {
+      "title": "Trima con confianza",
+      "desc": "Aplica las recomendaciones a bordo. Sube la mayor, caza el foque, ajusta el cunningham como un profesional."
+    }
+  },
+  "wind": {
+    "step": "Paso 1",
+    "title": "Ángulo de viento",
+    "subtitle": "Selecciona el ángulo del viento respecto a tu rumbo. Arrastra el indicador o haz clic en la rosa de los vientos."
+  },
+  "compass": {
+    "dragHint": "Arrastra o haz clic en la rosa para ajustar el ángulo de viento"
+  },
+  "conditions": {
+    "step": "Paso 2",
+    "title": "Condiciones",
+    "subtitle": "Configura tu barco, la fuerza del viento y tu nivel de experiencia para obtener recomendaciones personalizadas.",
+    "boatType": "Tipo de embarcación",
+    "windForce": "Fuerza del viento",
+    "experience": "Nivel de experiencia",
+    "seaState": "Estado del mar",
+    "seaOptional": "opcional",
+    "nextStep": "Próximo paso: conectar la IA para recibir recomendaciones",
+    "barco": "Barco",
+    "viento": "Viento",
+    "experiencia": "Experiencia"
+  },
+  "dashboard": {
+    "step": "Paso 3",
+    "title": "Asistente de trimado",
+    "subtitle": "Elige cómo obtener los datos, revisa las condiciones actuales y deja que el patrón IA te diga exactamente cómo trimar.",
+    "modes": {
+      "manual": { "label": "Manual", "desc": "Tú defines viento y rumbo" },
+      "demo": { "label": "Demo", "desc": "Viento simulado en vivo" },
+      "live": { "label": "En vivo", "desc": "Datos reales del barco" }
+    },
+    "currentConditions": "Condiciones actuales",
+    "realtime": "datos en tiempo real",
+    "manualConfig": "configuración manual",
+    "simulator": "simulador",
+    "instruments": "instrumentos del barco",
+    "barco": "Barco",
+    "angulo": "Ángulo",
+    "viento": "Viento",
+    "mar": "Mar",
+    "nivel": "Nivel",
+    "keyConfigured": "Clave de Gemini configurada",
+    "keyMissing": "Falta tu clave de Gemini",
+    "keySubtitle": "Gratis e ilimitado: cada navegante usa su propia clave (1.500 consultas/día)",
+    "changeKey": "Cambiar clave",
+    "configureKey": "Configurar clave",
+    "howToGetKey": "¿Cómo la consigo?"
+  },
+  "trimAnalyzer": {
+    "analyze": "Analizar trimado",
+    "continuousActive": "Análisis continuo activo",
+    "continuousOff": "Análisis continuo",
+    "activateSim": "Activa la simulación de viento para alimentar el modo Demo.",
+    "connectNmea": "Conecta el barco en la sección NMEA / SignalK para recibir datos en vivo.",
+    "consulting": "Consultando al patrón…",
+    "analyzingDetail": "Analizando condiciones y ajustes de trimado",
+    "errorCheckKey": "Comprueba tu API key o tu conexión a internet e inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "planTitle": "Plan de trimado",
+    "updating": "actualizando…",
+    "updatesEvery": "se actualiza cada {{interval}}",
+    "copied": "✓ Copiado",
+    "copy": "Copiar",
+    "basedOn": "Basado en las condiciones actuales",
+    "manualMode": "modo manual",
+    "liveSim": "simulación en vivo",
+    "shipData": "datos del barco",
+    "reanalyze": "↻ Re-analizar",
+    "pressToAnalyze": "Pulsa «Analizar trimado» para recibir el plan completo de tu patrón IA."
+  },
+  "chat": {
+    "step": "Paso 4",
+    "title": "Chat con el patrón",
+    "subtitle": "Pregunta lo que quieras sobre trimado, maniobras o tu barco. El patrón IA responde como si estuvieras a bordo.",
+    "consultas": "💬 Consultas",
+    "diagnostic": "🩺 ¿Qué está pasando?",
+    "toneLabel": "Tono del patrón",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "clearChat": "🗑️ Limpiar",
+    "clearAria": "Limpiar conversación",
+    "diagnosticBanner": "Modo diagnóstico activo — describe un síntoma y el patrón te dirá qué falla y cómo arreglarlo.",
+    "emptyConsultas": "Pregunta cualquier cosa sobre trimado, maniobras o tu barco. El patrón IA conoce tus condiciones actuales.",
+    "emptyDiagnostic": "Describe un síntoma y el patrón diagnosticará qué falla en el trimado.",
+    "sendAria": "Enviar mensaje",
+    "suggestions": "Sugerencias:",
+    "copyMessage": "Copiar mensaje",
+    "noKeyError": "Configura tu clave de Gemini en el panel de arriba para usar el chat.",
+    "apiError": "Error al contactar con el patrón IA",
+    "ok": "Ok",
+    "placeholders": [
+      "¿Cómo afecta el estado del mar al trimado?",
+      "¿Cuándo debo tomar un rizo?",
+      "¿Qué hago si el barco escora demasiado?",
+      "¿Cómo ajusto el traveller en ceñida?",
+      "Explica qué es el cunningham",
+      "Diferencia entre foque y genoa"
+    ],
+    "diagnosticPlaceholders": [
+      "El barco escora mucho y no puedo ceñir",
+      "La vela mayor flamea en la baluma",
+      "Pierdo velocidad en las viradas",
+      "El timón está muy duro",
+      "Noto mucho derrape a través"
+    ],
+    "tones": {
+      "casual": "🎙️ Casual",
+      "formal": "📻 Radio VHF",
+      "tecnico": "🔧 Técnico",
+      "principiante": "🧑‍🎓 Paciente"
+    }
+  },
+  "nmea": {
+    "connected": "Conectado",
+    "simulating": "Simulando",
+    "liveData": "Datos reales",
+    "title": "Conexión NMEA / SignalK",
+    "subtitle": "Conecta SailTrim al WiFi de tu barco para recibir datos de viento en tiempo real desde los instrumentos de a bordo. Compatible con SignalK y NMEA 0183 sobre WebSocket.",
+    "urlPlaceholder": "ws://barco-ip:3000/signalk/v1/stream",
+    "urlLabel": "URL WebSocket del barco",
+    "connect": "Conectar",
+    "connecting": "Conectando",
+    "disconnect": "Desconectar",
+    "simulate": "Simular",
+    "stop": "Parar",
+    "windDirection": "Dirección viento",
+    "speed": "Velocidad",
+    "beaufort": "Escala Beaufort",
+    "true": "Real",
+    "apparent": "Aparente",
+    "noData": "Conéctate al WiFi del barco o pulsa Simular para ver datos de prueba",
+    "noDataSub": "La simulación genera frases NMEA y SignalK realistas en tiempo real",
+    "simFeed": "Feed simulado",
+    "liveFeed": "Feed en vivo",
+    "lines": "líneas",
+    "tagNmea": "NMEA",
+    "tagSigK": "SigK",
+    "tagRaw": "RAW"
+  },
+  "simulation": {
+    "title": "Simulador de viento",
+    "subtitle": "Genera condiciones de viento cambiantes para probar la IA sin estar en el barco. El modo Demo se alimenta de este simulador.",
+    "start": "Iniciar simulación",
+    "stop": "Detener simulación",
+    "running": "Simulación activa",
+    "paused": "Simulación detenida",
+    "currentWind": "Viento actual",
+    "direction": "Dirección",
+    "speed": "Velocidad",
+    "force": "Fuerza",
+    "beaufort": "Beaufort",
+    "variation": "Variación"
+  },
+  "apiKeyModal": {
+    "badge": "IA Gratuita",
+    "title": "Tu clave de Gemini",
+    "description": "SailTrim usa tu propia clave de Gemini. Es gratis (1.500 consultas al día, sin coste) y nunca sale de tu navegador: se guarda solo en tu dispositivo y se envía únicamente a Google.",
+    "noKeyBanner": "🧭 ¿No tienes clave? Te la consigues en 5 pasos",
+    "viewGuide": "Ver guía →",
+    "placeholder": "Pega aquí tu API key (empieza por AIza… o AQ.…)",
+    "inputLabel": "API key de Gemini",
+    "save": "Guardar",
+    "saved": "✓ Guardada",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "fullGuide": "Ver guía completa: cómo obtener tu clave gratis",
+    "dialogLabel": "Configurar clave de Gemini"
+  },
+  "apiGuide": {
+    "badge": "Guía paso a paso",
+    "title": "Cómo conseguir tu clave gratis",
+    "subtitle": "Es un trámite de 5 minutos y solo hay que hacerlo una vez. Sigue estos pasos:",
+    "steps": [
+      {
+        "title": "Abre Google AI Studio",
+        "text": "Pulsa el botón azul de abajo. Se abrirá una página de Google en otra pestaña del navegador."
+      },
+      {
+        "title": "Inicia sesión con tu cuenta de Google",
+        "text": "Usa el correo de Gmail que quieras. Es gratis: Google no te pedirá pagar nada en ningún momento."
+      },
+      {
+        "title": "Crea tu clave",
+        "text": "Pulsa el botón «Crear API key» (en inglés: Create API key). Google generará tu clave automáticamente."
+      },
+      {
+        "title": "Cópiala",
+        "text": "Pulsa el icono de copiar que hay junto a la clave. No importa que empiece por «AIza» o por «AQ.»: ambas son válidas."
+      },
+      {
+        "title": "Pégala en SailTrim",
+        "text": "Cierra esta ayuda, vuelve al recuadro «Configurar clave», pega tu clave y pulsa «Guardar». ¡Ya puedes analizar trimado!"
+      }
+    ],
+    "openStudio": "Abrir Google AI Studio",
+    "watchVideo": "¿Prefieres verlo en vídeo? Ver tutorial",
+    "disclaimer": "Con tu clave, Google te regala 1.500 consultas al día sin coste. SailTrim solo la usa dentro de tu navegador: no la enviamos a ningún servidor propio.",
+    "close": "Cerrar",
+    "dialogLabel": "Cómo conseguir tu clave de Gemini"
+  },
+  "footer": {
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "github": "GitHub",
+    "tagline": "Hecho con pasión por la mar y el código · Open Source · SailTrim AI"
+  },
+  "glossary": {
+    "categories": {
+      "vela": "⛵ Vela",
+      "jarcia": "🪢 Jarcia",
+      "maniobra": "🔄 Maniobra",
+      "viento": "💨 Viento",
+      "barco": "🚢 Barco",
+      "seguridad": "🦺 Seguridad"
+    }
+  },
+  "beaufort": {
+    "0": { "label": "Calma", "description": "Mar como un espejo", "windSpeed": "< 1 kn", "seaState": "Plana" },
+    "1": { "label": "Ventolina", "description": "Pequeñas arrugas en el mar", "windSpeed": "1-3 kn", "seaState": "Rizos sin espuma" },
+    "2": { "label": "Flojito", "description": "Olas pequeñas, crestas vítreas", "windSpeed": "4-6 kn", "seaState": "Olas pequeñas" },
+    "3": { "label": "Flojo", "description": "Olas medianas, borreguitos", "windSpeed": "7-10 kn", "seaState": "Olas moderadas" },
+    "4": { "label": "Bonancible", "description": "Se forman olas más largas", "windSpeed": "11-16 kn", "seaState": "Olas con espuma" },
+    "5": { "label": "Fresquito", "description": "Olas moderadas y alargadas", "windSpeed": "17-21 kn", "seaState": "Borreguitos abundantes" },
+    "6": { "label": "Fresco", "description": "Olas grandes, crestas de espuma", "windSpeed": "22-27 kn", "seaState": "Mar gruesa" },
+    "7": { "label": "Frescachón", "description": "Mar gruesa, espuma arrastrada", "windSpeed": "28-33 kn", "seaState": "Mar muy gruesa" },
+    "8": { "label": "Temporal", "description": "Olas altas, rompientes", "windSpeed": "34-40 kn", "seaState": "Mar arbolada" },
+    "9": { "label": "Temporal fuerte", "description": "Olas muy altas, visibilidad reducida", "windSpeed": "41-47 kn", "seaState": "Mar montañosa" },
+    "10": { "label": "Temporal duro", "description": "Olas muy altas y largas", "windSpeed": "48-55 kn", "seaState": "Mar muy montañosa" },
+    "11": { "label": "Temporal muy duro", "description": "Olas excepcionalmente altas", "windSpeed": "56-63 kn", "seaState": "Mar excepcional" },
+    "12": { "label": "Huracán", "description": "Aire lleno de espuma y rocío", "windSpeed": "64+ kn", "seaState": "Mar confusa" }
+  },
+  "boatTypes": {
+    "monohull": "Monocasco / Velero",
+    "catamaran": "Catamarán",
+    "trimaran": "Trimarán",
+    "cruiser": "Crucero",
+    "racer": "Regata",
+    "dinghy": "Vela ligera / Dinghy"
+  },
+  "experience": {
+    "beginner": "Principiante",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado"
+  },
+  "seaState": {
+    "calm": "Calma",
+    "moderate": "Moderada",
+    "rough": "Gruesa",
+    "none": "—"
+  },
+  "windAngles": {
+    "0": { "short": "Proa", "full": "Proa al viento" },
+    "15": { "short": "Ceñida cerrada", "full": "Ceñida muy cerrada" },
+    "30": { "short": "Ceñida", "full": "Ceñida" },
+    "45": { "short": "Ceñida abierta", "full": "Ceñida abierta" },
+    "60": { "short": "Descuartelar", "full": "De través" },
+    "75": { "short": "Través", "full": "De través" },
+    "90": { "short": "Través", "full": "De través" },
+    "105": { "short": "Largo", "full": "De aleta" },
+    "120": { "short": "Largo", "full": "De aleta" },
+    "135": { "short": "Largo abierto", "full": "Largo abierto" },
+    "150": { "short": "Empopada", "full": "De empopada" },
+    "165": { "short": "Empopada", "full": "Empopada cerrada" },
+    "180": { "short": "Popa", "full": "Popa cerrada" }
+  },
+  "langSwitcher": {
+    "label": "Idioma"
+  }
+}

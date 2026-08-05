@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { WindAngle } from '../types'
-import { WIND_ANGLE_LABELS } from '../lib/constants'
 
 interface CompassRoseProps {
   angle: WindAngle
@@ -81,7 +81,9 @@ function CompassRose({ angle, onChange }: CompassRoseProps) {
     return () => window.removeEventListener('pointerup', cleanup)
   }, [dragging])
 
-  const label = WIND_ANGLE_LABELS[angle]
+  const { t } = useTranslation()
+  const windAngleData = t(`windAngles.${angle}`, { returnObjects: true }) as { short: string; full: string } | string
+  const windAngleFull = typeof windAngleData === 'string' ? `${angle}°` : windAngleData.full
 
   const WindArrow = ({ side }: { side: 'starboard' | 'port' }) => {
     const arrowAngle = side === 'starboard' ? angle : 360 - angle
@@ -204,13 +206,11 @@ function CompassRose({ angle, onChange }: CompassRoseProps) {
         <div className="text-4xl font-mono font-bold text-white tabular-nums">
           {angle}°
         </div>
-        {label && (
-          <p className="text-sail-400 text-lg font-medium">
-            {label.full}
-          </p>
-        )}
+        <p className="text-sail-400 text-lg font-medium">
+          {windAngleFull}
+        </p>
         <p className="text-sail-700 text-xs">
-          Arrastra o haz clic en la rosa para ajustar el ángulo de viento
+          {t('compass.dragHint')}
         </p>
       </div>
     </div>

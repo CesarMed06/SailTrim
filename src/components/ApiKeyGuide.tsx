@@ -1,39 +1,16 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ApiKeyGuideProps {
   open: boolean
   onClose: () => void
 }
 
-const STEPS = [
-  {
-    icon: '🔗',
-    title: 'Abre Google AI Studio',
-    text: 'Pulsa el botón azul de abajo. Se abrirá una página de Google en otra pestaña del navegador.',
-  },
-  {
-    icon: '👤',
-    title: 'Inicia sesión con tu cuenta de Google',
-    text: 'Usa el correo de Gmail que quieras. Es gratis: Google no te pedirá pagar nada en ningún momento.',
-  },
-  {
-    icon: '➕',
-    title: 'Crea tu clave',
-    text: 'Pulsa el botón «Crear API key» (en inglés: Create API key). Google generará tu clave automáticamente.',
-  },
-  {
-    icon: '📋',
-    title: 'Cópiala',
-    text: 'Pulsa el icono de copiar que hay junto a la clave. No importa que empiece por «AIza» o por «AQ.»: ambas son válidas.',
-  },
-  {
-    icon: '⌨️',
-    title: 'Pégala en SailTrim',
-    text: 'Cierra esta ayuda, vuelve al recuadro «Configurar clave», pega tu clave y pulsa «Guardar». ¡Ya puedes analizar trimado!',
-  },
-]
+const STEP_ICONS = ['🔗', '👤', '➕', '📋', '⌨️']
 
 function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
+  const { t } = useTranslation()
+
   useEffect(() => {
     if (!open) return
     const handleKey = (e: KeyboardEvent) => {
@@ -45,6 +22,12 @@ function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
 
   if (!open) return null
 
+  const steps = [1, 2, 3, 4, 5].map((i) => ({
+    icon: STEP_ICONS[i - 1],
+    title: t(`apiGuide.steps.${i - 1}.title`),
+    text: t(`apiGuide.steps.${i - 1}.text`),
+  }))
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
@@ -55,21 +38,21 @@ function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Cómo conseguir tu clave de Gemini"
+        aria-label={t('apiGuide.dialogLabel')}
         className="relative bg-ocean-900 border border-ocean-700/40 rounded-3xl p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50 animate-fade-in"
       >
         <div className="flex items-start justify-between mb-2">
           <div>
             <span className="text-wind-400 text-xs font-semibold tracking-widest uppercase">
-              Guía paso a paso
+              {t('apiGuide.badge')}
             </span>
             <h3 className="font-display text-2xl md:text-3xl font-bold text-white mt-1">
-              Cómo conseguir tu clave gratis
+              {t('apiGuide.title')}
             </h3>
           </div>
           <button
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('apiGuide.close')}
             className="text-sail-600 hover:text-sail-300 transition-colors p-1"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -80,12 +63,11 @@ function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
         </div>
 
         <p className="text-sail-500 text-sm mb-6">
-          Es un trámite de <span className="text-sail-300 font-medium">5 minutos</span> y solo hay
-          que hacerlo una vez. Sigue estos pasos:
+          {t('apiGuide.subtitle')}
         </p>
 
         <ol className="space-y-4">
-          {STEPS.map((step, i) => (
+          {steps.map((step, i) => (
             <li key={i} className="flex gap-4 bg-ocean-950/50 border border-ocean-800/30 rounded-2xl p-4">
               <div className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-wind-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-wind-500/20">
                 {i + 1}
@@ -112,7 +94,7 @@ function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
             <polyline points="15 3 21 3 21 9" />
             <line x1="10" y1="14" x2="21" y2="3" />
           </svg>
-          Abrir Google AI Studio
+          {t('apiGuide.openStudio')}
         </a>
 
         <a
@@ -125,12 +107,11 @@ function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
             <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
             <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="#011319" />
           </svg>
-          ¿Prefieres verlo en vídeo? Ver tutorial
+          {t('apiGuide.watchVideo')}
         </a>
 
         <p className="mt-5 text-center text-sail-700 text-xs leading-relaxed">
-          Con tu clave, Google te regala <span className="text-sail-500">1.500 consultas al día</span>{' '}
-          sin coste. SailTrim solo la usa dentro de tu navegador: no la enviamos a ningún servidor propio.
+          {t('apiGuide.disclaimer')}
         </p>
       </div>
     </div>

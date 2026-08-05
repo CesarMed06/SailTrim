@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next'
 import type { WindAngle } from '../types'
 import { useTrim } from '../context/TrimContext'
 import CompassRose from './CompassRose'
 
 function WindSelector() {
   const { conditions, setWindAngle } = useTrim()
+  const { t } = useTranslation()
   const angle = conditions.windAngle
 
   return (
@@ -11,13 +13,13 @@ function WindSelector() {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <span className="text-wind-400 text-sm font-semibold tracking-widest uppercase">
-            Paso 1
+            {t('wind.step')}
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mt-4 mb-4">
-            Ángulo de viento
+            {t('wind.title')}
           </h2>
           <p className="text-sail-600 text-lg max-w-lg mx-auto">
-            Selecciona el ángulo del viento respecto a tu rumbo. Arrastra el indicador o haz clic en la rosa de los vientos.
+            {t('wind.subtitle')}
           </p>
         </div>
 

@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { BeaufortForce } from '../types'
-import { BEAUFORT_SCALE } from '../lib/constants'
 
 interface BeaufortPickerProps {
   value: BeaufortForce
@@ -8,8 +8,6 @@ interface BeaufortPickerProps {
 }
 
 const FORCES: BeaufortForce[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-
-const SLIDER_STOPS = FORCES.map((f) => (f / 12) * 100)
 
 const FORCE_COLORS: Record<number, string> = {
   0: 'from-sky-300 via-sky-200 to-blue-200',
@@ -30,6 +28,7 @@ const FORCE_COLORS: Record<number, string> = {
 function BeaufortPicker({ value, onChange }: BeaufortPickerProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [dragging, setDragging] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!dragging) return
@@ -59,8 +58,7 @@ function BeaufortPicker({ value, onChange }: BeaufortPickerProps) {
 
   const handlePointerUp = useCallback(() => setDragging(false), [])
 
-  const percent = SLIDER_STOPS[value]
-  const info = BEAUFORT_SCALE[value]
+  const info = t(`beaufort.${value}`, { returnObjects: true }) as { label: string; description: string; windSpeed: string; seaState: string }
 
   return (
     <div className="select-none touch-none">
@@ -88,7 +86,7 @@ function BeaufortPicker({ value, onChange }: BeaufortPickerProps) {
 
         <div
           className="absolute top-1 bottom-1 w-6 transition-all duration-150 ease-out"
-          style={{ left: `calc(${percent}% - 12px)` }}
+          style={{ left: `calc(${(value / 12) * 100}% - 12px)` }}
         >
           <div className="w-full h-full rounded-full bg-white shadow-lg shadow-black/30 border-2 border-ocean-200 flex items-center justify-center">
             <div className="w-1.5 h-5 rounded-full bg-ocean-800/50" />

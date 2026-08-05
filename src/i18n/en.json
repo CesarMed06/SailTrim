@@ -1,0 +1,295 @@
+{
+  "hero": {
+    "badge": "AI Trim Assistant",
+    "title1": "Master",
+    "title2": "sail trim",
+    "description": "Describe your heading, wind, and boat. The AI guides you in real maritime language on which sails to raise, how to adjust them, and why.",
+    "cta": "Start trimming",
+    "howItWorks": "How it works"
+  },
+  "howItWorks": {
+    "tagline": "That simple",
+    "title": "How it works",
+    "subtitle": "Three steps. No signup. No payment. Just you, your boat, and AI.",
+    "step1": {
+      "title": "Describe your situation",
+      "desc": "Select boat type, wind force, heading angle, and your experience level."
+    },
+    "step2": {
+      "title": "AI analyzes and responds",
+      "desc": "Our AI model interprets the conditions and generates trim recommendations in maritime language."
+    },
+    "step3": {
+      "title": "Trim with confidence",
+      "desc": "Apply the recommendations onboard. Raise the mainsail, trim the jib, adjust the cunningham like a pro."
+    }
+  },
+  "wind": {
+    "step": "Step 1",
+    "title": "Wind angle",
+    "subtitle": "Select the wind angle relative to your heading. Drag the indicator or click on the compass rose."
+  },
+  "compass": {
+    "dragHint": "Drag or click the compass to adjust the wind angle"
+  },
+  "conditions": {
+    "step": "Step 2",
+    "title": "Conditions",
+    "subtitle": "Configure your boat, wind force, and experience level for personalized recommendations.",
+    "boatType": "Boat type",
+    "windForce": "Wind force",
+    "experience": "Experience level",
+    "seaState": "Sea state",
+    "seaOptional": "optional",
+    "nextStep": "Next step: connect the AI to receive recommendations",
+    "barco": "Boat",
+    "viento": "Wind",
+    "experiencia": "Experience"
+  },
+  "dashboard": {
+    "step": "Step 3",
+    "title": "Trim assistant",
+    "subtitle": "Choose how to get data, check current conditions, and let the AI skipper tell you exactly how to trim.",
+    "modes": {
+      "manual": { "label": "Manual", "desc": "You set wind & heading" },
+      "demo": { "label": "Demo", "desc": "Live simulated wind" },
+      "live": { "label": "Live", "desc": "Real boat data" }
+    },
+    "currentConditions": "Current conditions",
+    "realtime": "real-time data",
+    "manualConfig": "manual config",
+    "simulator": "simulator",
+    "instruments": "boat instruments",
+    "barco": "Boat",
+    "angulo": "Angle",
+    "viento": "Wind",
+    "mar": "Sea",
+    "nivel": "Level",
+    "keyConfigured": "Gemini key configured",
+    "keyMissing": "Gemini key missing",
+    "keySubtitle": "Free & unlimited: each sailor uses their own key (1,500 queries/day)",
+    "changeKey": "Change key",
+    "configureKey": "Set up key",
+    "howToGetKey": "How do I get one?"
+  },
+  "trimAnalyzer": {
+    "analyze": "Analyze trim",
+    "continuousActive": "Continuous analysis active",
+    "continuousOff": "Continuous analysis",
+    "activateSim": "Start the wind simulation to feed Demo mode.",
+    "connectNmea": "Connect the boat in the NMEA / SignalK section to receive live data.",
+    "consulting": "Consulting the skipper…",
+    "analyzingDetail": "Analyzing conditions and trim adjustments",
+    "errorCheckKey": "Check your API key or internet connection and try again.",
+    "retry": "Retry",
+    "planTitle": "Trim plan",
+    "updating": "updating…",
+    "updatesEvery": "updates every {{interval}}",
+    "copied": "✓ Copied",
+    "copy": "Copy",
+    "basedOn": "Based on current conditions",
+    "manualMode": "manual mode",
+    "liveSim": "live simulation",
+    "shipData": "boat data",
+    "reanalyze": "↻ Re-analyze",
+    "pressToAnalyze": "Press «Analyze trim» to get the full plan from your AI skipper."
+  },
+  "chat": {
+    "step": "Step 4",
+    "title": "Chat with the skipper",
+    "subtitle": "Ask anything about trim, maneuvers, or your boat. The AI skipper responds as if you were onboard.",
+    "consultas": "💬 Questions",
+    "diagnostic": "🩺 What's wrong?",
+    "toneLabel": "Skipper tone",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen",
+    "clearChat": "🗑️ Clear",
+    "clearAria": "Clear conversation",
+    "diagnosticBanner": "Diagnostic mode active — describe a symptom and the skipper will tell you what's wrong and how to fix it.",
+    "emptyConsultas": "Ask anything about trim, maneuvers, or your boat. The AI skipper knows your current conditions.",
+    "emptyDiagnostic": "Describe a symptom and the skipper will diagnose what's wrong with your trim.",
+    "sendAria": "Send message",
+    "suggestions": "Suggestions:",
+    "copyMessage": "Copy message",
+    "noKeyError": "Set up your Gemini key in the panel above to use the chat.",
+    "apiError": "Error contacting the AI skipper",
+    "ok": "Ok",
+    "placeholders": [
+      "How does sea state affect trim?",
+      "When should I reef?",
+      "What do I do if the boat heels too much?",
+      "How do I adjust the traveller upwind?",
+      "Explain what the cunningham is",
+      "Difference between jib and genoa"
+    ],
+    "diagnosticPlaceholders": [
+      "The boat heels a lot and I can't point upwind",
+      "The mainsail is flapping at the leech",
+      "I lose speed in tacks",
+      "The helm is very stiff",
+      "I notice a lot of leeway on a beam reach"
+    ],
+    "tones": {
+      "casual": "🎙️ Casual",
+      "formal": "📻 VHF Radio",
+      "tecnico": "🔧 Technical",
+      "principiante": "🧑‍🎓 Patient"
+    }
+  },
+  "nmea": {
+    "connected": "Connected",
+    "simulating": "Simulating",
+    "liveData": "Live data",
+    "title": "NMEA / SignalK Connection",
+    "subtitle": "Connect SailTrim to your boat's WiFi to receive real-time wind data from onboard instruments. Compatible with SignalK and NMEA 0183 over WebSocket.",
+    "urlPlaceholder": "ws://boat-ip:3000/signalk/v1/stream",
+    "urlLabel": "Boat WebSocket URL",
+    "connect": "Connect",
+    "connecting": "Connecting",
+    "disconnect": "Disconnect",
+    "simulate": "Simulate",
+    "stop": "Stop",
+    "windDirection": "Wind direction",
+    "speed": "Speed",
+    "beaufort": "Beaufort scale",
+    "true": "True",
+    "apparent": "Apparent",
+    "noData": "Connect to the boat WiFi or press Simulate to see test data",
+    "noDataSub": "The simulation generates realistic NMEA and SignalK sentences in real time",
+    "simFeed": "Simulated feed",
+    "liveFeed": "Live feed",
+    "lines": "lines",
+    "tagNmea": "NMEA",
+    "tagSigK": "SigK",
+    "tagRaw": "RAW"
+  },
+  "simulation": {
+    "title": "Wind simulator",
+    "subtitle": "Generate changing wind conditions to test the AI without being onboard. Demo mode feeds from this simulator.",
+    "start": "Start simulation",
+    "stop": "Stop simulation",
+    "running": "Simulation active",
+    "paused": "Simulation stopped",
+    "currentWind": "Current wind",
+    "direction": "Direction",
+    "speed": "Speed",
+    "force": "Force",
+    "beaufort": "Beaufort",
+    "variation": "Variation"
+  },
+  "apiKeyModal": {
+    "badge": "Free AI",
+    "title": "Your Gemini key",
+    "description": "SailTrim uses your own Gemini key. It's free (1,500 queries per day, no cost) and never leaves your browser: it's stored only on your device and sent exclusively to Google.",
+    "noKeyBanner": "🧭 Don't have a key? Get it in 5 steps",
+    "viewGuide": "View guide →",
+    "placeholder": "Paste your API key here (starts with AIza… or AQ.…)",
+    "inputLabel": "Gemini API key",
+    "save": "Save",
+    "saved": "✓ Saved",
+    "delete": "Delete",
+    "close": "Close",
+    "fullGuide": "View full guide: how to get your free key",
+    "dialogLabel": "Configure Gemini key"
+  },
+  "apiGuide": {
+    "badge": "Step-by-step guide",
+    "title": "How to get your free key",
+    "subtitle": "It's a 5-minute process you only do once. Follow these steps:",
+    "steps": [
+      {
+        "title": "Open Google AI Studio",
+        "text": "Click the blue button below. A Google page will open in another browser tab."
+      },
+      {
+        "title": "Sign in with your Google account",
+        "text": "Use whichever Gmail you want. It's free: Google won't ask you to pay at any point."
+      },
+      {
+        "title": "Create your key",
+        "text": "Click the «Create API key» button. Google will generate your key automatically."
+      },
+      {
+        "title": "Copy it",
+        "text": "Click the copy icon next to the key. It doesn't matter if it starts with «AIza» or «AQ.» — both are valid."
+      },
+      {
+        "title": "Paste it in SailTrim",
+        "text": "Close this help, go back to the «Set up key» box, paste your key and press «Save». You're now ready to analyze trim!"
+      }
+    ],
+    "openStudio": "Open Google AI Studio",
+    "watchVideo": "Prefer to watch a video? Watch tutorial",
+    "disclaimer": "With your key, Google gives you 1,500 free queries per day. SailTrim only uses it inside your browser: we never send it to any of our own servers.",
+    "close": "Close",
+    "dialogLabel": "How to get your Gemini key"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "github": "GitHub",
+    "tagline": "Made with passion for the sea and code · Open Source · SailTrim AI"
+  },
+  "glossary": {
+    "categories": {
+      "vela": "⛵ Sail",
+      "jarcia": "🪢 Rigging",
+      "maniobra": "🔄 Maneuver",
+      "viento": "💨 Wind",
+      "barco": "🚢 Boat",
+      "seguridad": "🦺 Safety"
+    }
+  },
+  "beaufort": {
+    "0": { "label": "Calm", "description": "Sea like a mirror", "windSpeed": "< 1 kn", "seaState": "Flat" },
+    "1": { "label": "Light air", "description": "Small ripples on the sea", "windSpeed": "1-3 kn", "seaState": "Ripples without foam" },
+    "2": { "label": "Light breeze", "description": "Small waves, glassy crests", "windSpeed": "4-6 kn", "seaState": "Small waves" },
+    "3": { "label": "Gentle breeze", "description": "Medium waves, whitecaps", "windSpeed": "7-10 kn", "seaState": "Moderate waves" },
+    "4": { "label": "Moderate breeze", "description": "Longer waves forming", "windSpeed": "11-16 kn", "seaState": "Waves with foam" },
+    "5": { "label": "Fresh breeze", "description": "Moderate, elongated waves", "windSpeed": "17-21 kn", "seaState": "Abundant whitecaps" },
+    "6": { "label": "Strong breeze", "description": "Large waves, foam crests", "windSpeed": "22-27 kn", "seaState": "Rough sea" },
+    "7": { "label": "Near gale", "description": "Rough sea, blown foam", "windSpeed": "28-33 kn", "seaState": "Very rough sea" },
+    "8": { "label": "Gale", "description": "High waves, breaking", "windSpeed": "34-40 kn", "seaState": "High sea" },
+    "9": { "label": "Strong gale", "description": "Very high waves, reduced visibility", "windSpeed": "41-47 kn", "seaState": "Mountainous sea" },
+    "10": { "label": "Storm", "description": "Very high, long waves", "windSpeed": "48-55 kn", "seaState": "Very mountainous sea" },
+    "11": { "label": "Violent storm", "description": "Exceptionally high waves", "windSpeed": "56-63 kn", "seaState": "Exceptional sea" },
+    "12": { "label": "Hurricane", "description": "Air filled with foam and spray", "windSpeed": "64+ kn", "seaState": "Confused sea" }
+  },
+  "boatTypes": {
+    "monohull": "Monohull / Sailboat",
+    "catamaran": "Catamaran",
+    "trimaran": "Trimaran",
+    "cruiser": "Cruiser",
+    "racer": "Racer",
+    "dinghy": "Dinghy"
+  },
+  "experience": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
+  },
+  "seaState": {
+    "calm": "Calm",
+    "moderate": "Moderate",
+    "rough": "Rough",
+    "none": "—"
+  },
+  "windAngles": {
+    "0": { "short": "Head to wind", "full": "Head to wind" },
+    "15": { "short": "Close hauled", "full": "Very close hauled" },
+    "30": { "short": "Close hauled", "full": "Close hauled" },
+    "45": { "short": "Close reach", "full": "Close reach" },
+    "60": { "short": "Beam reach", "full": "Beam reach" },
+    "75": { "short": "Beam reach", "full": "Beam reach" },
+    "90": { "short": "Beam reach", "full": "Beam reach" },
+    "105": { "short": "Broad reach", "full": "Broad reach" },
+    "120": { "short": "Broad reach", "full": "Broad reach" },
+    "135": { "short": "Broad reach", "full": "Broad reach" },
+    "150": { "short": "Running", "full": "Running downwind" },
+    "165": { "short": "Running", "full": "Running downwind" },
+    "180": { "short": "Dead run", "full": "Dead run" }
+  },
+  "langSwitcher": {
+    "label": "Language"
+  }
+}

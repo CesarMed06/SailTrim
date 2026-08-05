@@ -1,31 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNmeaConnection } from '../hooks/useNmeaConnection'
 import { processFeedBuffer, generateFakeNmeaSentence, generateFakeSignalKDelta } from '../lib/nmea-parser'
-import { BEAUFORT_SCALE, WIND_ANGLE_LABELS } from '../lib/constants'
 import { useTrim } from '../context/TrimContext'
 import type { ParsedWind, NmeaFeedLine } from '../types'
 
 const SIM_INTERVAL_MS = 1500
-
-function formatFeedLine(line: NmeaFeedLine): string {
-  if (!line.parsed) return line.raw.length > 100 ? line.raw.slice(0, 100) + '...' : line.raw
-
-  const p = line.parsed
-  const beaufort = BEAUFORT_SCALE[p.force]
-  const angleLabel = WIND_ANGLE_LABELS[p.windAngle]?.short ?? ''
-
-  if (line.raw.startsWith('{')) {
-    return `SigK →  ${p.direction}° ${angleLabel} · ${p.speedKnots.toFixed(1)} kn · F${p.force} ${beaufort.label}`
-  }
-
-  return `NMEA →  ${p.direction}° ${angleLabel} · ${p.speedKnots.toFixed(1)} kn · ${p.isTrue ? 'Real' : 'Aparente'} · F${p.force} ${beaufort.label}`
-}
 
 function NMEAPanel() {
   const { isConnected, isLoading, latestWind, feedLines, error, connect, disconnect } =
     useNmeaConnection()
   const { setLiveWind } = useTrim()
   const nmeaActiveRef = useRef(false)
+  const { t } = useTranslation()
 
   const [url, setUrl] = useState('ws://192.168.1.100:3000/signalk/v1/stream')
   const [isSimulating, setIsSimulating] = useState(false)
@@ -103,12 +90,20 @@ function NMEAPanel() {
     }
   }, [displayWind, setLiveWind])
 
-  const beaufort = displayWind ? BEAUFORT_SCALE[displayWind.force] : null
+  const beaufortInfo = displayWind
+    ? (t(`beaufort.${displayWind.force}`, { returnObjects: true }) as { label: string; description: string; windSpeed: string; seaState: string })
+    : null
 
   const handleConnect = () => {
     if (!url.trim()) return
     setIsSimulating(false)
     connect(url.trim())
+  }
+
+  const getStatusText = () => {
+    if (isConnected) return t('nmea.connected')
+    if (isSimulating) return t('nmea.simulating')
+    return t('nmea.liveData')
   }
 
   return (
@@ -138,15 +133,14 @@ function NMEAPanel() {
                 isConnected ? 'text-green-400' : isSimulating ? 'text-amber-400' : 'text-green-400'
               }`}
             >
-              {isConnected ? 'Conectado' : isSimulating ? 'Simulando' : 'Datos reales'}
+              {getStatusText()}
             </span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mt-4 mb-4">
-            Conexión NMEA / SignalK
+            {t('nmea.title')}
           </h2>
           <p className="text-sail-600 text-lg max-w-lg mx-auto">
-            Conecta SailTrim al WiFi de tu barco para recibir datos de viento en tiempo real desde
-            los instrumentos de a bordo. Compatible con SignalK y NMEA 0183 sobre WebSocket.
+            {t('nmea.subtitle')}
           </p>
         </div>
 
@@ -157,8 +151,8 @@ function NMEAPanel() {
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="ws://barco-ip:3000/signalk/v1/stream"
-                aria-label="URL WebSocket del barco"
+                placeholder={t('nmea.urlPlaceholder')}
+                aria-label={t('nmea.urlLabel')}
                 disabled={isConnected || isSimulating}
                 className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 font-mono text-sm text-sail-300 placeholder:text-sail-700 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
@@ -192,10 +186,10 @@ function NMEAPanel() {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                           />
                         </svg>
-                        Conectando
+                        {t('nmea.connecting')}
                       </span>
                     ) : (
-                      'Conectar'
+                      t('nmea.connect')
                     )}
                   </button>
                   <button
@@ -207,7 +201,7 @@ function NMEAPanel() {
                         : 'bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20'
                     }`}
                   >
-                    {isSimulating ? 'Parar' : 'Simular'}
+                    {isSimulating ? t('nmea.stop') : t('nmea.simulate')}
                   </button>
                 </>
               ) : (
@@ -215,7 +209,7 @@ function NMEAPanel() {
                   onClick={disconnect}
                   className="px-6 py-3 bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 text-red-400 font-semibold rounded-xl transition-all duration-300 active:scale-[0.98]"
                 >
-                  Desconectar
+                  {t('nmea.disconnect')}
                 </button>
               )}
             </div>
@@ -331,7 +325,7 @@ function NMEAPanel() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                     <span className="text-sail-600 text-xs uppercase tracking-wider font-medium mb-1 block">
-                      Dirección viento
+                      {t('nmea.windDirection')}
                     </span>
                     <div className="flex items-baseline gap-1">
                       <span
@@ -343,13 +337,13 @@ function NMEAPanel() {
                       </span>
                     </div>
                     <span className="text-sail-500 text-xs">
-                      {displayWind!.isTrue ? 'Real' : 'Aparente'}
+                      {displayWind!.isTrue ? t('nmea.true') : t('nmea.apparent')}
                     </span>
                   </div>
 
                   <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                     <span className="text-sail-600 text-xs uppercase tracking-wider font-medium mb-1 block">
-                      Velocidad
+                      {t('nmea.speed')}
                     </span>
                     <div className="flex items-baseline gap-1">
                       <span
@@ -366,15 +360,15 @@ function NMEAPanel() {
 
                 <div className="bg-ocean-950/60 rounded-2xl p-4 border border-ocean-800/20">
                   <span className="text-sail-600 text-xs uppercase tracking-wider font-medium mb-2 block">
-                    Escala Beaufort
+                    {t('nmea.beaufort')}
                   </span>
                   <div className="flex items-center gap-4">
                     <span className="text-5xl font-display font-bold text-white">
                       {displayWind!.force}
                     </span>
                     <div>
-                      <p className="text-sail-300 font-semibold text-lg">{beaufort?.label}</p>
-                      <p className="text-sail-600 text-sm">{beaufort?.description}</p>
+                      <p className="text-sail-300 font-semibold text-lg">{beaufortInfo?.label}</p>
+                      <p className="text-sail-600 text-sm">{beaufortInfo?.description}</p>
                     </div>
                   </div>
                 </div>
@@ -401,10 +395,10 @@ function NMEAPanel() {
                 <circle cx="12" cy="20" r="1" />
               </svg>
               <p className="font-medium text-sm">
-                Conéctate al WiFi del barco o pulsa <span className="text-amber-400">Simular</span> para ver datos de prueba
+                {t('nmea.noData')}
               </p>
               <p className="text-xs mt-1 text-sail-800">
-                La simulación genera frases NMEA y SignalK realistas en tiempo real
+                {t('nmea.noDataSub')}
               </p>
             </div>
           )}
@@ -413,10 +407,10 @@ function NMEAPanel() {
             <div className="mt-6 pt-6 border-t border-ocean-800/20">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sail-600 text-xs uppercase tracking-wider font-medium">
-                  {isSimulating ? 'Feed simulado' : 'Feed en vivo'}
+                  {isSimulating ? t('nmea.simFeed') : t('nmea.liveFeed')}
                 </span>
                 <span className="text-sail-700 text-xs font-mono">
-                  {displayFeed.length} líneas
+                  {displayFeed.length} {t('nmea.lines')}
                 </span>
               </div>
               <div className="bg-ocean-950/80 rounded-xl border border-ocean-800/30 p-4 h-48 overflow-y-auto font-mono text-xs">
@@ -451,9 +445,9 @@ function NMEAPanel() {
                                 : 'bg-sail-700/20 text-sail-500'
                           }`}
                         >
-                          {isNmea ? 'NMEA' : isSigK ? 'SigK' : 'RAW'}
+                          {isNmea ? t('nmea.tagNmea') : isSigK ? t('nmea.tagSigK') : t('nmea.tagRaw')}
                         </span>
-                        <span className="break-all">{formatFeedLine(line)}</span>
+                        <span className="break-all">{line.raw.length > 100 ? line.raw.slice(0, 100) + '...' : line.raw}</span>
                       </div>
                     )
                   })}
@@ -478,9 +472,9 @@ function NMEAPanel() {
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <span>
-                SailTrim se conecta directamente al servidor SignalK de tu barco por WebSocket. La
-                simulación genera frases <code className="text-sail-500 bg-ocean-950/60 px-1 rounded">$WIMWV</code> y
-                deltas SignalK con datos aleatorios realistas y checksums válidos.
+                SailTrim connects directly to your boat's SignalK server via WebSocket. The
+                simulation generates <code className="text-sail-500 bg-ocean-950/60 px-1 rounded">$WIMWV</code> sentences and
+                SignalK deltas with realistic random data and valid checksums.
               </span>
             </div>
           </div>

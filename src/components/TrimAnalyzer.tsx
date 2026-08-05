@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTrim } from '../context/TrimContext'
 import { analyzeTrim, getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { GlossaryInlineMd } from './GlossaryInlineMd'
@@ -82,6 +83,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
   const loadingRef = useRef(false)
   const autoRef = useRef(auto)
   const statusRef = useRef(status)
+  const { t } = useTranslation()
 
   useEffect(() => {
     autoRef.current = auto
@@ -120,7 +122,6 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
 
     loadingRef.current = true
     const keepResult = statusRef.current === 'success'
-    const background = autoRef.current && keepResult
     if (keepResult) {
       setRefreshing(true)
     } else {
@@ -133,11 +134,9 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       setResultKey((k) => k + 1)
       setStatus('success')
     } catch (err) {
-      if (!background) {
-        setError(err instanceof Error ? err.message : 'Error inesperado al analizar')
-        setResult('')
-        setStatus('error')
-      }
+      setError(err instanceof Error ? err.message : 'Error inesperado al analizar')
+      setResult('')
+      setStatus('error')
     } finally {
       loadingRef.current = false
       setRefreshing(false)
@@ -157,7 +156,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
-      // portapapeles no disponible
+      // clipboard not available
     }
   }, [result])
 
@@ -173,7 +172,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
-            Analizar trimado
+            {t('trimAnalyzer.analyze')}
           </span>
         </button>
 
@@ -193,7 +192,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
                   auto ? 'bg-green-400 animate-pulse' : 'bg-sail-600'
                 }`}
               />
-              {auto ? 'Análisis continuo activo' : 'Análisis continuo'}
+              {auto ? t('trimAnalyzer.continuousActive') : t('trimAnalyzer.continuousOff')}
             </button>
             {auto && (
               <select
@@ -204,7 +203,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
               >
                 {INTERVAL_OPTIONS.map((sec) => (
                   <option key={sec} value={sec} className="bg-ocean-900">
-                    cada {formatInterval(sec)}
+                    {t('trimAnalyzer.updatesEvery', { interval: formatInterval(sec) })}
                   </option>
                 ))}
               </select>
@@ -216,8 +215,8 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       {!hasData && (
         <p className="text-center text-amber-400/90 text-sm mt-4">
           {mode === 'demo'
-            ? 'Activa la simulación de viento para alimentar el modo Demo.'
-            : 'Conecta el barco en la sección NMEA / SignalK para recibir datos en vivo.'}
+            ? t('trimAnalyzer.activateSim')
+            : t('trimAnalyzer.connectNmea')}
         </p>
       )}
 
@@ -227,8 +226,8 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
             <div className="absolute inset-0 rounded-full border-4 border-ocean-800 border-t-cyan-400 animate-spin" />
             <div className="absolute inset-0 flex items-center justify-center text-2xl">⛵</div>
           </div>
-          <p className="mt-5 text-cyan-300 font-semibold animate-pulse">Consultando al patrón…</p>
-          <p className="text-sail-600 text-sm mt-1">Analizando condiciones y ajustes de trimado</p>
+          <p className="mt-5 text-cyan-300 font-semibold animate-pulse">{t('trimAnalyzer.consulting')}</p>
+          <p className="text-sail-600 text-sm mt-1">{t('trimAnalyzer.analyzingDetail')}</p>
         </div>
       )}
 
@@ -242,14 +241,14 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
           <div className="flex-1">
             <p className="text-red-400 font-medium text-sm">{error}</p>
             <p className="text-sail-600 text-xs mt-1">
-              Comprueba tu API key o tu conexión a internet e inténtalo de nuevo.
+              {t('trimAnalyzer.errorCheckKey')}
             </p>
           </div>
           <button
             onClick={runAnalysis}
             className="shrink-0 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 text-sm font-semibold rounded-xl transition-all"
           >
-            Reintentar
+            {t('trimAnalyzer.retry')}
           </button>
         </div>
       )}
@@ -262,7 +261,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
-                Plan de trimado
+                {t('trimAnalyzer.planTitle')}
               </span>
               {(auto || refreshing) && (
                 <span className="flex items-center gap-1.5 text-[10px] font-medium text-sail-600">
@@ -271,7 +270,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
                       refreshing ? 'bg-amber-400 animate-ping' : 'bg-green-400 animate-pulse'
                     }`}
                   />
-                  {refreshing ? 'actualizando…' : `se actualiza cada ${formatInterval(intervalSec)}`}
+                  {refreshing ? t('trimAnalyzer.updating') : t('trimAnalyzer.updatesEvery', { interval: formatInterval(intervalSec) })}
                 </span>
               )}
             </div>
@@ -280,14 +279,14 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
               className="flex items-center gap-1.5 text-sail-600 hover:text-sail-300 text-xs font-medium transition-colors"
             >
               {copied ? (
-                <span className="text-green-400">✓ Copiado</span>
+                <span className="text-green-400">{t('trimAnalyzer.copied')}</span>
               ) : (
                 <>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                   </svg>
-                  Copiar
+                  {t('trimAnalyzer.copy')}
                 </>
               )}
             </button>
@@ -299,14 +298,14 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
 
           <div className="mt-7 pt-4 border-t border-ocean-800/20 flex items-center justify-between text-xs">
             <span className="text-sail-700">
-              Basado en las condiciones actuales ·{' '}
-              {mode === 'manual' ? 'modo manual' : mode === 'demo' ? 'simulación en vivo' : 'datos del barco'}
+              {t('trimAnalyzer.basedOn')} ·{' '}
+              {mode === 'manual' ? t('trimAnalyzer.manualMode') : mode === 'demo' ? t('trimAnalyzer.liveSim') : t('trimAnalyzer.shipData')}
             </span>
             <button
               onClick={runAnalysis}
               className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
             >
-              ↻ Re-analizar
+              {t('trimAnalyzer.reanalyze')}
             </button>
           </div>
         </div>
@@ -320,7 +319,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
               <line x1="12" y1="16" x2="12" y2="12" />
               <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
-            Pulsa «Analizar trimado» para recibir el plan completo de tu patrón IA.
+            {t('trimAnalyzer.pressToAnalyze')}
           </span>
         </div>
       )}

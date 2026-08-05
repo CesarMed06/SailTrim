@@ -1,4 +1,8 @@
+import { useTranslation } from 'react-i18next'
+
 function Hero() {
+  const { t } = useTranslation()
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-ocean-950 via-ocean-900/80 to-ocean-950" />
@@ -36,21 +40,20 @@ function Hero() {
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-ocean-600/30 bg-ocean-800/40 mb-8">
           <span className="w-2 h-2 rounded-full bg-wind-400 animate-pulse" />
           <span className="text-sail-400 text-sm font-medium tracking-wide uppercase">
-            Asistente IA de trimado
+            {t('hero.badge')}
           </span>
         </div>
 
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-none mb-6">
           <span className="bg-gradient-to-b from-sail-200 via-sail-400 to-sail-600 bg-clip-text text-transparent">
-            Domina
+            {t('hero.title1')}
           </span>
           <br />
-          <span className="text-white">el trimado</span>
+          <span className="text-white">{t('hero.title2')}</span>
         </h1>
 
         <p className="text-sail-500 text-lg md:text-xl max-w-xl mx-auto mb-10 leading-relaxed">
-          Describe tu rumbo, viento y barco. La IA te guía en lenguaje marinero real
-          sobre qué velas subir, cómo regularlas y por qué.
+          {t('hero.description')}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -58,7 +61,7 @@ function Hero() {
             onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
             className="group relative px-8 py-3.5 bg-wind-500 hover:bg-wind-400 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-wind-500/25 hover:-translate-y-0.5"
           >
-            Comenzar a trimar
+            {t('hero.cta')}
             <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
           </button>
 
@@ -66,7 +69,7 @@ function Hero() {
             href="#how-it-works"
             className="px-8 py-3.5 text-sail-500 hover:text-sail-300 font-medium rounded-xl border border-sail-800/50 hover:border-sail-600/50 transition-all duration-300"
           >
-            Cómo funciona
+            {t('hero.howItWorks')}
           </a>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { CATEGORY_LABELS, type GlossaryEntry } from '../data/glossary'
+import { useTranslation } from 'react-i18next'
+import { getDefinition, type GlossaryEntry } from '../data/glossary'
 
 interface GlossaryPopoverProps {
   term: string
@@ -9,9 +10,13 @@ interface GlossaryPopoverProps {
   onClose: () => void
 }
 
+import { getCurrentLanguage } from '../i18n'
+
 function GlossaryPopover({ term, entry, parentRect, onClose }: GlossaryPopoverProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+  const { t } = useTranslation()
+  const definition = getDefinition(entry, getCurrentLanguage())
 
   useEffect(() => {
     const el = ref.current
@@ -49,10 +54,12 @@ function GlossaryPopover({ term, entry, parentRect, onClose }: GlossaryPopoverPr
     }
   }, [onClose])
 
+  const categoryLabel = t(`glossary.categories.${entry.category}`, '')
+
   if (!pos) {
     return createPortal(
       <div ref={ref} className="fixed opacity-0 pointer-events-none z-[60]">
-        <PopoverContent term={term} entry={entry} />
+        <PopoverContent term={term} entry={entry} categoryLabel={categoryLabel} definition={definition} />
       </div>,
       document.body,
     )
@@ -64,23 +71,27 @@ function GlossaryPopover({ term, entry, parentRect, onClose }: GlossaryPopoverPr
       className="fixed z-[60] animate-fade-in"
       style={{ top: pos.top, left: pos.left }}
     >
-      <PopoverContent term={term} entry={entry} />
+      <PopoverContent term={term} entry={entry} categoryLabel={categoryLabel} definition={definition} />
     </div>,
     document.body,
   )
 }
 
-function PopoverContent({ term, entry }: { term: string; entry: GlossaryEntry }) {
+function PopoverContent({ term, entry, categoryLabel, definition }: { term: string; entry: GlossaryEntry; categoryLabel: string; definition: string }) {
+  const parts = categoryLabel ? categoryLabel.split(' ') : []
+  const icon = parts[0] || ''
+  const label = parts.slice(1).join(' ') || entry.category
+
   return (
     <div className="bg-ocean-900 border border-cyan-500/30 rounded-2xl shadow-2xl shadow-cyan-500/10 backdrop-blur-xl p-4 max-w-xs w-72">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-sm">{CATEGORY_LABELS[entry.category].split(' ')[0]}</span>
+        <span className="text-sm">{icon}</span>
         <span className="text-[10px] font-semibold tracking-widest uppercase text-cyan-400/70">
-          {CATEGORY_LABELS[entry.category].split(' ').slice(1).join(' ')}
+          {label}
         </span>
       </div>
       <h4 className="text-white font-bold text-base mb-2">{term}</h4>
-      <p className="text-sail-400 text-sm leading-relaxed">{entry.definition}</p>
+      <p className="text-sail-400 text-sm leading-relaxed">{definition}</p>
     </div>
   )
 }

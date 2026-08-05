@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useTrim, type TrimMode } from '../context/TrimContext'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
-import { BEAUFORT_SCALE, BOAT_TYPES, EXPERIENCE_LEVELS, WIND_ANGLE_LABELS } from '../lib/constants'
 import ApiKeyModal from './ApiKeyModal'
 import ApiKeyGuide from './ApiKeyGuide'
 import TrimAnalyzer from './TrimAnalyzer'
 
-const MODES: { value: TrimMode; label: string; icon: string; desc: string }[] = [
-  { value: 'manual', label: 'Manual', icon: '🎛️', desc: 'Tú defines viento y rumbo' },
-  { value: 'demo', label: 'Demo', icon: '🌀', desc: 'Viento simulado en vivo' },
-  { value: 'live', label: 'En vivo', icon: '📡', desc: 'Datos reales del barco' },
+const MODES: { value: TrimMode; icon: string; labelKey: string; descKey: string }[] = [
+  { value: 'manual', icon: '🎛️', labelKey: 'manual', descKey: 'manual' },
+  { value: 'demo', icon: '🌀', labelKey: 'demo', descKey: 'demo' },
+  { value: 'live', icon: '📡', labelKey: 'live', descKey: 'live' },
 ]
 
 const MODE_ACCENT: Record<TrimMode, string> = {
@@ -35,6 +35,7 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
   const [guideOpen, setGuideOpen] = useState(false)
   const [keyConfigured, setKeyConfigured] = useState(() => !!getApiKey())
   const prevMode = useRef(mode)
+  const { t } = useTranslation()
 
   const effective = useMemo(
     () => getEffectiveConditions(conditions, mode, liveWind),
@@ -57,29 +58,30 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
   const openGuide = useCallback(() => setGuideOpen(true), [])
   const closeGuide = useCallback(() => setGuideOpen(false), [])
 
-  const boat = BOAT_TYPES.find((b) => b.value === effective.boatType)?.label ?? effective.boatType
-  const exp = EXPERIENCE_LEVELS.find((e) => e.value === effective.experience)?.label ?? effective.experience
-  const beaufort = BEAUFORT_SCALE[effective.force]
-  const angleLabel = WIND_ANGLE_LABELS[effective.angle]?.short ?? `${effective.angle}°`
+  const boatLabel = t(`boatTypes.${effective.boatType}`)
+  const expLabel = t(`experience.${effective.experience}`)
+  const beaufortInfo = t(`beaufort.${effective.force}`, { returnObjects: true }) as { label: string; description: string; windSpeed: string; seaState: string }
+  const windAngleData = t(`windAngles.${effective.angle}`, { returnObjects: true }) as { short: string; full: string }
+  const angleLabel = windAngleData?.short ?? `${effective.angle}°`
   const windText =
     effective.speedKnots !== null
       ? `${effective.speedKnots.toFixed(1)} kn · F${effective.force}`
-      : `${beaufort.windSpeed} · F${effective.force}`
-  const seaText =
-    effective.seaState === 'calm'
-      ? 'Calma'
-      : effective.seaState === 'moderate'
-        ? 'Moderada'
-        : effective.seaState === 'rough'
-          ? 'Gruesa'
-          : '—'
+      : `${beaufortInfo?.windSpeed || ''} · F${effective.force}`
+
+  const getSeaLabelKey = () => {
+    if (effective.seaState === 'calm') return 'seaState.calm'
+    if (effective.seaState === 'moderate') return 'seaState.moderate'
+    if (effective.seaState === 'rough') return 'seaState.rough'
+    return 'seaState.none'
+  }
+  const seaText = t(getSeaLabelKey())
 
   const chips = [
-    { icon: '🚢', label: 'Barco', value: boat },
-    { icon: '🧭', label: 'Ángulo', value: `${effective.angle}° ${angleLabel}` },
-    { icon: '💨', label: 'Viento', value: windText },
-    { icon: '🌊', label: 'Mar', value: seaText },
-    { icon: '🎓', label: 'Nivel', value: exp },
+    { icon: '🚢', label: t('dashboard.barco'), value: boatLabel },
+    { icon: '🧭', label: t('dashboard.angulo'), value: `${effective.angle}° ${angleLabel}` },
+    { icon: '💨', label: t('dashboard.viento'), value: windText },
+    { icon: '🌊', label: t('dashboard.mar'), value: seaText },
+    { icon: '🎓', label: t('dashboard.nivel'), value: expLabel },
   ]
 
   return (
@@ -87,14 +89,13 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <span className="text-wind-400 text-sm font-semibold tracking-widest uppercase">
-            Paso 3
+            {t('dashboard.step')}
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mt-4 mb-4">
-            Asistente de trimado
+            {t('dashboard.title')}
           </h2>
           <p className="text-sail-600 text-lg max-w-lg mx-auto">
-            Elige cómo obtener los datos, revisa las condiciones actuales y deja que el patrón IA
-            te diga exactamente cómo trimar.
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -116,10 +117,10 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
                     {m.icon}
                   </span>
                   <span className={`text-sm font-bold ${selected ? 'text-white' : 'text-sail-300'}`}>
-                    {m.label}
+                    {t(`dashboard.modes.${m.labelKey}.label`)}
                   </span>
                   <span className={`text-[11px] ${selected ? 'text-white/80' : 'text-sail-600'}`}>
-                    {m.desc}
+                    {t(`dashboard.modes.${m.descKey}.desc`)}
                   </span>
                   {selected && (
                     <span
@@ -139,19 +140,19 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
                     mode === 'manual' ? 'bg-sail-500' : `${MODE_DOT[mode]} animate-pulse`
                   }`}
                 />
-                Condiciones actuales
+                {t('dashboard.currentConditions')}
                 {mode !== 'manual' && (
                   <span className="text-[10px] normal-case font-normal text-sail-700">
-                    · datos en tiempo real
+                    · {t('dashboard.realtime')}
                   </span>
                 )}
               </span>
               <span className="text-sail-700 text-xs">
                 {mode === 'manual'
-                  ? 'configuración manual'
+                  ? t('dashboard.manualConfig')
                   : mode === 'demo'
-                    ? 'simulador'
-                    : 'instrumentos del barco'}
+                    ? t('dashboard.simulator')
+                    : t('dashboard.instruments')}
               </span>
             </div>
 
@@ -184,10 +185,10 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
               />
               <div>
                 <p className="text-sm font-semibold text-sail-200">
-                  {keyConfigured ? 'Clave de Gemini configurada' : 'Falta tu clave de Gemini'}
+                  {keyConfigured ? t('dashboard.keyConfigured') : t('dashboard.keyMissing')}
                 </p>
                 <p className="text-xs text-sail-600">
-                  Gratis e ilimitado: cada navegante usa su propia clave (1.500 consultas/día)
+                  {t('dashboard.keySubtitle')}
                 </p>
               </div>
             </div>
@@ -196,13 +197,13 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
                 onClick={openApiKey}
                 className="px-5 py-2.5 bg-wind-500/15 border border-wind-500/30 hover:bg-wind-500/25 text-wind-300 font-semibold text-sm rounded-xl transition-all duration-300 active:scale-[0.98]"
               >
-                {keyConfigured ? 'Cambiar clave' : 'Configurar clave'}
+                {keyConfigured ? t('dashboard.changeKey') : t('dashboard.configureKey')}
               </button>
               <button
                 onClick={openGuide}
                 className="px-5 py-2.5 text-sail-500 hover:text-sail-300 border border-ocean-700/40 hover:border-ocean-600/60 text-sm font-medium rounded-xl transition-all duration-300 active:scale-[0.98]"
               >
-                ¿Cómo la consigo?
+                {t('dashboard.howToGetKey')}
               </button>
             </div>
           </div>

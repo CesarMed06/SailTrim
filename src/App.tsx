@@ -11,6 +11,7 @@ import SimulationPanel from './components/SimulationPanel'
 import ChatPanel from './components/ChatPanel'
 import NMEAPanel from './components/NMEAPanel'
 import Footer from './components/Footer'
+import LanguageSwitcher from './components/LanguageSwitcher'
 
 function AppInner() {
   const { isRunning, wind, toggle } = useWindSimulation()
@@ -53,6 +54,7 @@ function AppInner() {
       <ChatPanel />
       <SimulationPanel isRunning={isRunning} wind={wind} onToggle={toggle} />
       <NMEAPanel />
+      <LanguageSwitcher />
       <Footer />
     </div>
   )
