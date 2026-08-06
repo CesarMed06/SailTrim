@@ -289,6 +289,30 @@
     "165": { "short": "Empopada", "full": "Empopada cerrada" },
     "180": { "short": "Popa", "full": "Popa cerrada" }
   },
+  "sidebar": {
+    "title": "Conversaciones",
+    "newChat": "Nuevo chat",
+    "toggle": "Abrir historial",
+    "close": "Cerrar panel",
+    "untitled": "Sin título",
+    "justNow": "Ahora",
+    "minutesAgo": "Hace {{count}} min",
+    "hoursAgo": "Hace {{count}} h",
+    "daysAgo": "Hace {{count}} d",
+    "msgCount": "msgs",
+    "diagnosticBadge": "Diagnóstico",
+    "questionsBadge": "Consultas",
+    "pin": "Fijar",
+    "unpin": "Desfijar",
+    "rename": "Renombrar",
+    "delete": "Eliminar",
+    "confirmDelete": "Confirmar",
+    "cancelDelete": "Cancelar",
+    "export": "Copiar chat",
+    "copied": "✓ Copiado",
+    "emptyState": "Aún no hay conversaciones. Empieza una consulta al patrón IA.",
+    "shortcut": "☰ Historial de chats"
+  },
   "langSwitcher": {
     "label": "Idioma"
   }

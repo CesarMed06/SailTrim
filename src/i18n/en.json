@@ -289,6 +289,30 @@
     "165": { "short": "Running", "full": "Running downwind" },
     "180": { "short": "Dead run", "full": "Dead run" }
   },
+  "sidebar": {
+    "title": "Conversations",
+    "newChat": "New chat",
+    "toggle": "Open history",
+    "close": "Close panel",
+    "untitled": "Untitled",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}} min ago",
+    "hoursAgo": "{{count}} h ago",
+    "daysAgo": "{{count}} d ago",
+    "msgCount": "msgs",
+    "diagnosticBadge": "Diagnostic",
+    "questionsBadge": "Questions",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "rename": "Rename",
+    "delete": "Delete",
+    "confirmDelete": "Confirm",
+    "cancelDelete": "Cancel",
+    "export": "Copy chat",
+    "copied": "✓ Copied",
+    "emptyState": "No conversations yet. Start a chat with the AI skipper.",
+    "shortcut": "☰ Chat history"
+  },
   "langSwitcher": {
     "label": "Language"
   }

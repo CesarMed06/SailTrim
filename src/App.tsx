@@ -8,7 +8,7 @@ import WindSelector from './components/WindSelector'
 import ConditionsPanel from './components/ConditionsPanel'
 import Dashboard from './components/Dashboard'
 import SimulationPanel from './components/SimulationPanel'
-import ChatPanel from './components/ChatPanel'
+import ChatSection from './components/ChatSection'
 import NMEAPanel from './components/NMEAPanel'
 import Footer from './components/Footer'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -51,7 +51,7 @@ function AppInner() {
       <WindSelector />
       <ConditionsPanel />
       <Dashboard simulationRunning={isRunning} onToggleSimulation={toggle} />
-      <ChatPanel />
+      <ChatSection />
       <SimulationPanel isRunning={isRunning} wind={wind} onToggle={toggle} />
       <NMEAPanel />
       <LanguageSwitcher />

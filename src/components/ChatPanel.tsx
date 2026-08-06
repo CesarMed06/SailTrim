@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useTrim } from '../context/TrimContext'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { sendChatMessage, type ChatEntry, type ChatTone } from '../lib/chat'
+import type { Conversation } from '../hooks/useChatHistory'
 import { GlossaryInlineMd } from './GlossaryInlineMd'
 
 function mergeNumberedLines(lines: string[]): string[] {
@@ -134,21 +135,51 @@ const CONSULTAS_COLORS = {
   glow: 'shadow-cyan-500/10',
 }
 
-function ChatPanel() {
+interface ChatPanelProps {
+  activeChat: Conversation | null
+  activeId: string | null
+  onCreateChat: (tone: ChatTone, diagnostic: boolean) => string
+  onUpdateMessages: (id: string, messages: ChatEntry[]) => void
+  onUpdateSettings: (id: string, settings: { tone?: ChatTone; diagnostic?: boolean }) => void
+  onClearChat: () => void
+  onToggleSidebar: () => void
+}
+
+function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpdateSettings, onClearChat, onToggleSidebar }: ChatPanelProps) {
   const { conditions, mode, liveWind } = useTrim()
-  const [messages, setMessages] = useState<ChatEntry[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [diagnostic, setDiagnostic] = useState(false)
+  const [diagnostic, setDiagnostic] = useState(activeChat?.diagnostic ?? false)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [error, setError] = useState('')
-  const [tone, setTone] = useState<ChatTone>('casual')
+  const [tone, setTone] = useState<ChatTone>(activeChat?.tone ?? 'casual')
   const [fullscreen, setFullscreen] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const focusQueued = useRef(false)
   const wasFullscreen = useRef(false)
   const { t } = useTranslation()
+
+  const messages = activeChat?.messages ?? []
+
+  useEffect(() => {
+    if (activeChat) {
+      setDiagnostic(activeChat.diagnostic)
+      setTone(activeChat.tone)
+    }
+  }, [activeChat?.id])
+
+  const prevSettingsRef = useRef({ tone, diagnostic })
+  useEffect(() => {
+    if (!activeId) return
+    if (
+      prevSettingsRef.current.tone !== tone ||
+      prevSettingsRef.current.diagnostic !== diagnostic
+    ) {
+      onUpdateSettings(activeId, { tone, diagnostic })
+      prevSettingsRef.current = { tone, diagnostic }
+    }
+  }, [tone, diagnostic, activeId, onUpdateSettings])
 
   const effective = getEffectiveConditions(conditions, mode, liveWind)
 
@@ -164,6 +195,13 @@ function ChatPanel() {
     scrollDown()
   }, [messages, scrollDown])
 
+  useEffect(() => {
+    if (activeChat && activeChat.messages.length === 0) {
+      setSuggestions([])
+      setError('')
+    }
+  }, [activeChat?.id])
+
   const send = useCallback(async () => {
     const text = input.trim()
     if (!text || loading) return
@@ -178,25 +216,33 @@ function ChatPanel() {
     setError('')
     setSuggestions([])
 
+    let chatId = activeId
+    if (!chatId) {
+      chatId = onCreateChat(tone, diagnostic)
+    }
+
+    const currentMessages = activeChat?.messages ?? []
     const userMsg: ChatEntry = { role: 'user', content: text }
-    setMessages((prev) => [...prev, userMsg])
+    const updatedMessages = [...currentMessages, userMsg]
+    onUpdateMessages(chatId, updatedMessages)
     setLoading(true)
 
     try {
       const { content, suggestions: sug } = await sendChatMessage(
-        [...messages, userMsg],
+        updatedMessages,
         effective,
         diagnostic,
         tone,
       )
-      setMessages((prev) => [...prev, { role: 'assistant', content }])
+      const finalMessages = [...updatedMessages, { role: 'assistant' as const, content }]
+      onUpdateMessages(chatId, finalMessages)
       setSuggestions(sug)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('chat.apiError'))
     } finally {
       setLoading(false)
     }
-  }, [input, loading, messages, effective, diagnostic, tone])
+  }, [input, loading, activeId, activeChat?.messages, effective, diagnostic, tone, onCreateChat, onUpdateMessages, t])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -229,10 +275,12 @@ function ChatPanel() {
   )
 
   const clearChat = useCallback(() => {
-    setMessages([])
-    setSuggestions([])
-    setError('')
-  }, [])
+    if (activeId) {
+      onClearChat()
+      setSuggestions([])
+      setError('')
+    }
+  }, [activeId, onClearChat])
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -309,6 +357,19 @@ function ChatPanel() {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={onToggleSidebar}
+            aria-label={t('sidebar.toggle')}
+            className="text-sail-600 hover:text-cyan-400 text-xs transition-colors"
+            title={t('sidebar.toggle')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+
+          <button
             onClick={() => setFullscreen((f) => !f)}
             aria-label={fullscreen ? t('chat.exitFullscreen') : t('chat.fullscreen')}
             className="text-sail-600 hover:text-sail-300 text-xs transition-colors"
@@ -354,7 +415,13 @@ function ChatPanel() {
 
       <div
         ref={chatRef}
-        className={`p-5 space-y-4 overflow-x-hidden ${fullscreen ? 'flex-1 overflow-y-auto' : hasMessages ? 'h-[420px] overflow-y-auto' : 'min-h-[420px] flex items-center justify-center'}`}
+        className={`p-5 space-y-4 overflow-x-hidden ${
+          fullscreen
+            ? 'flex-1 overflow-y-auto'
+            : hasMessages
+              ? 'h-[420px] overflow-y-auto'
+              : 'min-h-[420px] flex items-center justify-center'
+        }`}
       >
         {!hasMessages && !loading && (
           <div className="flex flex-col items-center text-center gap-3">
