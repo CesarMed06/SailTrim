@@ -7,6 +7,7 @@ const MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
 export interface ChatEntry {
   role: 'user' | 'assistant'
   content: string
+  images?: string[]
 }
 
 export type ChatTone = 'casual' | 'formal' | 'tecnico' | 'principiante'
@@ -147,11 +148,13 @@ export function stripSuggestedQuestions(content: string): string {
   return content
 }
 
+type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } }
+
 function buildContents(
   history: ChatEntry[],
   conditions: EffectiveConditions,
   isDiagnostic: boolean,
-): { role: string; parts: { text: string }[] }[] {
+): { role: string; parts: GeminiPart[] }[] {
   const isEn = getCurrentLanguage() === 'en'
   const prefix = isDiagnostic
     ? (isEn ? 'Diagnostic mode. The sailor describes a symptom and expects you to figure out what is wrong and how to fix it. Current conditions:' : 'Modo diagnóstico. El navegante describe un síntoma y espera que averigües qué falla y cómo arreglarlo. Condiciones actuales:')
@@ -159,13 +162,24 @@ function buildContents(
   const contextLine = `${prefix} ${describeConditionsBrief(conditions)}.`
   const systemNote = {
     role: 'user' as const,
-    parts: [{ text: contextLine }],
+    parts: [{ text: contextLine }] as GeminiPart[],
   }
-  const response = { role: 'model' as const, parts: [{ text: isEn ? 'Understood.' : 'Entendido.' }] }
-  const messages: { role: string; parts: { text: string }[] }[] = [systemNote, response]
+  const response = { role: 'model' as const, parts: [{ text: isEn ? 'Understood.' : 'Entendido.' }] as GeminiPart[] }
+  const messages: { role: string; parts: GeminiPart[] }[] = [systemNote, response]
   for (const msg of history) {
     const role = msg.role === 'user' ? 'user' : 'model'
-    messages.push({ role, parts: [{ text: msg.content }] })
+    const parts: GeminiPart[] = []
+    if (msg.images && msg.images.length > 0 && msg.role === 'user') {
+      for (const dataUrl of msg.images) {
+        const mime = dataUrl.match(/^data:(image\/\w+);/)?.at(1) ?? 'image/jpeg'
+        const base64 = dataUrl.split(',')[1] ?? ''
+        if (base64) {
+          parts.push({ inlineData: { mimeType: mime, data: base64 } })
+        }
+      }
+    }
+    parts.push({ text: msg.content })
+    messages.push({ role, parts })
   }
   return messages
 }
@@ -209,7 +223,8 @@ export async function sendChatMessage(
         }
         throw new Error(message)
       }
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      const parts = data?.candidates?.[0]?.content?.parts
+      const text = Array.isArray(parts) ? parts.find((p: { text?: string }) => typeof p.text === 'string')?.text : parts?.[0]?.text
       if (typeof text !== 'string' || !text.trim()) throw new Error(isDiagnostic ? 'Empty response' : 'El modelo devolvió una respuesta vacía')
       const fullText = text.trim()
       const suggestions = parseSuggestedQuestions(fullText)

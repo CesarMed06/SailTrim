@@ -4,6 +4,7 @@ import { useTrim } from '../context/TrimContext'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { sendChatMessage, type ChatEntry, type ChatTone } from '../lib/chat'
 import type { Conversation } from '../hooks/useChatHistory'
+import { fileToDataUrl, getMaxImages, isImageFile, resizeDataUrl } from '../lib/image-utils'
 import { GlossaryInlineMd } from './GlossaryInlineMd'
 
 function mergeNumberedLines(lines: string[]): string[] {
@@ -119,6 +120,94 @@ function MessageCopyButton({ text }: { text: string }) {
   )
 }
 
+function Lightbox({ images, initialIndex, onClose }: { images: string[]; initialIndex: number; onClose: () => void }) {
+  const [index, setIndex] = useState(initialIndex)
+  const { t } = useTranslation()
+
+  const imgCount = images.length
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') setIndex((i) => (i > 0 ? i - 1 : imgCount - 1))
+      if (e.key === 'ArrowRight') setIndex((i) => (i < imgCount - 1 ? i + 1 : 0))
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [imgCount, onClose])
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center" onClick={onClose}>
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
+        aria-label={t('chat.close')}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); setIndex((i) => (i > 0 ? i - 1 : images.length - 1)) }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
+            aria-label={t('chat.prevImage')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setIndex((i) => (i < images.length - 1 ? i + 1 : 0)) }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
+            aria-label={t('chat.nextImage')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </>
+      )}
+      <img
+        src={images[index]}
+        alt=""
+        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      />
+      {images.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm">
+          {index + 1} / {images.length}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ImageThumbnail({ src, onRemove, onClick }: { src: string; onRemove?: () => void; onClick?: () => void }) {
+  return (
+    <div className={`relative group shrink-0 ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
+      <img
+        src={src}
+        alt=""
+        className="w-16 h-16 object-cover rounded-lg border border-ocean-700/40 hover:border-cyan-500/40 transition-all"
+      />
+      {onRemove && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove() }}
+          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label="Eliminar imagen"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      )}
+    </div>
+  )
+}
+
 const DIAGNOSTIC_COLORS = {
   tab: 'bg-amber-500/20 text-amber-300',
   bubble: 'bg-amber-500/5 border border-amber-500/20',
@@ -154,10 +243,14 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
   const [error, setError] = useState('')
   const [tone, setTone] = useState<ChatTone>(activeChat?.tone ?? 'casual')
   const [fullscreen, setFullscreen] = useState(false)
+  const [pendingImages, setPendingImages] = useState<string[]>([])
+  const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null)
   const chatRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const focusQueued = useRef(false)
   const wasFullscreen = useRef(false)
+  const skipSave = useRef(false)
   const { t } = useTranslation()
 
   const messages = activeChat?.messages ?? []
@@ -166,6 +259,21 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     if (activeChat) {
       setDiagnostic(activeChat.diagnostic)
       setTone(activeChat.tone)
+    }
+    const draftKey = `sailtrim_draft_${activeChat?.id ?? 'new'}`
+    try {
+      const raw = localStorage.getItem(draftKey)
+      if (raw) {
+        const draft = JSON.parse(raw) as { input: string; images: string[] }
+        if (draft.input) setInput(draft.input)
+        if (draft.images?.length) setPendingImages(draft.images)
+        skipSave.current = true
+      } else {
+        setInput('')
+        setPendingImages([])
+      }
+    } catch {
+      setPendingImages([])
     }
   }, [activeChat?.id])
 
@@ -202,9 +310,52 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     }
   }, [activeChat?.id])
 
+  const maxImages = getMaxImages()
+
+  const handleAttach = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleFiles = useCallback(async (files: FileList | File[]) => {
+    const remaining = maxImages - pendingImages.length
+    if (remaining <= 0) return
+    const fileArray = Array.from(files).slice(0, remaining)
+    const validFiles = fileArray.filter(isImageFile)
+    if (validFiles.length === 0) return
+    const dataUrls = await Promise.all(validFiles.map(async (file) => {
+      try {
+        const dataUrl = await fileToDataUrl(file)
+        return await resizeDataUrl(dataUrl)
+      } catch {
+        return ''
+      }
+    }))
+    setPendingImages((prev) => [...prev, ...dataUrls.filter(Boolean)].slice(0, maxImages))
+  }, [pendingImages.length, maxImages])
+
+  const removePendingImage = useCallback((index: number) => {
+    setPendingImages((prev) => prev.filter((_, i) => i !== index))
+  }, [])
+
+  useEffect(() => {
+    const handlePaste = async (e: ClipboardEvent) => {
+      if (!inputRef.current || document.activeElement !== inputRef.current) return
+      if (e.clipboardData?.files && e.clipboardData.files.length > 0) {
+        const files = Array.from(e.clipboardData.files)
+        const imageFiles = files.filter(isImageFile)
+        if (imageFiles.length > 0) {
+          e.preventDefault()
+          await handleFiles(imageFiles)
+        }
+      }
+    }
+    document.addEventListener('paste', handlePaste)
+    return () => document.removeEventListener('paste', handlePaste)
+  }, [handleFiles])
+
   const send = useCallback(async () => {
     const text = input.trim()
-    if (!text || loading) return
+    if ((!text && pendingImages.length === 0) || loading) return
 
     const apiKey = getApiKey()
     if (!apiKey) {
@@ -215,6 +366,13 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     setInput('')
     setError('')
     setSuggestions([])
+    const imagesToSend = [...pendingImages]
+    setPendingImages([])
+    try {
+      localStorage.removeItem(`sailtrim_draft_${activeId ?? 'new'}`)
+    } catch {
+      // ignore
+    }
 
     let chatId = activeId
     if (!chatId) {
@@ -222,7 +380,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     }
 
     const currentMessages = activeChat?.messages ?? []
-    const userMsg: ChatEntry = { role: 'user', content: text }
+    const userMsg: ChatEntry = { role: 'user', content: text || ' ', images: imagesToSend.length > 0 ? imagesToSend : undefined }
     const updatedMessages = [...currentMessages, userMsg]
     onUpdateMessages(chatId, updatedMessages)
     setLoading(true)
@@ -242,7 +400,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     } finally {
       setLoading(false)
     }
-  }, [input, loading, activeId, activeChat?.messages, effective, diagnostic, tone, onCreateChat, onUpdateMessages, t])
+  }, [input, pendingImages, loading, activeId, activeChat?.messages, effective, diagnostic, tone, onCreateChat, onUpdateMessages, t])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -260,6 +418,23 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       focusQueued.current = false
     }
   }, [input])
+
+  useEffect(() => {
+    if (skipSave.current) {
+      skipSave.current = false
+      return
+    }
+    const draftKey = `sailtrim_draft_${activeId ?? 'new'}`
+    try {
+      if (input.trim() || pendingImages.length > 0) {
+        localStorage.setItem(draftKey, JSON.stringify({ input, images: pendingImages }))
+      } else {
+        localStorage.removeItem(draftKey)
+      }
+    } catch {
+      // ignore
+    }
+  }, [input, pendingImages, activeId])
 
   const stripMarkdown = useCallback((text: string) => {
     return text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1')
@@ -279,6 +454,12 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       onClearChat()
       setSuggestions([])
       setError('')
+      setPendingImages([])
+      try {
+        localStorage.removeItem(`sailtrim_draft_${activeId}`)
+      } catch {
+        // ignore
+      }
     }
   }, [activeId, onClearChat])
 
@@ -463,7 +644,20 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
                 }`}
               >
                 {isUser ? (
-                  <p>{msg.content}</p>
+                  <div className="space-y-2">
+                    {msg.images && msg.images.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-1">
+                        {msg.images.map((img, idx) => (
+                          <ImageThumbnail
+                            key={idx}
+                            src={img}
+                            onClick={() => setLightbox({ images: msg.images ?? [], index: idx })}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    {msg.content && msg.content !== ' ' && <p>{msg.content}</p>}
+                  </div>
                 ) : (
                   <>
                     <ChatMarkdown text={msg.content} />
@@ -517,32 +711,71 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
         </div>
       )}
 
-      <div className={`flex items-end gap-2 p-4 border-t ${diagnostic ? 'border-amber-500/10' : 'border-ocean-800/20'} bg-ocean-950/40`}>
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={randomPlaceholder}
-          rows={2}
-          disabled={loading}
-          className="flex-1 resize-none bg-ocean-950/60 border border-ocean-800/30 focus:border-cyan-500/40 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-sail-200 placeholder-sail-700 disabled:opacity-50 transition-all"
-        />
-        <button
-          onClick={send}
-          aria-label={t('chat.sendAria')}
-          disabled={!input.trim() || loading}
-          className={`shrink-0 p-3 bg-gradient-to-br ${
-            diagnostic
-              ? 'from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-amber-500/20'
-              : 'from-cyan-500 to-wind-500 hover:from-cyan-400 hover:to-wind-400 shadow-cyan-500/20'
-          } disabled:from-ocean-800 disabled:to-ocean-800 disabled:text-sail-700 text-white rounded-xl transition-all duration-300 active:scale-[0.95] disabled:cursor-not-allowed shadow-lg`}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-        </button>
+      <div className={`space-y-2 p-4 border-t ${diagnostic ? 'border-amber-500/10' : 'border-ocean-800/20'} bg-ocean-950/40`}>
+        {pendingImages.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {pendingImages.map((img, idx) => (
+              <ImageThumbnail
+                key={idx}
+                src={img}
+                onRemove={() => removePendingImage(idx)}
+                onClick={() => setLightbox({ images: pendingImages, index: idx })}
+              />
+            ))}
+          </div>
+        )}
+        <div className="flex items-end gap-2">
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={pendingImages.length > 0 ? t('chat.imagePlaceholder') : randomPlaceholder}
+            rows={2}
+            disabled={loading}
+            className="flex-1 resize-none bg-ocean-950/60 border border-ocean-800/30 focus:border-cyan-500/40 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-sail-200 placeholder-sail-700 disabled:opacity-50 transition-all"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) handleFiles(e.target.files)
+              e.target.value = ''
+            }}
+          />
+          <button
+            onClick={handleAttach}
+            disabled={loading || pendingImages.length >= maxImages}
+            aria-label={t('chat.attachImage')}
+            className={`shrink-0 w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 ${
+              pendingImages.length >= maxImages
+                ? 'bg-ocean-950/60 text-sail-700 cursor-not-allowed'
+                : 'bg-ocean-900/60 border border-ocean-700/40 hover:border-cyan-500/40 text-sail-400 hover:text-cyan-300 hover:bg-ocean-800/60'
+            }`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+            </svg>
+          </button>
+          <button
+            onClick={send}
+            aria-label={t('chat.sendAria')}
+            disabled={(!input.trim() && pendingImages.length === 0) || loading}
+            className={`shrink-0 w-11 h-11 flex items-center justify-center bg-gradient-to-br ${
+              diagnostic
+                ? 'from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-amber-500/20'
+                : 'from-cyan-500 to-wind-500 hover:from-cyan-400 hover:to-wind-400 shadow-cyan-500/20'
+            } disabled:from-ocean-800 disabled:to-ocean-800 disabled:text-sail-700 text-white rounded-xl transition-all duration-300 active:scale-[0.95] disabled:cursor-not-allowed shadow-lg`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
       </div>
     </>
   )
@@ -574,6 +807,14 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
           {chatContent}
         </div>
       </div>
+
+      {lightbox && (
+        <Lightbox
+          images={lightbox.images}
+          initialIndex={lightbox.index}
+          onClose={() => setLightbox(null)}
+        />
+      )}
     </section>
   )
 }

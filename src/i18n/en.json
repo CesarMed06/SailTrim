@@ -114,6 +114,11 @@
     "noKeyError": "Set up your Gemini key in the panel above to use the chat.",
     "apiError": "Error contacting the AI skipper",
     "ok": "Ok",
+    "attachImage": "Attach image",
+    "imagePlaceholder": "Add a comment to the image…",
+    "close": "Close",
+    "prevImage": "Previous image",
+    "nextImage": "Next image",
     "placeholders": [
       "How does sea state affect trim?",
       "When should I reef?",

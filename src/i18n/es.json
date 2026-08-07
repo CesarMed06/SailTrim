@@ -114,6 +114,11 @@
     "noKeyError": "Configura tu clave de Gemini en el panel de arriba para usar el chat.",
     "apiError": "Error al contactar con el patrón IA",
     "ok": "Ok",
+    "attachImage": "Adjuntar imagen",
+    "imagePlaceholder": "Añade un comentario a la imagen…",
+    "close": "Cerrar",
+    "prevImage": "Imagen anterior",
+    "nextImage": "Imagen siguiente",
     "placeholders": [
       "¿Cómo afecta el estado del mar al trimado?",
       "¿Cuándo debo tomar un rizo?",
