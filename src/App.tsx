@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import './App.css'
 import { TrimProvider, useTrim } from './context/TrimContext'
 import { useWindSimulation } from './hooks/useWindSimulation'
+import { useOnlineStatus } from './hooks/useOnlineStatus'
 import Hero from './components/Hero'
 import HowItWorks from './components/HowItWorks'
 import WindSelector from './components/WindSelector'
@@ -12,10 +13,14 @@ import ChatSection from './components/ChatSection'
 import NMEAPanel from './components/NMEAPanel'
 import Footer from './components/Footer'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import OfflineBanner from './components/OfflineBanner'
+import PWAInstallPrompt from './components/PWAInstallPrompt'
+import SWUpdatePrompt from './components/SWUpdatePrompt'
 
 function AppInner() {
   const { isRunning, wind, toggle } = useWindSimulation()
   const { mode, setLiveWind } = useTrim()
+  const online = useOnlineStatus()
   const lastPushRef = useRef('')
   const prevModeRef = useRef(mode)
 
@@ -44,19 +49,21 @@ function AppInner() {
     })
   }, [mode, isRunning, wind, setLiveWind])
 
-  return (
-    <div className="min-h-screen bg-ocean-950 text-white">
-      <Hero />
-      <HowItWorks />
-      <WindSelector />
-      <ConditionsPanel />
-      <Dashboard simulationRunning={isRunning} onToggleSimulation={toggle} />
-      <ChatSection />
-      <SimulationPanel isRunning={isRunning} wind={wind} onToggle={toggle} />
-      <NMEAPanel />
-      <LanguageSwitcher />
-      <Footer />
-    </div>
+  return (      <div className="min-h-screen bg-ocean-950 text-white">
+        {!online && <OfflineBanner />}
+        <Hero />
+        <HowItWorks />
+        <WindSelector />
+        <ConditionsPanel />
+        <Dashboard simulationRunning={isRunning} onToggleSimulation={toggle} />
+        <ChatSection />
+        <SimulationPanel isRunning={isRunning} wind={wind} onToggle={toggle} />
+        <NMEAPanel />
+        <LanguageSwitcher />
+        <PWAInstallPrompt />
+        <SWUpdatePrompt />
+        <Footer />
+      </div>
   )
 }
 

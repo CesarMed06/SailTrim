@@ -235,5 +235,9 @@ export async function sendChatMessage(
     }
   }
 
+  if (lastError instanceof TypeError && lastError.message === 'Failed to fetch') {
+    const isEn = getCurrentLanguage() === 'en'
+    throw new Error(isEn ? 'No internet connection. The AI skipper needs to be online.' : 'Sin conexión a internet. El patrón IA necesita estar en línea para responder.')
+  }
   throw lastError instanceof Error ? lastError : new Error('No se pudo contactar con la API de Gemini')
 }

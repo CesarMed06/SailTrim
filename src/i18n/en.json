@@ -320,5 +320,19 @@
   },
   "langSwitcher": {
     "label": "Language"
+  },
+  "pwa": {
+    "installPrompt": "Install SailTrim on your device?",
+    "installSubtitle": "Use it as a native app, even offline at sea.",
+    "install": "Install",
+    "dismiss": "Dismiss",
+    "iosHelpLink": "How to install on iPhone/iPad?",
+    "iosHelpTitle": "Install SailTrim on iOS",
+    "iosStep1": "Tap the Share button (📤) in Safari.",
+    "iosStep2": "Scroll and select «Add to Home Screen».",
+    "iosStep3": "Tap «Add». Done!",
+    "updateAvailable": "New version available",
+    "update": "Update",
+    "offlineBanner": "Offline — you can't chat with the AI skipper. You can review your saved conversations and use the simulator and other tools."
   }
 }

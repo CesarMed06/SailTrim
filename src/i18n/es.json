@@ -320,5 +320,19 @@
   },
   "langSwitcher": {
     "label": "Idioma"
+  },
+  "pwa": {
+    "installPrompt": "¿Instalar SailTrim en tu dispositivo?",
+    "installSubtitle": "Úsala como una app nativa, incluso sin conexión en alta mar.",
+    "install": "Instalar",
+    "dismiss": "Cerrar",
+    "iosHelpLink": "¿Cómo se instala en iPhone/iPad?",
+    "iosHelpTitle": "Instalar SailTrim en iOS",
+    "iosStep1": "Pulsa el botón Compartir (📤) en Safari.",
+    "iosStep2": "Desliza y selecciona «Añadir a pantalla de inicio».",
+    "iosStep3": "Pulsa «Añadir». ¡Listo!",
+    "updateAvailable": "Nueva versión disponible",
+    "update": "Actualizar",
+    "offlineBanner": "Sin conexión — no puedes chatear con el patrón IA. Puedes revisar tus conversaciones guardadas y usar el simulador y el resto de herramientas."
   }
 }
