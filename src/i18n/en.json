@@ -321,6 +321,50 @@
   "langSwitcher": {
     "label": "Language"
   },
+  "boatProfilePanel": {
+    "untitled": "Untitled",
+    "rigTypes": {
+      "sloop": "Sloop",
+      "ketch": "Ketch",
+      "yawl": "Yawl",
+      "cutter": "Cutter",
+      "catamaran": "Catamaran",
+      "schooner": "Schooner",
+      "other": "Other"
+    },
+    "materials": {
+      "fiberglass": "Fiberglass",
+      "aluminum": "Aluminum",
+      "steel": "Steel",
+      "wood": "Wood",
+      "carbon": "Carbon",
+      "other": "Other"
+    },
+    "priorities": {
+      "speed": "Speed",
+      "comfort": "Comfort",
+      "racing": "Racing",
+      "safety": "Safety",
+      "passage": "Passage"
+    },
+    "zones": {
+      "mediterranean": "Mediterranean",
+      "atlantic": "Atlantic",
+      "caribbean": "Caribbean",
+      "pacific": "Pacific",
+      "cantabrian": "Cantabrian",
+      "baltic": "Baltic",
+      "north_sea": "North Sea",
+      "indian_ocean": "Indian Ocean",
+      "other": "Other"
+    },
+    "timeOfDay": {
+      "morning": "Morning",
+      "midday": "Midday",
+      "afternoon": "Afternoon",
+      "night": "Night"
+    }
+  },
   "pwa": {
     "installPrompt": "Install SailTrim on your device?",
     "installSubtitle": "Use it as a native app, even offline at sea.",

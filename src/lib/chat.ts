@@ -4,6 +4,152 @@ import i18n, { getCurrentLanguage } from '../i18n'
 
 const MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
 
+const PROFILE_KEY = 'sailtrim_boat_profile'
+const NAV_KEY = 'sailtrim_nav_config'
+const CREW_KEY = 'sailtrim_crew_config'
+
+function loadJson<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : fallback
+  } catch { return fallback }
+}
+
+function buildBoatContext(): string {
+  const lang = getCurrentLanguage()
+  const isEn = lang === 'en'
+
+  const profile = loadJson<Record<string, unknown>>(PROFILE_KEY, {})
+  const nav = loadJson<Record<string, unknown>>(NAV_KEY, {})
+  const crew = loadJson<Record<string, unknown>>(CREW_KEY, {})
+
+  const hasName = typeof profile.boatName === 'string' && profile.boatName.trim()
+  const hasModel = typeof profile.model === 'string' && profile.model.trim()
+  if (!hasName && !hasModel) return ''
+
+  const lines: string[] = []
+
+  if (isEn) {
+    lines.push('THE SAILOR\'S BOAT:')
+    if (hasName) lines.push(`- Name: ${(profile.boatName as string).trim()}`)
+    if (hasModel) lines.push(`- Model: ${(profile.model as string).trim()}`)
+    const length = typeof profile.lengthMeters === 'number' ? profile.lengthMeters : null
+    const beam = typeof profile.beamMeters === 'number' ? profile.beamMeters : null
+    const draft = typeof profile.draftMeters === 'number' ? profile.draftMeters : null
+    if (length || beam || draft) {
+      const dims: string[] = []
+      if (length) dims.push(`LOA ${length}m`)
+      if (beam) dims.push(`beam ${beam}m`)
+      if (draft) dims.push(`draft ${draft}m`)
+      lines.push(`- Dimensions: ${dims.join(', ')}`)
+    }
+    if (typeof profile.rigType === 'string') {
+      const rig = profile.rigType === 'other' && typeof profile.rigTypeOther === 'string' && profile.rigTypeOther.trim()
+        ? profile.rigTypeOther
+        : profile.rigType
+      lines.push(`- Rig: ${rig}`)
+    }
+    if (typeof profile.hullMaterial === 'string') {
+      const mat = profile.hullMaterial === 'other' && typeof profile.hullMaterialOther === 'string' && profile.hullMaterialOther.trim()
+        ? profile.hullMaterialOther
+        : profile.hullMaterial
+      lines.push(`- Hull: ${mat}`)
+    }
+    if (typeof profile.year === 'number') lines.push(`- Year: ${profile.year}`)
+
+    if (typeof nav.priority === 'string') {
+      const priority = nav.priority === 'other' && typeof nav.priorityOther === 'string' && nav.priorityOther.trim()
+        ? nav.priorityOther
+        : nav.priority
+      lines.push(`- Priority: ${priority}`)
+    }
+    if (typeof nav.zone === 'string') {
+      const zone = nav.zone === 'other' && typeof nav.zoneOther === 'string' && nav.zoneOther.trim()
+        ? nav.zoneOther
+        : nav.zone
+      lines.push(`- Zone: ${zone}`)
+    }
+    if (typeof nav.month === 'number') {
+      const day = typeof nav.day === 'number' ? nav.day : null
+      lines.push(`- Month: ${nav.month}${day ? `, day ${day}` : ''}`)
+    }
+    if (typeof nav.timeOfDay === 'string') {
+      const tod = nav.timeOfDay === 'other' && typeof nav.timeOfDayOther === 'string' && nav.timeOfDayOther.trim()
+        ? nav.timeOfDayOther
+        : nav.timeOfDay
+      lines.push(`- Time of day: ${tod}`)
+    }
+
+    const crewCount = typeof crew.count === 'number' ? crew.count : 0
+    if (crewCount > 0) {
+      const crewParts: string[] = [`${crewCount} people`]
+      if (typeof crew.roles === 'string' && crew.roles.trim()) crewParts.push(`roles: ${crew.roles}`)
+      if (typeof crew.notes === 'string' && crew.notes.trim()) crewParts.push(`notes: ${crew.notes}`)
+      lines.push(`- Crew: ${crewParts.join(' — ')}`)
+    }
+  } else {
+    lines.push('BARCO DEL NAVEGANTE:')
+    if (hasName) lines.push(`- Nombre: ${(profile.boatName as string).trim()}`)
+    if (hasModel) lines.push(`- Modelo: ${(profile.model as string).trim()}`)
+    const length = typeof profile.lengthMeters === 'number' ? profile.lengthMeters : null
+    const beam = typeof profile.beamMeters === 'number' ? profile.beamMeters : null
+    const draft = typeof profile.draftMeters === 'number' ? profile.draftMeters : null
+    if (length || beam || draft) {
+      const dims: string[] = []
+      if (length) dims.push(`eslora ${length}m`)
+      if (beam) dims.push(`manga ${beam}m`)
+      if (draft) dims.push(`calado ${draft}m`)
+      lines.push(`- Dimensiones: ${dims.join(', ')}`)
+    }
+    if (typeof profile.rigType === 'string') {
+      const rig = profile.rigType === 'other' && typeof profile.rigTypeOther === 'string' && profile.rigTypeOther.trim()
+        ? profile.rigTypeOther
+        : profile.rigType
+      lines.push(`- Aparejo: ${rig}`)
+    }
+    if (typeof profile.hullMaterial === 'string') {
+      const mat = profile.hullMaterial === 'other' && typeof profile.hullMaterialOther === 'string' && profile.hullMaterialOther.trim()
+        ? profile.hullMaterialOther
+        : profile.hullMaterial
+      lines.push(`- Casco: ${mat}`)
+    }
+    if (typeof profile.year === 'number') lines.push(`- Año: ${profile.year}`)
+
+    if (typeof nav.priority === 'string') {
+      const priority = nav.priority === 'other' && typeof nav.priorityOther === 'string' && nav.priorityOther.trim()
+        ? nav.priorityOther
+        : nav.priority
+      lines.push(`- Prioridad: ${priority}`)
+    }
+    if (typeof nav.zone === 'string') {
+      const zone = nav.zone === 'other' && typeof nav.zoneOther === 'string' && nav.zoneOther.trim()
+        ? nav.zoneOther
+        : nav.zone
+      lines.push(`- Zona: ${zone}`)
+    }
+    if (typeof nav.month === 'number') {
+      const day = typeof nav.day === 'number' ? nav.day : null
+      lines.push(`- Mes: ${nav.month}${day ? `, día ${day}` : ''}`)
+    }
+    if (typeof nav.timeOfDay === 'string') {
+      const tod = nav.timeOfDay === 'other' && typeof nav.timeOfDayOther === 'string' && nav.timeOfDayOther.trim()
+        ? nav.timeOfDayOther
+        : nav.timeOfDay
+      lines.push(`- Hora del día: ${tod}`)
+    }
+
+    const crewCount = typeof crew.count === 'number' ? crew.count : 0
+    if (crewCount > 0) {
+      const crewParts: string[] = [`${crewCount} personas`]
+      if (typeof crew.roles === 'string' && crew.roles.trim()) crewParts.push(`roles: ${crew.roles}`)
+      if (typeof crew.notes === 'string' && crew.notes.trim()) crewParts.push(`notas: ${crew.notes}`)
+      lines.push(`- Tripulación: ${crewParts.join(' — ')}`)
+    }
+  }
+
+  return lines.join('\n')
+}
+
 export interface ChatEntry {
   role: 'user' | 'assistant'
   content: string
@@ -47,8 +193,10 @@ function describeConditionsBrief(c: EffectiveConditions): string {
 function chatSystemPrompt(tone: ChatTone): string {
   const lang = getCurrentLanguage()
   const isEn = lang === 'en'
+  const boatContext = buildBoatContext()
 
   const baseEs = `Eres un instructor de vela oceánica con décadas de experiencia. Hablas en español con terminología marinera real: ceñida, través, descuartelar, aleta, empopada, mayor, foque, escota, traveller, cunningham, pajarín, rizos, backstay, carro de escota.
+${boatContext ? `\n${boatContext}\n` : ''}
 
 Reglas:
 - No te presentes ni saludes. No digas tu experiencia ni uses frases como "hola", "ahoy", "soy un instructor con X años". Empieza directo.
@@ -60,6 +208,7 @@ Reglas:
 - Si usas una lista numerada en tu respuesta, escribe cada paso así: "1. texto" (número, punto, espacio, texto en la MISMA línea, nunca con saltos de línea entre el número y el texto).`
 
   const baseEn = `You are an ocean sailing instructor with decades of experience. Speak in real English maritime terminology: close-hauled, beam reach, broad reach, running, mainsail, jib, sheet, traveller, cunningham, outhaul, reefs, backstay, fairleads.
+${boatContext ? `\n${boatContext}\n` : ''}
 
 Rules:
 - Do not introduce yourself or greet. Do not mention your experience or use phrases like "hello", "ahoy", or "I'm an instructor with X years". Get straight to the point.
@@ -89,20 +238,16 @@ Rules:
     : `${baseEs}\n${tonesEs[tone]}`
 }
 
-const DIAGNOSTIC_SYSTEM_PROMPT_ES = `Eres un instructor de vela experto en diagnosticar problemas de trimado. Hablas en español con terminología marinera real.
+function getDiagnosticPrompt(): string {
+  const lang = getCurrentLanguage()
+  const isEn = lang === 'en'
+  const boatContext = buildBoatContext()
+  const prefix = boatContext ? `
+${boatContext}
+` : ''
 
-Tu tarea: el navegante te describe un síntoma ("el barco escora mucho", "no puedo ceñir", "la mayor flamea") y tú diagnosticas la causa más probable y das la solución concreta.
-
-Reglas:
-- No te presentes ni saludes. Empieza directo con el diagnóstico.
-- Sé conciso y directo.
-- Usa negrita (**texto**) para los términos importantes.
-- No uses cursiva ni asteriscos sueltos.
-- Estructura tu respuesta: primero el diagnóstico (qué está pasando), luego la solución (qué hacer).
-- Al final, añade la sección ## 💭 Preguntas con 1-2 sugerencias de continuación.`
-
-const DIAGNOSTIC_SYSTEM_PROMPT_EN = `You are a sailing instructor expert in diagnosing trim problems. Speak in English with real maritime terminology.
-
+  if (isEn) {
+    return `You are a sailing instructor expert in diagnosing trim problems. Speak in English with real maritime terminology.${prefix}
 Your task: the sailor describes a symptom ("the boat heels a lot", "I can't point upwind", "the mainsail is flapping") and you diagnose the most likely cause and give a concrete solution.
 
 Rules:
@@ -112,9 +257,18 @@ Rules:
 - No italics or loose asterisks.
 - Structure your response: first the diagnosis (what's happening), then the solution (what to do).
 - At the end, add the ## 💭 Questions section with 1-2 follow-up suggestions.`
+  }
 
-function getDiagnosticPrompt(): string {
-  return getCurrentLanguage() === 'en' ? DIAGNOSTIC_SYSTEM_PROMPT_EN : DIAGNOSTIC_SYSTEM_PROMPT_ES
+  return `Eres un instructor de vela experto en diagnosticar problemas de trimado. Hablas en español con terminología marinera real.${prefix}
+Tu tarea: el navegante te describe un síntoma ("el barco escora mucho", "no puedo ceñir", "la mayor flamea") y tú diagnosticas la causa más probable y das la solución concreta.
+
+Reglas:
+- No te presentes ni saludes. Empieza directo con el diagnóstico.
+- Sé conciso y directo.
+- Usa negrita (**texto**) para los términos importantes.
+- No uses cursiva ni asteriscos sueltos.
+- Estructura tu respuesta: primero el diagnóstico (qué está pasando), luego la solución (qué hacer).
+- Al final, añade la sección ## 💭 Preguntas con 1-2 sugerencias de continuación.`
 }
 
 export function parseSuggestedQuestions(content: string): string[] {
