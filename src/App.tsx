@@ -14,6 +14,7 @@ import ChatSection from './components/ChatSection'
 import NMEAPanel from './components/NMEAPanel'
 import Footer from './components/Footer'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import SEO from './components/SEO'
 import OfflineBanner from './components/OfflineBanner'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import SWUpdatePrompt from './components/SWUpdatePrompt'
@@ -51,6 +52,7 @@ function AppInner() {
   }, [mode, isRunning, wind, setLiveWind])
 
   return (      <div className="min-h-screen bg-ocean-950 text-white">
+        <SEO />
         {!online && <OfflineBanner />}
         <Hero />
         <HowItWorks />
