@@ -196,19 +196,24 @@ export async function analyzeTrim(c: EffectiveConditions, apiKey: string): Promi
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         const message = data?.error?.message ?? `Error ${res.status}`
-        if (res.status === 404) {
+        if (res.status === 404 || res.status === 429) {
           lastError = message
           continue
         }
         throw new Error(message)
       }
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      if (typeof text !== 'string' || !text.trim()) throw new Error('El modelo devolvió una respuesta vacía')
+      if (typeof text !== 'string' || !text.trim()) {
+        lastError = new Error('El modelo devolvió una respuesta vacía')
+        continue
+      }
       return fixSpanishCaps(text.trim())
     } catch (err) {
       lastError = err
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error('No se pudo contactar con la API de Gemini')
+  throw lastError instanceof Error
+    ? lastError
+    : new Error('Todos los modelos Gemini están ocupados. Reintenta en unos segundos.')
 }

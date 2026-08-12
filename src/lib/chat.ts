@@ -371,7 +371,7 @@ export async function sendChatMessage(
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         const message = data?.error?.message ?? `Error ${res.status}`
-        if (res.status === 404) {
+        if (res.status === 404 || res.status === 429) {
           lastError = message
           continue
         }
@@ -379,7 +379,10 @@ export async function sendChatMessage(
       }
       const parts = data?.candidates?.[0]?.content?.parts
       const text = Array.isArray(parts) ? parts.find((p: { text?: string }) => typeof p.text === 'string')?.text : parts?.[0]?.text
-      if (typeof text !== 'string' || !text.trim()) throw new Error(isDiagnostic ? 'Empty response' : 'El modelo devolvió una respuesta vacía')
+      if (typeof text !== 'string' || !text.trim()) {
+        lastError = new Error(isDiagnostic ? 'Empty response' : 'El modelo devolvió una respuesta vacía')
+        continue
+      }
       const fullText = text.trim()
       const suggestions = parseSuggestedQuestions(fullText)
       const content = stripSuggestedQuestions(fullText)
@@ -393,5 +396,8 @@ export async function sendChatMessage(
     const isEn = getCurrentLanguage() === 'en'
     throw new Error(isEn ? 'No internet connection. The AI skipper needs to be online.' : 'Sin conexión a internet. El patrón IA necesita estar en línea para responder.')
   }
-  throw lastError instanceof Error ? lastError : new Error('No se pudo contactar con la API de Gemini')
+  const isEn = getCurrentLanguage() === 'en'
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(isEn ? 'All Gemini models are busy. Try again in a few seconds.' : 'Todos los modelos Gemini están ocupados. Reintenta en unos segundos.')
 }
