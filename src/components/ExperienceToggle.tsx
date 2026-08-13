@@ -13,12 +13,14 @@ function ExperienceToggle({ value, onChange }: ExperienceToggleProps) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="inline-flex bg-ocean-900/50 border border-ocean-800/30 rounded-full p-1 gap-0.5">
+      <div className="inline-flex bg-ocean-900/50 border border-ocean-800/30 rounded-full p-1 gap-0.5" role="radiogroup" aria-label={t('conditions.experience')}>
         {LEVELS.map((level) => {
           const selected = value === level
           return (
             <button
               key={level}
+              role="radio"
+              aria-checked={selected}
               onClick={() => onChange(level)}
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                 selected

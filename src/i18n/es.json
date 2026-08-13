@@ -30,7 +30,8 @@
     "subtitle": "Selecciona el ángulo del viento respecto a tu rumbo. Arrastra el indicador o haz clic en la rosa de los vientos."
   },
   "compass": {
-    "dragHint": "Arrastra o haz clic en la rosa para ajustar el ángulo de viento"
+    "ariaLabel": "Ángulo de viento",
+    "dragHint": "Arrastra o haz clic en la rosa para ajustar el ángulo de viento. Usa las flechas del teclado para ajustes finos."
   },
   "conditions": {
     "step": "Paso 2",

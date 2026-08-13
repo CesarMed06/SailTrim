@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { clearApiKey, getApiKey, saveApiKey } from '../lib/gemini'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 
 interface ApiKeyModalProps {
   open: boolean
@@ -12,6 +13,7 @@ function ApiKeyModal({ open, onClose, onOpenGuide }: ApiKeyModalProps) {
   const [key, setKey] = useState('')
   const [saved, setSaved] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dialogRef = useFocusTrap<HTMLDivElement>(open, 'input[type="text"]')
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -62,6 +64,7 @@ function ApiKeyModal({ open, onClose, onOpenGuide }: ApiKeyModalProps) {
         aria-hidden="true"
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={t('apiKeyModal.dialogLabel')}
@@ -109,7 +112,6 @@ function ApiKeyModal({ open, onClose, onOpenGuide }: ApiKeyModalProps) {
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
           placeholder={t('apiKeyModal.placeholder')}
           aria-label={t('apiKeyModal.inputLabel')}
-          autoFocus
           className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 font-mono text-sm text-sail-200 placeholder:text-sail-700 focus:outline-none focus:border-wind-500/50 focus:ring-1 focus:ring-wind-500/30 transition-all"
         />
 

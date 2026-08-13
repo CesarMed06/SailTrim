@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 
 interface ApiKeyGuideProps {
   open: boolean
@@ -9,6 +10,7 @@ interface ApiKeyGuideProps {
 const STEP_ICONS = ['🔗', '👤', '➕', '📋', '⌨️']
 
 function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
+  const dialogRef = useFocusTrap<HTMLDivElement>(open)
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -36,6 +38,7 @@ function ApiKeyGuide({ open, onClose }: ApiKeyGuideProps) {
         aria-hidden="true"
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={t('apiGuide.dialogLabel')}

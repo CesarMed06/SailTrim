@@ -21,13 +21,15 @@ function BoatTypeSelector({ value, onChange }: BoatTypeSelectorProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3" role="radiogroup" aria-label={t('conditions.boatType')}>
       {BOAT_VALUES.map((boatValue) => {
         const selected = value === boatValue
         const label = t(`boatTypes.${boatValue}`)
         return (
           <button
             key={boatValue}
+            role="radio"
+            aria-checked={selected}
             onClick={() => onChange(boatValue)}
             className={`relative flex flex-col items-center gap-2 p-5 rounded-2xl border transition-all duration-300 cursor-pointer group ${
               selected

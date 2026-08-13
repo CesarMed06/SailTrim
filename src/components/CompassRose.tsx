@@ -74,6 +74,17 @@ function CompassRose({ angle, onChange }: CompassRoseProps) {
     setDragging(false)
   }, [])
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    let next: number | null = null
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = angle - 15
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = angle + 15
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = 180
+    if (next === null) return
+    e.preventDefault()
+    onChange(Math.max(0, Math.min(180, next)) as WindAngle)
+  }, [angle, onChange])
+
   useEffect(() => {
     if (!dragging) return
     const cleanup = () => setDragging(false)
@@ -114,12 +125,15 @@ function CompassRose({ angle, onChange }: CompassRoseProps) {
       <svg
         ref={svgRef}
         viewBox="0 0 300 300"
-        className="w-full max-w-[350px] md:max-w-[400px] mx-auto cursor-grab active:cursor-grabbing"
+        className="w-full max-w-[350px] md:max-w-[400px] mx-auto cursor-grab active:cursor-grabbing focus:outline-none focus-visible:ring-2 focus-visible:ring-wind-400/50 rounded-xl"
         role="slider"
-        aria-label="Ángulo de viento"
+        aria-label={t('compass.ariaLabel')}
         aria-valuenow={angle}
         aria-valuemin={0}
         aria-valuemax={180}
+        aria-valuetext={windAngleFull}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

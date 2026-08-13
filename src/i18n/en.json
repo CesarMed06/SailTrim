@@ -30,7 +30,8 @@
     "subtitle": "Select the wind angle relative to your heading. Drag the indicator or click on the compass rose."
   },
   "compass": {
-    "dragHint": "Drag or click the compass to adjust the wind angle"
+    "ariaLabel": "Wind angle",
+    "dragHint": "Drag or click the compass to adjust the wind angle. Use the arrow keys for fine adjustments."
   },
   "conditions": {
     "step": "Step 2",

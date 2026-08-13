@@ -26,10 +26,11 @@ function WindSelector() {
         <div className="bg-ocean-900/30 border border-ocean-800/30 rounded-3xl p-8 md:p-12">
           <CompassRose angle={angle} onChange={setWindAngle} />
 
-          <div className="flex justify-center gap-3 mt-8 flex-wrap">
+          <div className="flex justify-center gap-3 mt-8 flex-wrap" role="group" aria-label={t('wind.title')}>
             {([0, 30, 45, 90, 135, 180] as WindAngle[]).map((preset) => (
               <button
                 key={preset}
+                aria-pressed={angle === preset}
                 onClick={() => setWindAngle(preset)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
                   angle === preset

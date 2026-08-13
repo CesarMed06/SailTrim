@@ -11,12 +11,13 @@ function SeaStateSelector({ value, onChange }: SeaStateSelectorProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="flex flex-wrap justify-center gap-3">
+    <div className="flex flex-wrap justify-center gap-3" role="group" aria-label={t('conditions.seaState')}>
       {SEA_VALUES.map((state) => {
         const selected = value === state
         return (
           <button
             key={state}
+            aria-pressed={selected}
             onClick={() => onChange(selected ? undefined : state)}
             className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-all duration-300 ${
               selected
