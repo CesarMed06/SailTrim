@@ -5,208 +5,11 @@ import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { sendChatMessage, type ChatEntry, type ChatTone } from '../lib/chat'
 import type { Conversation } from '../hooks/useChatHistory'
 import { fileToDataUrl, getMaxImages, isImageFile, resizeDataUrl } from '../lib/image-utils'
-import { GlossaryInlineMd } from './GlossaryInlineMd'
-
-function mergeNumberedLines(lines: string[]): string[] {
-  const merged: string[] = []
-  let i = 0
-  while (i < lines.length) {
-    const line = lines[i]
-    const soloNum = line.match(/^(\d+)[.)]\s*$/)
-    if (soloNum && i + 1 < lines.length && lines[i + 1].trim() && !/^\d+[.)]\s*$/.test(lines[i + 1])) {
-      merged.push(`${soloNum[1]}. ${lines[i + 1]}`)
-      i += 2
-      continue
-    }
-    merged.push(line)
-    i++
-  }
-  return merged
-}
-
-function ChatMarkdown({ text }: { text: string }) {
-  const rawLines = text.split(/\r?\n/)
-  const lines = mergeNumberedLines(rawLines)
-
-  return (
-    <div className="space-y-2">
-      {lines.map((line, i) => {
-        if (!line.trim()) return <div key={i} />
-        if (line.startsWith('### ')) {
-          return (
-            <h4 key={i} className="text-sm font-semibold text-sail-300 pt-1">
-              <GlossaryInlineMd text={line.slice(4)} />
-            </h4>
-          )
-        }
-        if (line.startsWith('## ')) {
-          return (
-            <h3 key={i} className="text-base font-bold text-cyan-300 pt-2 first:pt-0">
-              <GlossaryInlineMd text={line.slice(3)} />
-            </h3>
-          )
-        }
-        if (line.startsWith('- ') || line.startsWith('* ')) {
-          return (
-            <div key={i} className="flex gap-2 text-sail-500 leading-relaxed">
-              <span className="text-cyan-500/70 shrink-0 mt-0.5">▸</span>
-              <span>
-                <GlossaryInlineMd text={line.slice(2)} />
-              </span>
-            </div>
-          )
-        }
-        const numbered = line.match(/^(\d+)[.)]\s+(.*)$/)
-        if (numbered) {
-          return (
-            <div key={i} className="flex gap-2.5 text-sail-500 leading-relaxed">
-              <span className="text-cyan-500/70 shrink-0 mt-0.5 font-mono text-xs w-5 text-right">
-                {numbered[1]}.
-              </span>
-              <span>
-                <GlossaryInlineMd text={numbered[2]} />
-              </span>
-            </div>
-          )
-        }
-        return (
-          <p key={i} className="text-sail-500 leading-relaxed">
-            <GlossaryInlineMd text={line} />
-          </p>
-        )
-      })}
-    </div>
-  )
-}
-
-const LOADING_DOTS = (
-  <div className="flex items-center gap-1.5 py-1.5 px-2">
-    <span className="w-2 h-2 rounded-full bg-cyan-400/60 animate-bounce [animation-delay:0ms]" />
-    <span className="w-2 h-2 rounded-full bg-cyan-400/60 animate-bounce [animation-delay:150ms]" />
-    <span className="w-2 h-2 rounded-full bg-cyan-400/60 animate-bounce [animation-delay:300ms]" />
-  </div>
-)
-
-function MessageCopyButton({ text }: { text: string }) {
-  const [done, setDone] = useState(false)
-
-  const copy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setDone(true)
-      setTimeout(() => setDone(false), 1500)
-    } catch {
-      // clipboard not available
-    }
-  }, [text])
-
-  return (
-    <button
-      onClick={copy}
-      aria-label="Copiar mensaje"
-      className="opacity-0 group-hover:opacity-100 focus:opacity-100 absolute top-2 right-2 p-1.5 rounded-lg bg-ocean-950/80 border border-ocean-700/40 hover:border-cyan-500/30 text-sail-600 hover:text-cyan-300 transition-all duration-200"
-    >
-      {done ? (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-      ) : (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-        </svg>
-      )}
-    </button>
-  )
-}
-
-function Lightbox({ images, initialIndex, onClose }: { images: string[]; initialIndex: number; onClose: () => void }) {
-  const [index, setIndex] = useState(initialIndex)
-  const { t } = useTranslation()
-
-  const imgCount = images.length
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowLeft') setIndex((i) => (i > 0 ? i - 1 : imgCount - 1))
-      if (e.key === 'ArrowRight') setIndex((i) => (i < imgCount - 1 ? i + 1 : 0))
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [imgCount, onClose])
-
-  return (
-    <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center" onClick={onClose}>
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
-        aria-label={t('chat.close')}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={(e) => { e.stopPropagation(); setIndex((i) => (i > 0 ? i - 1 : images.length - 1)) }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
-            aria-label={t('chat.prevImage')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); setIndex((i) => (i < images.length - 1 ? i + 1 : 0)) }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
-            aria-label={t('chat.nextImage')}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </>
-      )}
-      <img
-        src={images[index]}
-        alt=""
-        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
-        onClick={(e) => e.stopPropagation()}
-      />
-      {images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm">
-          {index + 1} / {images.length}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ImageThumbnail({ src, onRemove, onClick }: { src: string; onRemove?: () => void; onClick?: () => void }) {
-  return (
-    <div className={`relative group shrink-0 ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
-      <img
-        src={src}
-        alt=""
-        className="w-16 h-16 object-cover rounded-lg border border-ocean-700/40 hover:border-cyan-500/40 transition-all"
-      />
-      {onRemove && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onRemove() }}
-          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          aria-label="Eliminar imagen"
-        >
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      )}
-    </div>
-  )
-}
+import { ChatInput } from './ChatInput'
+import { Lightbox } from './Lightbox'
+import { LoadingDots } from './LoadingDots'
+import { MessageBubble } from './MessageBubble'
+import { SuggestedQuestions } from './SuggestedQuestions'
 
 const DIAGNOSTIC_COLORS = {
   tab: 'bg-amber-500/20 text-amber-300',
@@ -629,50 +432,19 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
           </div>
         )}
 
-        {messages.map((msg, i) => {
-          const isUser = msg.role === 'user'
-          return (
-            <div
-              key={i}
-              className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-slide-up`}
-            >
-              <div
-                className={`relative group max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                  isUser
-                    ? 'bg-gradient-to-br from-cyan-500/20 to-wind-500/20 border border-cyan-500/30 text-sail-200'
-                    : `${colors.bubble} text-sail-300`
-                }`}
-              >
-                {isUser ? (
-                  <div className="space-y-2">
-                    {msg.images && msg.images.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-1">
-                        {msg.images.map((img, idx) => (
-                          <ImageThumbnail
-                            key={idx}
-                            src={img}
-                            onClick={() => setLightbox({ images: msg.images ?? [], index: idx })}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    {msg.content && msg.content !== ' ' && <p>{msg.content}</p>}
-                  </div>
-                ) : (
-                  <>
-                    <ChatMarkdown text={msg.content} />
-                    <MessageCopyButton text={msg.content} />
-                  </>
-                )}
-              </div>
-            </div>
-          )
-        })}
+        {messages.map((msg, i) => (
+          <MessageBubble
+            key={i}
+            msg={msg}
+            bubbleClass={colors.bubble}
+            onImageClick={(images, idx) => setLightbox({ images, index: idx })}
+          />
+        ))}
 
         {loading && (
           <div className="flex justify-start animate-slide-up">
             <div className={`rounded-2xl px-4 py-3 ${colors.bubble}`}>
-              {LOADING_DOTS}
+              <LoadingDots />
             </div>
           </div>
         )}
@@ -693,90 +465,30 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       </div>
 
       {suggestions.length > 0 && (
-        <div className={`px-5 py-3 border-t ${diagnostic ? 'border-amber-500/10 bg-amber-500/5' : 'border-ocean-800/20 bg-ocean-950/30'} flex flex-wrap items-center gap-2`}>
-          <span className="text-sail-700 text-xs shrink-0 mr-1">{t('chat.suggestions')}</span>
-          {suggestions.map((q, i) => (
-            <button
-              key={i}
-              onClick={() => handleSuggestion(q)}
-              className={`px-3 py-1.5 border text-xs rounded-xl transition-all active:scale-[0.97] ${
-                diagnostic
-                  ? 'bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-300'
-                  : 'bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-300'
-              }`}
-            >
-              <GlossaryInlineMd text={q} />
-            </button>
-          ))}
-        </div>
+        <SuggestedQuestions
+          suggestions={suggestions}
+          diagnostic={diagnostic}
+          onSelect={handleSuggestion}
+        />
       )}
 
-      <div className={`space-y-2 p-4 border-t ${diagnostic ? 'border-amber-500/10' : 'border-ocean-800/20'} bg-ocean-950/40`}>
-        {pendingImages.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {pendingImages.map((img, idx) => (
-              <ImageThumbnail
-                key={idx}
-                src={img}
-                onRemove={() => removePendingImage(idx)}
-                onClick={() => setLightbox({ images: pendingImages, index: idx })}
-              />
-            ))}
-          </div>
-        )}
-        <div className="flex items-end gap-2">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={pendingImages.length > 0 ? t('chat.imagePlaceholder') : randomPlaceholder}
-            rows={2}
-            disabled={loading}
-            className="flex-1 resize-none bg-ocean-950/60 border border-ocean-800/30 focus:border-cyan-500/40 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-sail-200 placeholder-sail-700 disabled:opacity-50 transition-all"
-          />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files) handleFiles(e.target.files)
-              e.target.value = ''
-            }}
-          />
-          <button
-            onClick={handleAttach}
-            disabled={loading || pendingImages.length >= maxImages}
-            aria-label={t('chat.attachImage')}
-            className={`shrink-0 w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 ${
-              pendingImages.length >= maxImages
-                ? 'bg-ocean-950/60 text-sail-700 cursor-not-allowed'
-                : 'bg-ocean-900/60 border border-ocean-700/40 hover:border-cyan-500/40 text-sail-400 hover:text-cyan-300 hover:bg-ocean-800/60'
-            }`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-            </svg>
-          </button>
-          <button
-            onClick={send}
-            aria-label={t('chat.sendAria')}
-            disabled={(!input.trim() && pendingImages.length === 0) || loading}
-            className={`shrink-0 w-11 h-11 flex items-center justify-center bg-gradient-to-br ${
-              diagnostic
-                ? 'from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-amber-500/20'
-                : 'from-cyan-500 to-wind-500 hover:from-cyan-400 hover:to-wind-400 shadow-cyan-500/20'
-            } disabled:from-ocean-800 disabled:to-ocean-800 disabled:text-sail-700 text-white rounded-xl transition-all duration-300 active:scale-[0.95] disabled:cursor-not-allowed shadow-lg`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13" />
-              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-            </svg>
-          </button>
-        </div>
-      </div>
+      <ChatInput
+        input={input}
+        onInputChange={setInput}
+        pendingImages={pendingImages}
+        onRemoveImage={removePendingImage}
+        onPreviewImage={(images, idx) => setLightbox({ images, index: idx })}
+        loading={loading}
+        maxImages={maxImages}
+        diagnostic={diagnostic}
+        placeholder={randomPlaceholder}
+        inputRef={inputRef}
+        fileInputRef={fileInputRef}
+        onKeyDown={handleKeyDown}
+        onSend={send}
+        onAttach={handleAttach}
+        onFiles={handleFiles}
+      />
     </>
   )
 
