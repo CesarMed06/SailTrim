@@ -181,7 +181,9 @@
     "speed": "Speed",
     "force": "Force",
     "beaufort": "Beaufort",
-    "variation": "Variation"
+    "variation": "Variation",
+    "runningHint": "Simulating real-time wind data. Variations mimic natural wind behavior at sea.",
+    "stoppedHint": "Enable the simulation to see how SailTrim would work with real boat instruments."
   },
   "apiKeyModal": {
     "badge": "Free AI",

@@ -241,9 +241,9 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <span>
-                {              isRunning
-                ? 'Simulating real-time wind data. Variations mimic natural wind behavior at sea.'
-                : 'Enable the simulation to see how SailTrim would work with real boat instruments.'}
+                {isRunning
+                  ? t('simulation.runningHint')
+                  : t('simulation.stoppedHint')}
               </span>
             </div>
           </div>

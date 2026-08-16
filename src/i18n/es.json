@@ -181,7 +181,9 @@
     "speed": "Velocidad",
     "force": "Fuerza",
     "beaufort": "Beaufort",
-    "variation": "Variación"
+    "variation": "Variación",
+    "runningHint": "Simulando datos de viento en tiempo real. Las variaciones imitan el comportamiento natural del viento en el mar.",
+    "stoppedHint": "Activa la simulación para ver cómo funcionaría SailTrim con instrumentos reales del barco."
   },
   "apiKeyModal": {
     "badge": "IA Gratuita",
