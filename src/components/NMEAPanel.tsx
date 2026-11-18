@@ -232,7 +232,7 @@ function NMEAPanel() {
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
-              <span>{error}</span>
+              <span>{t(error)}</span>
             </div>
           )}
 
@@ -471,11 +471,7 @@ function NMEAPanel() {
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
-              <span>
-                SailTrim connects directly to your boat's SignalK server via WebSocket. The
-                simulation generates <code className="text-sail-500 bg-ocean-950/60 px-1 rounded">$WIMWV</code> sentences and
-                SignalK deltas with realistic random data and valid checksums.
-              </span>
+              <span>{t('nmea.connectionHint')}</span>
             </div>
           </div>
         </div>

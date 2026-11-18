@@ -20,72 +20,81 @@ export function useNmeaConnection() {
   })
 
   const wsRef = useRef<WebSocket | null>(null)
-  const urlRef = useRef<string | null>(null)
+  const attemptRef = useRef(0)
 
   const connect = useCallback((url: string) => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }))
+    if (window.location.protocol === 'https:' && url.startsWith('ws://')) {
+      setState((prev) => ({ ...prev, isLoading: false, error: 'nmea.errorMixedContent' }))
+      return
+    }
 
+    attemptRef.current += 1
+    const attempt = attemptRef.current
+
+    if (wsRef.current) {
+      wsRef.current.close()
+      wsRef.current = null
+    }
+
+    setState((prev) => ({ ...prev, isLoading: true, error: null }))
+
+    let ws: WebSocket
     try {
-      const ws = new WebSocket(url)
-
-      ws.onopen = () => {
-        urlRef.current = url
-        wsRef.current = ws
-        setState(prev => ({
-          ...prev,
-          isConnected: true,
-          isLoading: false,
-          error: null,
-        }))
-      }
-
-      ws.onmessage = (event) => {
-        const data = typeof event.data === 'string' ? event.data : ''
-        if (!data) return
-
-        setState(prev => {
-          const result = processFeedBuffer(data, prev.feedLines)
-          return {
-            ...prev,
-            feedLines: result.lines,
-            latestWind: result.latestWind || prev.latestWind,
-          }
-        })
-      }
-
-      ws.onerror = () => {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          isConnected: false,
-          error: 'No se pudo conectar al barco. Verifica la IP y que el WiFi del barco esté activo.',
-        }))
-      }
-
-      ws.onclose = () => {
-        wsRef.current = null
-        urlRef.current = null
-        setState(prev => ({
-          ...prev,
-          isConnected: false,
-          isLoading: false,
-        }))
-      }
+      ws = new WebSocket(url)
     } catch {
-      setState(prev => ({
+      setState((prev) => ({ ...prev, isLoading: false, error: 'nmea.errorInvalidUrl' }))
+      return
+    }
+
+    wsRef.current = ws
+
+    ws.onopen = () => {
+      if (attempt !== attemptRef.current) return
+      setState((prev) => ({ ...prev, isConnected: true, isLoading: false, error: null }))
+    }
+
+    ws.onmessage = (event) => {
+      if (attempt !== attemptRef.current) return
+      const data = typeof event.data === 'string' ? event.data : ''
+      if (!data) return
+
+      setState((prev) => {
+        const result = processFeedBuffer(data, prev.feedLines)
+        return {
+          ...prev,
+          feedLines: result.lines,
+          latestWind: result.latestWind || prev.latestWind,
+        }
+      })
+    }
+
+    ws.onerror = () => {
+      if (attempt !== attemptRef.current) return
+      setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: 'URL inválida. Usa ws://IP:puerto/ruta',
+        isConnected: false,
+        error: 'nmea.errorConnection',
+      }))
+    }
+
+    ws.onclose = () => {
+      if (attempt !== attemptRef.current) return
+      wsRef.current = null
+      setState((prev) => ({
+        ...prev,
+        isConnected: false,
+        isLoading: false,
       }))
     }
   }, [])
 
   const disconnect = useCallback(() => {
+    attemptRef.current += 1
     if (wsRef.current) {
       wsRef.current.close()
       wsRef.current = null
     }
-    urlRef.current = null
     setState({
       isConnected: false,
       isLoading: false,
@@ -97,9 +106,8 @@ export function useNmeaConnection() {
 
   useEffect(() => {
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close()
-      }
+      attemptRef.current += 1
+      if (wsRef.current) wsRef.current.close()
     }
   }, [])
 
