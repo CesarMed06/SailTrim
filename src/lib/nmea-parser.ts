@@ -1,6 +1,13 @@
 import { knotsToBeaufort, toWindAngle } from './wind-utils'
 import type { ParsedWind, NmeaFeedLine } from '../types'
 
+function speedToKnots(value: number, units: string): number | null {
+  if (units === 'N') return value
+  if (units === 'K') return value / 1.852
+  if (units === 'M') return value * 1.94384
+  return null
+}
+
 function nmeaChecksum(sentence: string): boolean {
   const starIdx = sentence.lastIndexOf('*')
   if (starIdx === -1) return true
@@ -31,11 +38,13 @@ export function parseNmeaSentence(sentence: string): ParsedWind | null {
     const reference = fields[2]
     const speed = parseFloat(fields[3])
     const units = fields[4]
+    const status = fields[5]?.trim()
 
     if (isNaN(angle) || isNaN(speed)) return null
+    if (status !== 'A') return null
 
-    let speedKn = speed
-    if (units === 'K') speedKn = speed * 1.852
+    const speedKn = speedToKnots(speed, units)
+    if (speedKn === null) return null
 
     return {
       direction: Math.round(angle),
@@ -56,8 +65,8 @@ export function parseNmeaSentence(sentence: string): ParsedWind | null {
 
     if (isNaN(angle) || isNaN(speed)) return null
 
-    let speedKn = speed
-    if (units === 'K') speedKn = speed * 1.852
+    const speedKn = speedToKnots(speed, units)
+    if (speedKn === null) return null
 
     return {
       direction: Math.round(angle),
@@ -84,16 +93,18 @@ export function parseSignalKDelta(msg: string): ParsedWind | null {
 
       let directionDeg: number | null = null
       let speedMs: number | null = null
+      let isTrue = true
 
       for (const v of values) {
-        if (
-          v.path === 'environment.wind.directionTrue' ||
-          v.path === 'environment.wind.directionApparent'
-        ) {
-          directionDeg = Number(v.value)
-        }
-        if (
-          v.path === 'environment.wind.speedTrue' ||
+        if (v.path === 'environment.wind.directionTrue') {
+          directionDeg = (Number(v.value) * 180) / Math.PI
+          isTrue = true
+        } else if (v.path === 'environment.wind.directionApparent') {
+          directionDeg = (Number(v.value) * 180) / Math.PI
+          isTrue = false
+        } else if (v.path === 'environment.wind.speedTrue') {
+          speedMs = Number(v.value)
+        } else if (
           v.path === 'environment.wind.speedApparent' ||
           v.path === 'environment.wind.speedOverGround'
         ) {
@@ -101,14 +112,20 @@ export function parseSignalKDelta(msg: string): ParsedWind | null {
         }
       }
 
-      if (directionDeg !== null && speedMs !== null) {
+      if (
+        directionDeg !== null &&
+        Number.isFinite(directionDeg) &&
+        speedMs !== null &&
+        Number.isFinite(speedMs)
+      ) {
+        const normalized = ((directionDeg % 360) + 360) % 360
         const speedKn = speedMs * 1.94384
         return {
-          direction: Math.round(directionDeg * 10) / 10,
+          direction: Math.round(normalized * 10) / 10,
           speedKnots: Math.round(speedKn * 10) / 10,
           force: knotsToBeaufort(speedKn),
-          windAngle: toWindAngle(Math.round(directionDeg)),
-          isTrue: true,
+          windAngle: toWindAngle(Math.round(normalized)),
+          isTrue,
           rawSentence: msg.slice(0, 200),
         }
       }

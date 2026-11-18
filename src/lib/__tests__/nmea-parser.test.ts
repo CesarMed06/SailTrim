@@ -55,37 +55,60 @@ describe('parseNmeaSentence', () => {
     const result = parseNmeaSentence('$WIMWV,010,R,25.0,N,A*0B')
     expect(result?.force).toBe(6)
   })
+
+  it('converts kilometres per hour to knots', () => {
+    const result = parseNmeaSentence('$WIMWV,045,R,20.0,K,A')
+    expect(result?.speedKnots).toBe(10.8)
+  })
+
+  it('converts metres per second to knots', () => {
+    const result = parseNmeaSentence('$WIMWV,045,R,10.0,M,A')
+    expect(result?.speedKnots).toBe(19.4)
+  })
+
+  it('rejects a sentence marked as invalid (V)', () => {
+    expect(parseNmeaSentence('$WIMWV,045,R,12.5,N,V')).toBeNull()
+  })
+
+  it('rejects an unknown speed unit', () => {
+    expect(parseNmeaSentence('$WIMWV,045,R,12.5,X,A')).toBeNull()
+  })
 })
 
 describe('parseSignalKDelta', () => {
-  it('parses a valid SignalK delta with true wind direction in degrees', () => {
+  it('converts true wind direction from radians to degrees', () => {
     const msg = JSON.stringify({
-      updates: [{
-        values: [
-          { path: 'environment.wind.directionTrue', value: 45 },
-          { path: 'environment.wind.speedTrue', value: 7.5 },
-        ],
-      }],
+      updates: [
+        {
+          values: [
+            { path: 'environment.wind.directionTrue', value: Math.PI / 4 },
+            { path: 'environment.wind.speedTrue', value: 7.5 },
+          ],
+        },
+      ],
     })
     const result = parseSignalKDelta(msg)
     expect(result).not.toBeNull()
-    expect(result?.direction).toBe(45)
-    expect(result?.speedKnots).toBeCloseTo(14.5, 0)
+    expect(result?.direction).toBeCloseTo(45, 1)
+    expect(result?.speedKnots).toBeCloseTo(14.6, 1)
     expect(result?.isTrue).toBe(true)
   })
 
-  it('parses SignalK with apparent wind in degrees', () => {
+  it('flags apparent wind as not true', () => {
     const msg = JSON.stringify({
-      updates: [{
-        values: [
-          { path: 'environment.wind.directionApparent', value: 90 },
-          { path: 'environment.wind.speedApparent', value: 10 },
-        ],
-      }],
+      updates: [
+        {
+          values: [
+            { path: 'environment.wind.directionApparent', value: Math.PI / 2 },
+            { path: 'environment.wind.speedApparent', value: 10 },
+          ],
+        },
+      ],
     })
     const result = parseSignalKDelta(msg)
     expect(result).not.toBeNull()
-    expect(result?.direction).toBe(90)
+    expect(result?.direction).toBeCloseTo(90, 1)
+    expect(result?.isTrue).toBe(false)
   })
 
   it('returns null for invalid JSON', () => {
