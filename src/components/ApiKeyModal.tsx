@@ -12,8 +12,9 @@ interface ApiKeyModalProps {
 function ApiKeyModal({ open, onClose, onOpenGuide }: ApiKeyModalProps) {
   const [key, setKey] = useState('')
   const [saved, setSaved] = useState(false)
+  const [showKey, setShowKey] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const dialogRef = useFocusTrap<HTMLDivElement>(open, 'input[type="text"]')
+  const dialogRef = useFocusTrap<HTMLDivElement>(open, 'input')
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -105,15 +106,38 @@ function ApiKeyModal({ open, onClose, onOpenGuide }: ApiKeyModalProps) {
           <span className="text-wind-400 text-xs font-semibold shrink-0">{t('apiKeyModal.viewGuide')}</span>
         </button>
 
-        <input
-          type="text"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-          placeholder={t('apiKeyModal.placeholder')}
-          aria-label={t('apiKeyModal.inputLabel')}
-          className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 font-mono text-sm text-sail-200 placeholder:text-sail-700 focus:outline-none focus:border-wind-500/50 focus:ring-1 focus:ring-wind-500/30 transition-all"
-        />
+        <div className="relative">
+          <input
+            type={showKey ? 'text' : 'password'}
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+            placeholder={t('apiKeyModal.placeholder')}
+            aria-label={t('apiKeyModal.inputLabel')}
+            autoComplete="off"
+            spellCheck={false}
+            className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 pr-12 font-mono text-sm text-sail-200 placeholder:text-sail-700 focus:outline-none focus:border-wind-500/50 focus:ring-1 focus:ring-wind-500/30 transition-all"
+          />
+          <button
+            type="button"
+            onClick={() => setShowKey((v) => !v)}
+            aria-label={showKey ? t('apiKeyModal.hide') : t('apiKeyModal.show')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-sail-600 hover:text-sail-300 transition-colors"
+          >
+            {showKey ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
 
         <div className="flex items-center justify-between gap-3 mt-4">
           <div className="flex gap-2">
