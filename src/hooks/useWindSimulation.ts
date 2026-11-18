@@ -36,6 +36,7 @@ export function useWindSimulation() {
     prevSpeed: 12,
     prevDirection: 45,
     directionChangeTimer: 0,
+    speedChangeTimer: 0,
   })
 
   const rafRef = useRef<number>(0)
@@ -61,10 +62,11 @@ export function useWindSimulation() {
 
       s.oscillation = lerp(s.oscillation, (Math.random() - 0.5) * 8, dt * 2)
 
-      const speedChangeTimer = s.directionChangeTimer
-      if (speedChangeTimer <= 0.5) {
+      s.speedChangeTimer -= dt
+      if (s.speedChangeTimer <= 0) {
         s.targetSpeed = 8 + Math.random() * 20
         s.targetSpeed = Math.max(0, Math.min(50, s.targetSpeed))
+        s.speedChangeTimer = 4 + Math.random() * 8
       }
 
       s.baseSpeed = lerp(s.baseSpeed, s.targetSpeed, dt * 0.15)

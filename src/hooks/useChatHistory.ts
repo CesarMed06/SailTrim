@@ -131,17 +131,11 @@ export function useChatHistory() {
   )
 
   const deleteChat = useCallback((id: string) => {
-    setChats((prev) => {
-      const next = prev.filter((c) => c.id !== id)
-      return next
-    })
-    setActiveId((prev) => {
-      if (prev === id) {
-        const remaining = chats.filter((c) => c.id !== id)
-        const nextId = remaining.length > 0 ? remaining[0].id : null
-        return nextId
-      }
-      return prev
+    setChats((prev) => prev.filter((c) => c.id !== id))
+    setActiveId((current) => {
+      if (current !== id) return current
+      const remaining = chats.filter((c) => c.id !== id)
+      return remaining.length > 0 ? remaining[0].id : null
     })
   }, [chats])
 
