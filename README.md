@@ -1,220 +1,161 @@
-<div align="center">
+# SailTrim AI
 
-# ⛵ SailTrim AI
+Asistente de trimado de velas con IA, datos de instrumentos NMEA 0183 / Signal K y modo diagnóstico.
 
-**Tu asistente de trimado de velas — sin backend, sin registro, sin pagos.**
+[Demo en vivo](https://sail-trim.vercel.app/) · [Licencia MIT](LICENSE)
 
-*Describe tu rumbo, viento y barco. La IA te guía en lenguaje marinero real sobre qué velas subir, cómo regularlas y por qué.*
-
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-63%20passing-brightgreen)](#-tests)
-[![Vercel](https://img.shields.io/badge/deploy-Vercel-black?logo=vercel)](https://sail-trim.vercel.app/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](#-stack)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](#-stack)
-[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](#-stack)
-[![Tailwind](https://img.shields.io/badge/Tailwind-3-38BDF8?logo=tailwindcss&logoColor=white)](#-stack)
-[![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8)](#-pwa-instalable)
-[![i18n](https://img.shields.io/badge/i18n-ES%20%2F%20EN-0A7EA4)](#-idiomas)
-
-**[🚀 Probar en vivo](https://sail-trim.vercel.app/)**
-
-</div>
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Tests](https://img.shields.io/badge/tests-67%20passing-brightgreen)
+![CI](https://github.com/CesarMed06/SailTrim/actions/workflows/ci.yml/badge.svg)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF)
+![Tailwind](https://img.shields.io/badge/Tailwind-3-38BDF8)
 
 ---
 
-## 📸 Capturas
+## Qué es
 
-| | | |
+SailTrim traduce una situación de navegación —tipo de barco, fuerza y ángulo del viento, estado del mar y nivel del navegante— en un plan de trimado concreto: qué vela subir, cómo regularla y por qué. También incluye un chat con el patrón, un modo diagnóstico para problemas de trimado y la posibilidad de alimentarse con datos reales del barco.
+
+Está pensado para quien está aprendiendo o quiere contrastar su criterio a bordo, no para sustituir al patrón ni a los manuales del fabricante.
+
+## Capturas
+
+| Portada | Ángulo de viento | Plan de trimado |
 |:---:|:---:|:---:|
-| ![Portada](screenshots/1.png) | ![Rosa de los vientos](screenshots/2.png) | ![Asistente de trimado](screenshots/3.png) |
-| **Portada** | **Paso 1 · Rosa de los vientos** | **Paso 3 · Recomendación de trimado** |
-| ![Chat con el patrón](screenshots/4.png) | ![Simulador de viento](screenshots/5.png) | ![Perfil del barco](screenshots/6.png) |
-| **Paso 4 · Chat con la IA** | **Simulador de viento (demo)** | **Perfil del barco** |
+| ![](screenshots/1.png) | ![](screenshots/2.png) | ![](screenshots/3.png) |
 
----
+| Chat con el patrón | Simulador de viento | Perfil del barco |
+|:---:|:---:|:---:|
+| ![](screenshots/4.png) | ![](screenshots/5.png) | ![](screenshots/6.png) |
 
-## 📖 Índice
+## Funcionalidades
 
-- [✨ Características](#-características)
-- [🎯 El enfoque "cero backend"](#-el-enfoque-cero-backend)
-- [🛠️ Stack](#️-stack)
-- [🧭 Cómo funciona](#-cómo-funciona)
-- [🚀 Empezar en local](#-empezar-en-local)
-- [🔑 Clave de Gemini](#-clave-de-gemini)
-- [🧪 Tests](#-tests)
-- [📱 PWA instalable](#-pwa-instalable)
-- [🚢 Despliegue en Vercel](#-despliegue-en-vercel)
-- [🗂️ Estructura](#️-estructura)
-- [🌍 Idiomas](#-idiomas)
-- [📜 Licencia](#-licencia)
-- [🙏 English](#-english)
+- Rosa de los vientos interactiva con ratón, táctil y teclado (flechas, Inicio/Fin).
+- Recomendaciones de trimado estructuradas: mayor, foque/genoa, cunningham, pajarín, traveller, backstay y rizos.
+- Modo diagnóstico: se describe un síntoma y la IA identifica la causa probable y la solución.
+- Chat con historial, tonos de respuesta, imágenes adjuntas y pantalla completa.
+- Lectura de datos reales mediante WebSocket: NMEA 0183 (`$WIMWV`, `$IIMWV`, `$WIVWT`) y Signal K.
+- Simulador de viento para probar la app sin instrumentos.
+- Perfil del barco: modelo, aparejo, casco, dimensiones, zona, mes y tripulación.
+- Interfaz en español e inglés.
+- PWA instalable con funcionamiento offline para las herramientas locales.
+- La clave de Gemini y las conversaciones permanecen en el navegador.
 
----
+## Arquitectura
 
-## ✨ Características
+La aplicación es un frontend estático. No hay servidor propio ni base de datos.
 
-- 🧭 **Rosa de los vientos interactiva** — arrastra, haz clic o usa las flechas del teclado para fijar el ángulo de viento (0°–180°, en pasos de 15°).
-- ⛵ **Recomendaciones de trimado** — mayor, foque/genoa, cunningham, pajarín, traveller, backstay, rizos… en lenguaje marinero real y con el *por qué*.
-- 🩺 **Modo diagnóstico** — describe un síntoma ("el barco escora mucho") y la IA te dice qué falla y cómo arreglarlo.
-- 💬 **Chat con el patrón** — conversación completa con historial, tonos de respuesta, adjuntar/pegar imágenes y modo pantalla completa.
-- 📟 **Datos reales del barco** — integración con **NMEA 0183** (`$WIMWV`, `$IIMWV`) y **Signal K** para leer viento y rumbo en vivo.
-- 🎛️ **Simulador de viento** — modo demo que genera condiciones cambiantes sin necesitar instrumentos.
-- 🚢 **Perfil del barco** — modelo, aparejo, casco, eslora/manga/calado, zona, mes, tripulación… para respuestas 100% personalizadas.
-- 🌍 **Bilingüe** — español e inglés con un clic.
-- 📱 **PWA instalable** — funciona offline y se instala en el móvil/escritorio.
-- 🔒 **Privado por diseño** — tu API key y tus conversaciones viven solo en tu navegador (`localStorage`).
+```
+Navegador
+├── TrimContext            fuente de datos: manual / demo / en vivo
+├── useBoatProfile         perfil del barco (localStorage)
+├── useChatHistory         conversaciones (localStorage)
+├── useNmeaConnection      WebSocket → parser NMEA 0183 y Signal K
+├── useWindSimulation      generador de viento sintético
+└── lib/gemini + lib/chat  construcción de prompts y llamada a Gemini
+        │
+        └── generativelanguage.googleapis.com
+```
 
----
+### Flujo de datos
 
-## 🎯 El enfoque "cero backend"
+1. El usuario elige condiciones manuales o conecta una fuente (simulador o instrumentos).
+2. `getEffectiveConditions` normaliza la situación a un modelo común.
+3. Se construye el prompt con las condiciones y el perfil del barco.
+4. Se llama a Gemini con una cascada de modelos: si un modelo no está disponible o se alcanza el límite de peticiones, se prueba el siguiente.
+5. La respuesta se procesa (markdown, sugerencias, glosario) y se muestra.
 
-SailTrim no tiene servidor. **Todo corre en el cliente**:
+### Decisiones técnicas
 
-- **Frontend estático** — React + Vite, desplegado en Vercel gratis.
-- **IA sin backend** — se llama a la API de Gemini directamente desde el navegador usando **tu propia clave** (gratis), así no hay límites de uso ni coste para quien lo aloja.
-- **Sin base de datos** — el contexto vive en memoria (`useState`) y se persiste en `localStorage`.
-- **Cascada de modelos** — si un modelo devuelve `404` o `429` (límite de peticiones), se reintenta automáticamente con el siguiente (`gemini-2.0-flash` → `gemini-2.5-flash` → `gemini-1.5-flash`).
+- **Cero backend (BYOK).** Cada usuario aporta su propia clave de Gemini, así el proyecto no necesita financiar consultas ni mantener un servidor. La contrapartida es que la clave vive en el navegador y es responsabilidad del usuario.
+- **Cascada de modelos.** Ante `404` (modelo no disponible) o `429` (límite de peticiones) se reintenta con el siguiente modelo en lugar de fallar al primer intento.
+- **Parseo en el cliente.** NMEA y Signal K se interpretan en el navegador; el navegador solo puede recibir datos por WebSocket, no acceder directamente a un puerto serie.
+- **localStorage.** Suficiente para ajustes y conversaciones de un portfolio; un producto real usaría IndexedDB.
 
-Resultado: **gratis e ilimitado**, sin cuenta, sin servidor que mantener.
-
----
-
-## 🛠️ Stack
+## Stack
 
 | Capa | Tecnología |
-|---|---|
+| --- | --- |
 | UI | React 19 + TypeScript |
 | Build | Vite 8 |
 | Estilos | Tailwind CSS 3 |
-| IA | Gemini (llamada directa desde cliente) |
+| IA | Gemini, llamada directa desde el cliente |
 | i18n | i18next + react-i18next |
 | SEO | react-helmet-async, sitemap, robots.txt, JSON-LD |
 | PWA | vite-plugin-pwa |
-| Tests | Vitest + React Testing Library + jsdom |
+| Tests | Vitest + Testing Library + jsdom |
 | Lint | oxlint |
 
----
+## Empezar en local
 
-## 🧭 Cómo funciona
-
-1. **Describe tu situación** — tipo de barco, fuerza del viento (Beaufort), ángulo de rumbo y nivel de experiencia.
-2. **La IA analiza y responde** — interpreta las condiciones y genera recomendaciones de trimado en lenguaje marinero.
-3. **Trima con confianza** — aplica las recomendaciones a bordo como un profesional.
-
----
-
-## 🚀 Empezar en local
-
-### Requisitos
-
-- [Node.js](https://nodejs.org/) 20+ y npm.
-
-### Instalación
+Requisitos: Node.js 20.19+ o 22.12+ (requisito de Vite 8) y npm.
 
 ```bash
 git clone https://github.com/CesarMed06/SailTrim.git
 cd SailTrim
 npm install
+npm run dev
 ```
 
-### Scripts
+Scripts disponibles:
 
 ```bash
-npm run dev       # servidor de desarrollo (http://localhost:5173)
-npm run build     # typecheck + build de producción
-npm run preview   # sirve el build de producción localmente
-npm test          # ejecuta los 63 tests una vez
-npm run test:watch# tests en modo watch
-npm run lint      # oxlint
+npm run dev         # servidor de desarrollo
+npm run build       # typecheck + build de producción
+npm run preview     # sirve el build
+npm test            # ejecuta la suite de tests
+npm run typecheck   # solo comprobación de tipos
+npm run lint        # oxlint
 ```
 
----
+## Clave de Gemini
 
-## 🔑 Clave de Gemini
+SailTrim usa la API de Gemini con la clave del propio usuario.
 
-SailTrim usa la API gratuita de Gemini. **Cada usuario introduce su propia clave**, que se guarda únicamente en su navegador.
+1. Entra en [Google AI Studio](https://aistudio.google.com/apikey) y crea una clave.
+2. En la app, abre «Configurar clave» y pégala.
 
-1. Ve a [Google AI Studio](https://aistudio.google.com/apikey) y pulsa **"Create API key"**.
-2. Copia la clave.
-3. En SailTrim, abre **"Configurar clave"** y pégala.
+La clave se guarda solo en el navegador y se envía directamente a Google. Puedes borrarla en cualquier momento desde el mismo panel.
 
-> La clave nunca se envía a ningún servidor propio: se usa directamente contra `generativelanguage.googleapis.com` desde tu navegador. Puedes borrarla cuando quieras.
-
----
-
-## 🧪 Tests
-
-**63 tests** cubriendo lógica de negocio, hooks y componentes UI:
-
-| Sujeto | Cobertura |
-|---|---|
-| `nmea-parser` | parseo `$WIMWV`/`$IIMWV` y Signal K, checksum, errores |
-| `chat` | preguntas sugeridas, limpieza de markdown |
-| `image-utils` | validación y redimensionado de imágenes |
-| `useOnlineStatus` | eventos online/offline |
-| `useBoatProfile` | persistencia y actualización del perfil |
-| `CompassRose` | semántica de slider y teclado |
-| `BoatProfilePanel` | abrir, rellenar y guardar |
-| `ChatPanel` | envío, error sin clave, modo diagnóstico |
+## Tests
 
 ```bash
 npm test
 ```
 
----
+La suite cubre el parser NMEA y Signal K (unidades, checksum, estado A/V, radianes), utilidades de chat, manejo de imágenes, hooks de persistencia y estado de conexión, y componentes de UI como la rosa de los vientos, el perfil del barco y el chat.
 
-## 📱 PWA instalable
+## Despliegue
 
-SailTrim es una PWA: funciona **offline** y puede instalarse en el móvil y en el escritorio. Las conversaciones y las herramientas locales siguen disponibles sin conexión (solo la IA requiere red).
+Cualquier hosting estático sirve. En Vercel:
 
----
+1. Importa el repositorio.
+2. Build command: `npm run build`. Output: `dist`.
+3. No se necesitan variables de entorno.
 
-## 🚢 Despliegue en Vercel
-
-1. Sube el repo a GitHub.
-2. En [Vercel](https://vercel.com), importa el repositorio.
-3. Build command: `npm run build` · Output: `dist`.
-4. Deploy. Sin variables de entorno necesarias.
-
----
-
-## 🗂️ Estructura
+## Estructura
 
 ```
 src/
-├── components/        # UI (ChatPanel, CompassRose, Dashboard, …)
-│   └── __tests__/     # tests de componentes
-├── context/           # estado global (TrimContext)
-├── hooks/             # hooks (useBoatProfile, useChatHistory, …)
-│   └── __tests__/
-├── lib/               # lógica pura (chat, gemini, nmea-parser, …)
-│   └── __tests__/
-├── i18n/              # es.json / en.json
-├── data/              # glosario náutico
-└── types/             # tipos compartidos
+├── components/       UI y tests de componentes
+├── context/          estado global de trimado
+├── hooks/            perfiles, historial de chat, conexión y simulación
+├── lib/              parsers, prompts, imágenes y utilidades
+├── i18n/             es.json / en.json
+├── data/             glosario náutico
+└── types/            tipos compartidos
 ```
 
----
+## Limitaciones conocidas
 
-## 🌍 Idiomas
+- La IA necesita conexión a internet.
+- Por seguridad del navegador, solo se puede conectar a los instrumentos por WebSocket (normalmente con un servidor Signal K); no hay acceso directo al puerto serie.
+- En una página HTTPS, `ws://` queda bloqueado: hay que usar `wss://` o ejecutar la app en local.
+- La clave de Gemini se guarda en `localStorage` y queda bajo responsabilidad del usuario.
+- Es una herramienta educativa: no sustituye el criterio del patrón, los manuales del barco ni las condiciones reales.
 
-SailTrim está disponible en **español** e **inglés**. El selector de idioma está fijo en la esquina superior derecha y tu elección se recuerda en el navegador.
+## Licencia
 
----
-
-## 📜 Licencia
-
-[MIT](LICENSE) © 2026 César Medina — libre para usar, modificar y redistribuir.
-
----
-
-## 🙏 English
-
-**SailTrim AI** is a free, serverless sailing-trim assistant. Pick your boat type, wind strength, heading angle and experience level, and the AI tells you — in real sailing language — which sails to raise, how to trim them and why.
-
-- **Zero backend** — static React + Vite on Vercel; the Gemini API is called directly from the browser using your own free key.
-- **Live data** — NMEA 0183 and Signal K support, plus a built-in wind simulator for demos.
-- **Chat + diagnostics** — full conversation with the skipper, images, tones and history.
-- **Offline PWA**, **ES/EN i18n**, **63 passing tests**, MIT licensed.
-
-**[Try it live](https://sail-trim.vercel.app/)**
+MIT. Ver [LICENSE](LICENSE).
