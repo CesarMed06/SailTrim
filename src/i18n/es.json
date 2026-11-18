@@ -112,6 +112,7 @@
     "sendAria": "Enviar mensaje",
     "suggestions": "Sugerencias:",
     "copyMessage": "Copiar mensaje",
+    "removeImage": "Eliminar imagen",
     "noKeyError": "Configura tu clave de Gemini en el panel de arriba para usar el chat.",
     "apiError": "Error al contactar con el patrón IA",
     "ok": "Ok",
@@ -167,7 +168,11 @@
     "lines": "líneas",
     "tagNmea": "NMEA",
     "tagSigK": "SigK",
-    "tagRaw": "RAW"
+    "tagRaw": "RAW",
+    "errorConnection": "No se pudo conectar al barco. Verifica la IP y que el WiFi del barco esté activo.",
+    "errorInvalidUrl": "URL inválida. Usa ws://IP:puerto/ruta",
+    "errorMixedContent": "No se puede usar ws:// desde una página HTTPS. Usa wss:// mediante un túnel TLS o abre la app en local.",
+    "connectionHint": "SailTrim se conecta por WebSocket al servidor Signal K del barco. La simulación genera frases $WIMWV y deltas Signal K con datos realistas y checksums válidos."
   },
   "simulation": {
     "title": "Simulador de viento",
@@ -183,7 +188,14 @@
     "beaufort": "Beaufort",
     "variation": "Variación",
     "runningHint": "Simulando datos de viento en tiempo real. Las variaciones imitan el comportamiento natural del viento en el mar.",
-    "stoppedHint": "Activa la simulación para ver cómo funcionaría SailTrim con instrumentos reales del barco."
+    "stoppedHint": "Activa la simulación para ver cómo funcionaría SailTrim con instrumentos reales del barco.",
+    "trends": {
+      "steady": "Estable",
+      "increasing": "Subiendo",
+      "decreasing": "Bajando",
+      "backing": "Rolando atrás",
+      "veering": "Rolando derecha"
+    }
   },
   "apiKeyModal": {
     "badge": "IA Gratuita",
@@ -193,6 +205,8 @@
     "viewGuide": "Ver guía →",
     "placeholder": "Pega aquí tu API key (empieza por AIza… o AQ.…)",
     "inputLabel": "API key de Gemini",
+    "show": "Mostrar clave",
+    "hide": "Ocultar clave",
     "save": "Guardar",
     "saved": "✓ Guardada",
     "delete": "Eliminar",

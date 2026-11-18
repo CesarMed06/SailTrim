@@ -1,7 +1,9 @@
 import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function MessageCopyButton({ text }: { text: string }) {
   const [done, setDone] = useState(false)
+  const { t } = useTranslation()
 
   const copy = useCallback(async () => {
     try {
@@ -16,7 +18,7 @@ export function MessageCopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      aria-label="Copiar mensaje"
+      aria-label={t('chat.copyMessage')}
       className="opacity-0 group-hover:opacity-100 focus:opacity-100 absolute top-2 right-2 p-1.5 rounded-lg bg-ocean-950/80 border border-ocean-700/40 hover:border-cyan-500/30 text-sail-600 hover:text-cyan-300 transition-all duration-200"
     >
       {done ? (

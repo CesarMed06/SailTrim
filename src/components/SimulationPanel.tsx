@@ -28,11 +28,11 @@ function SimulationPanel({ isRunning, wind, onToggle }: SimulationPanelProps) {
   }
 
   const trendLabels: Record<SimulatedWind['trend'], string> = {
-    steady: 'Estable',
-    increasing: 'Subiendo',
-    decreasing: 'Bajando',
-    backing: 'Rolando atrás',
-    veering: 'Rolando derecha',
+    steady: t('simulation.trends.steady'),
+    increasing: t('simulation.trends.increasing'),
+    decreasing: t('simulation.trends.decreasing'),
+    backing: t('simulation.trends.backing'),
+    veering: t('simulation.trends.veering'),
   }
 
   return (

@@ -106,6 +106,7 @@ export function GlossaryTerm({ word, entry, children }: GlossaryTermProps) {
   const termRef = useRef<HTMLSpanElement>(null)
   const [open, setOpen] = useState(false)
   const [rect, setRect] = useState<DOMRect | null>(null)
+  const definition = getDefinition(entry, getCurrentLanguage())
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -136,7 +137,7 @@ export function GlossaryTerm({ word, entry, children }: GlossaryTermProps) {
           }
         }}
         className="cursor-pointer border-b border-dotted border-cyan-500/50 hover:border-cyan-400 text-cyan-200 hover:text-cyan-100 transition-colors duration-150"
-        title={`${word}: ${entry.definition}`}
+        title={`${word}: ${definition}`}
       >
         {children}
       </span>
