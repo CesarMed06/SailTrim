@@ -352,7 +352,7 @@ export async function sendChatMessage(
   const body = {
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents,
-    generationConfig: { temperature: 0.7, maxOutputTokens: 4096 },
+    generationConfig: { temperature: 0.7, maxOutputTokens: 4096, thinkingConfig: { thinkingLevel: 'low' } },
   }
 
   const text = await generateContent({ apiKey, body })

@@ -177,7 +177,7 @@ export async function analyzeTrim(c: EffectiveConditions, apiKey: string): Promi
   const body = {
     system_instruction: { parts: [{ text: getSystemPrompt() }] },
     contents: [{ role: 'user', parts: [{ text: buildTrimPrompt(c) }] }],
-    generationConfig: { temperature: 0.6, maxOutputTokens: 4096 },
+    generationConfig: { temperature: 0.6, maxOutputTokens: 4096, thinkingConfig: { thinkingLevel: 'low' } },
   }
 
   const text = await generateContent({ apiKey, body })
