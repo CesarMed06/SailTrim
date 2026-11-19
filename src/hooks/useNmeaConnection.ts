@@ -10,6 +10,15 @@ interface NmeaConnectionState {
   error: string | null
 }
 
+export function isSupportedNmeaUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value)
+    return (parsed.protocol === 'ws:' || parsed.protocol === 'wss:') && parsed.hostname !== ''
+  } catch {
+    return false
+  }
+}
+
 export function useNmeaConnection() {
   const [state, setState] = useState<NmeaConnectionState>({
     isConnected: false,
@@ -28,6 +37,11 @@ export function useNmeaConnection() {
       return
     }
 
+    if (!isSupportedNmeaUrl(url)) {
+      setState((prev) => ({ ...prev, isLoading: false, error: 'nmea.errorInvalidUrl' }))
+      return
+    }
+
     attemptRef.current += 1
     const attempt = attemptRef.current
 
@@ -38,14 +52,7 @@ export function useNmeaConnection() {
 
     setState((prev) => ({ ...prev, isLoading: true, error: null }))
 
-    let ws: WebSocket
-    try {
-      ws = new WebSocket(url)
-    } catch {
-      setState((prev) => ({ ...prev, isLoading: false, error: 'nmea.errorInvalidUrl' }))
-      return
-    }
-
+    const ws = new WebSocket(url)
     wsRef.current = ws
 
     ws.onopen = () => {
