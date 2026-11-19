@@ -197,6 +197,15 @@
       "veering": "Rolando derecha"
     }
   },
+  "aiErrors": {
+    "auth": "Tu clave de Gemini no es válida o no tiene permiso. Revísala en el panel de configuración.",
+    "rateLimit": "Has alcanzado el límite de consultas de Gemini. Espera un minuto y reinténtalo.",
+    "timeout": "Gemini tardó demasiado en responder. Reinténtalo.",
+    "network": "Sin conexión con Gemini. Comprueba tu conexión a internet.",
+    "empty": "El modelo devolvió una respuesta vacía. Reinténtalo.",
+    "server": "Los servidores de Gemini no están disponibles ahora mismo. Reinténtalo en unos segundos.",
+    "unknown": "No se pudo contactar con Gemini. Reinténtalo."
+  },
   "apiKeyModal": {
     "badge": "IA Gratuita",
     "title": "Tu clave de Gemini",

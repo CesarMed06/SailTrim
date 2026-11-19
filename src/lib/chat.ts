@@ -1,8 +1,7 @@
 import { getApiKey } from './gemini'
 import type { EffectiveConditions } from './gemini'
 import i18n, { getCurrentLanguage } from '../i18n'
-
-const MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+import { generateContent } from './gemini-client'
 
 const PROFILE_KEY = 'sailtrim_boat_profile'
 const NAV_KEY = 'sailtrim_nav_config'
@@ -345,7 +344,7 @@ export async function sendChatMessage(
   tone: ChatTone = 'casual',
 ): Promise<{ content: string; suggestions: string[] }> {
   const apiKey = getApiKey()
-  if (!apiKey) throw new Error('API key no configurada')
+  if (!apiKey) throw new Error(i18n.t('chat.noKeyError', { lng: getCurrentLanguage() }))
 
   const systemPrompt = isDiagnostic ? getDiagnosticPrompt() : chatSystemPrompt(tone)
   const contents = buildContents(history, conditions, isDiagnostic)
@@ -356,48 +355,8 @@ export async function sendChatMessage(
     generationConfig: { temperature: 0.7, maxOutputTokens: 4096 },
   }
 
-  let lastError: unknown = null
-
-  for (const model of MODELS) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        },
-      )
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        const message = data?.error?.message ?? `Error ${res.status}`
-        if (res.status === 404 || res.status === 429) {
-          lastError = message
-          continue
-        }
-        throw new Error(message)
-      }
-      const parts = data?.candidates?.[0]?.content?.parts
-      const text = Array.isArray(parts) ? parts.find((p: { text?: string }) => typeof p.text === 'string')?.text : parts?.[0]?.text
-      if (typeof text !== 'string' || !text.trim()) {
-        lastError = new Error(isDiagnostic ? 'Empty response' : 'El modelo devolvió una respuesta vacía')
-        continue
-      }
-      const fullText = text.trim()
-      const suggestions = parseSuggestedQuestions(fullText)
-      const content = stripSuggestedQuestions(fullText)
-      return { content, suggestions }
-    } catch (err) {
-      lastError = err
-    }
-  }
-
-  if (lastError instanceof TypeError && lastError.message === 'Failed to fetch') {
-    const isEn = getCurrentLanguage() === 'en'
-    throw new Error(isEn ? 'No internet connection. The AI skipper needs to be online.' : 'Sin conexión a internet. El patrón IA necesita estar en línea para responder.')
-  }
-  const isEn = getCurrentLanguage() === 'en'
-  throw lastError instanceof Error
-    ? lastError
-    : new Error(isEn ? 'All Gemini models are busy. Try again in a few seconds.' : 'Todos los modelos Gemini están ocupados. Reintenta en unos segundos.')
+  const text = await generateContent({ apiKey, body })
+  const suggestions = parseSuggestedQuestions(text)
+  const content = stripSuggestedQuestions(text)
+  return { content, suggestions }
 }

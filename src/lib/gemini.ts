@@ -3,6 +3,7 @@ import { GEMINI_API_KEY_STORAGE } from './constants'
 import type { LiveWind, TrimMode } from '../context/TrimContext'
 import { toWindAngle } from './wind-utils'
 import i18n, { getCurrentLanguage } from '../i18n'
+import { generateContent } from './gemini-client'
 
 export interface EffectiveConditions {
   angle: WindAngle
@@ -172,8 +173,6 @@ Notas de seguridad específicas para estas condiciones.
 Usa listas con guiones y negrita para lo importante.`
 }
 
-const MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
-
 export async function analyzeTrim(c: EffectiveConditions, apiKey: string): Promise<string> {
   const body = {
     system_instruction: { parts: [{ text: getSystemPrompt() }] },
@@ -181,39 +180,6 @@ export async function analyzeTrim(c: EffectiveConditions, apiKey: string): Promi
     generationConfig: { temperature: 0.6, maxOutputTokens: 4096 },
   }
 
-  let lastError: unknown = null
-
-  for (const model of MODELS) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        },
-      )
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        const message = data?.error?.message ?? `Error ${res.status}`
-        if (res.status === 404 || res.status === 429) {
-          lastError = message
-          continue
-        }
-        throw new Error(message)
-      }
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      if (typeof text !== 'string' || !text.trim()) {
-        lastError = new Error('El modelo devolvió una respuesta vacía')
-        continue
-      }
-      return fixSpanishCaps(text.trim())
-    } catch (err) {
-      lastError = err
-    }
-  }
-
-  throw lastError instanceof Error
-    ? lastError
-    : new Error('Todos los modelos Gemini están ocupados. Reintenta en unos segundos.')
+  const text = await generateContent({ apiKey, body })
+  return fixSpanishCaps(text)
 }
