@@ -261,6 +261,63 @@
     "github": "GitHub",
     "tagline": "Made with passion for the sea and code · Open Source · SailTrim AI"
   },
+    "legal": {
+      "close": "Close",
+      "privacy": {
+        "title": "Privacy",
+        "intro": "SailTrim runs entirely in your browser: no backend, no accounts, no analytics.",
+        "sections": [
+          {
+            "title": "What is stored and where",
+            "text": "Your boat profile, conversations, language and data mode are saved in this browser's local storage. They never leave your device."
+          },
+          {
+            "title": "Your Gemini key",
+            "text": "The key is stored only in this browser and sent straight to Google when you query. SailTrim never receives it or forwards it to any server of its own."
+          },
+          {
+            "title": "What is sent to Google",
+            "text": "Sailing conditions, your boat profile, chat messages and any images you attach travel to the Gemini API to generate the answer. From that point on, Google's handling applies."
+          },
+          {
+            "title": "No tracking",
+            "text": "No analytics cookies, no advertising, no user profiles. The hosting provider may log basic technical data, such as IP address and date, when serving the page."
+          },
+          {
+            "title": "How to delete it",
+            "text": "Remove the key from «Change key» and conversations from the history. Clearing the site data in your browser wipes everything, key included."
+          }
+        ],
+        "googleLink": "Google privacy policy"
+      },
+      "terms": {
+        "title": "Terms of use",
+        "intro": "SailTrim is an open source educational project. Use it at your own risk.",
+        "sections": [
+          {
+            "title": "No warranty",
+            "text": "The application is provided as is, with no guarantee of availability or accuracy. It may change or stop working without notice."
+          },
+          {
+            "title": "Your key, your usage",
+            "text": "You use your own Gemini key and its quota and terms are Google's. SailTrim charges nothing and is not responsible for that usage."
+          },
+          {
+            "title": "Safety on board",
+            "text": "Trim recommendations are advisory and do not replace the skipper's judgement, the rules of the sea or the manufacturer's instructions. The safety of the vessel and her crew is the responsibility of whoever is in command."
+          },
+          {
+            "title": "AI-generated content",
+            "text": "Answers are produced by a language model and may contain errors. Check any manoeuvre or adjustment before carrying it out."
+          },
+          {
+            "title": "Open source",
+            "text": "The code is distributed under the licence published in the GitHub repository."
+          }
+        ],
+        "licenseLink": "View the repository on GitHub"
+      }
+    },
   "glossary": {
     "categories": {
       "vela": "⛵ Sail",
