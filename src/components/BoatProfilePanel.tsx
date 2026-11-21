@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { RigType, HullMaterial, NavigationPriority, NavigationZone, TimeOfDay } from '../hooks/useBoatProfile'
 import { useBoatProfile } from '../hooks/useBoatProfile'
+import HintTooltip from './HintTooltip'
 
 const RIG_OPTIONS: { value: RigType; icon: string }[] = [
   { value: 'sloop', icon: '⛵' },
@@ -238,18 +239,22 @@ export default function BoatProfilePanel() {
               </label>
               <div className="grid grid-cols-4 gap-1.5">
                 {RIG_OPTIONS.map((r) => (
-                  <button
+                  <HintTooltip
                     key={r.value}
-                    onClick={() => updateProfile({ rigType: r.value })}
-                    title={`${r.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.rigTypes.${r.value}`)} — ${t(`boatProfilePanel.hints.rig.${r.value}`)}`}
-                    className={`text-lg p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
-                      profile.rigType === r.value
-                        ? 'bg-cyan-500/15 border-cyan-500/40 scale-105'
-                        : 'bg-ocean-950/40 border-ocean-700/20 hover:border-ocean-600/40'
-                    }`}
+                    label={r.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.rigTypes.${r.value}`)}
+                    text={t(`boatProfilePanel.hints.rig.${r.value}`)}
                   >
-                    {r.icon}
-                  </button>
+                    <button
+                      onClick={() => updateProfile({ rigType: r.value })}
+                      className={`w-full text-lg p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
+                        profile.rigType === r.value
+                          ? 'bg-cyan-500/15 border-cyan-500/40 scale-105'
+                          : 'bg-ocean-950/40 border-ocean-700/20 hover:border-ocean-600/40'
+                      }`}
+                    >
+                      {r.icon}
+                    </button>
+                  </HintTooltip>
                 ))}
               </div>
               <p className="mt-1.5 text-[10px] leading-snug text-sail-600">
@@ -273,18 +278,22 @@ export default function BoatProfilePanel() {
               </label>
               <div className="grid grid-cols-3 gap-1.5">
                 {MATERIAL_OPTIONS.map((m) => (
-                  <button
+                  <HintTooltip
                     key={m.value}
-                    onClick={() => updateProfile({ hullMaterial: m.value })}
-                    title={`${m.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.materials.${m.value}`)} — ${t(`boatProfilePanel.hints.materials.${m.value}`)}`}
-                    className={`text-lg p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
-                      profile.hullMaterial === m.value
-                        ? 'bg-cyan-500/15 border-cyan-500/40 scale-105'
-                        : 'bg-ocean-950/40 border-ocean-700/20 hover:border-ocean-600/40'
-                    }`}
+                    label={m.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.materials.${m.value}`)}
+                    text={t(`boatProfilePanel.hints.materials.${m.value}`)}
                   >
-                    {m.icon}
-                  </button>
+                    <button
+                      onClick={() => updateProfile({ hullMaterial: m.value })}
+                      className={`w-full text-lg p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
+                        profile.hullMaterial === m.value
+                          ? 'bg-cyan-500/15 border-cyan-500/40 scale-105'
+                          : 'bg-ocean-950/40 border-ocean-700/20 hover:border-ocean-600/40'
+                      }`}
+                    >
+                      {m.icon}
+                    </button>
+                  </HintTooltip>
                 ))}
               </div>
               <p className="mt-1.5 text-[10px] leading-snug text-sail-600">
@@ -328,19 +337,23 @@ export default function BoatProfilePanel() {
             </label>
             <div className="flex flex-wrap gap-2">
               {PRIORITY_OPTIONS.map((p) => (
-                <button
+                <HintTooltip
                   key={p.value}
-                  onClick={() => updateNav({ priority: p.value })}
-                  title={`${p.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.priorities.${p.value}`)} — ${t(`boatProfilePanel.hints.priorities.${p.value}`)}`}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-l-4 text-sm font-medium transition-all duration-200 cursor-pointer ${
-                    nav.priority === p.value
-                      ? `bg-ocean-950/60 ${p.color} border-ocean-700/40 scale-105`
-                      : `bg-ocean-950/30 border-ocean-700/20 border-l-ocean-700/20 hover:border-ocean-600/40`
-                  }`}
+                  label={p.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.priorities.${p.value}`)}
+                  text={t(`boatProfilePanel.hints.priorities.${p.value}`)}
                 >
-                  <span className="text-lg">{p.icon}</span>
-                  <span className="text-sail-200">{p.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.priorities.${p.value}`)}</span>
-                </button>
+                  <button
+                    onClick={() => updateNav({ priority: p.value })}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-l-4 text-sm font-medium transition-all duration-200 cursor-pointer ${
+                      nav.priority === p.value
+                        ? `bg-ocean-950/60 ${p.color} border-ocean-700/40 scale-105`
+                        : `bg-ocean-950/30 border-ocean-700/20 border-l-ocean-700/20 hover:border-ocean-600/40`
+                    }`}
+                  >
+                    <span className="text-lg">{p.icon}</span>
+                    <span className="text-sail-200">{p.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.priorities.${p.value}`)}</span>
+                  </button>
+                </HintTooltip>
               ))}
             </div>
             <p className="mt-2 text-[11px] leading-snug text-sail-600">
@@ -439,19 +452,23 @@ export default function BoatProfilePanel() {
               </label>
               <div className="flex flex-wrap gap-2">
                 {TIME_OPTIONS.map((tOpt) => (
-                  <button
+                  <HintTooltip
                     key={tOpt.value}
-                    onClick={() => updateNav({ timeOfDay: tOpt.value })}
-                  title={`${tOpt.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.timeOfDay.${tOpt.value}`)} — ${t(`boatProfilePanel.hints.timeOfDay.${tOpt.value}`)}`}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all cursor-pointer ${
-                      nav.timeOfDay === tOpt.value
-                        ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300'
-                        : 'bg-ocean-950/40 border-ocean-700/20 text-sail-500 hover:border-ocean-600/40'
-                    }`}
+                    label={tOpt.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.timeOfDay.${tOpt.value}`)}
+                    text={t(`boatProfilePanel.hints.timeOfDay.${tOpt.value}`)}
                   >
-                    <span>{tOpt.icon}</span>
-                    <span>{tOpt.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.timeOfDay.${tOpt.value}`)}</span>
-                  </button>
+                    <button
+                      onClick={() => updateNav({ timeOfDay: tOpt.value })}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all cursor-pointer ${
+                        nav.timeOfDay === tOpt.value
+                          ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300'
+                          : 'bg-ocean-950/40 border-ocean-700/20 text-sail-500 hover:border-ocean-600/40'
+                      }`}
+                    >
+                      <span>{tOpt.icon}</span>
+                      <span>{tOpt.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.timeOfDay.${tOpt.value}`)}</span>
+                    </button>
+                  </HintTooltip>
                 ))}
               </div>
               <p className="mt-1.5 text-[11px] leading-snug text-sail-600">
