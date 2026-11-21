@@ -80,9 +80,9 @@ function Hero() {
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10" aria-hidden="true">
-        <div className="scroll-indicator w-6 h-10 rounded-full border-2 border-sail-700/50 flex items-start justify-center p-1.5">
-          <div className="w-1 h-2.5 bg-sail-500/70 rounded-full scroll-dot" />
-        </div>
+        <svg className="scroll-dot w-5 h-5 text-sail-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
       </div>
     </section>
   )
