@@ -45,7 +45,7 @@ const SECTORS = [
 
 const TICK_ANGLES = Array.from({ length: 24 }, (_, i) => i * 15)
 
-const LABEL_R = 116
+const LABEL_R = 110
 const LABELS = [
   { angle: 0, text: '0°' },
   { angle: 90, text: '90°' },
@@ -236,7 +236,6 @@ function CompassRose({ angle, onChange }: CompassRoseProps) {
             stroke="rgba(255,255,255,0.4)"
             strokeWidth="0.8"
           />
-          <line x1="-10" y1="-10" x2="10" y2="-10" stroke="rgba(255,255,255,0.3)" strokeWidth="0.6" />
         </g>
       </svg>
 
