@@ -387,7 +387,7 @@ export default function BoatProfilePanel() {
                     <button
                       onClick={() => updateNav({ zone: z.value })}
                       aria-pressed={nav.zone === z.value}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all cursor-pointer ${
                         nav.zone === z.value
                           ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300'
                           : 'bg-ocean-950/40 border-ocean-700/20 text-sail-500 hover:border-ocean-600/40'
