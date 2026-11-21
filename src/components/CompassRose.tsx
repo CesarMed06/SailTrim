@@ -8,8 +8,8 @@ interface CompassRoseProps {
 }
 
 const CENTER = 150
-const OUTER_R = 140
-const INNER_R = 105
+const OUTER_R = 124
+const INNER_R = 92
 const BOAT_R = 28
 
 function polarToCartesian(angleDeg: number, r: number) {
@@ -45,7 +45,7 @@ const SECTORS = [
 
 const TICK_ANGLES = Array.from({ length: 24 }, (_, i) => i * 15)
 
-const LABEL_R = 110
+const LABEL_R = 138
 const LABELS = [
   { angle: 0, text: '0°' },
   { angle: 90, text: '90°' },
