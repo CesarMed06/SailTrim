@@ -5,7 +5,8 @@
     "title2": "sail trim",
     "description": "Describe your heading, wind, and boat. The AI guides you in real maritime language on which sails to raise, how to adjust them, and why.",
     "cta": "Start trimming",
-    "howItWorks": "How it works"
+    "howItWorks": "How it works",
+    "scrollHint": "Scroll to step 1"
   },
   "howItWorks": {
     "tagline": "That simple",

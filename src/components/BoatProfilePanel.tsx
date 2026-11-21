@@ -372,27 +372,33 @@ export default function BoatProfilePanel() {
             )}
           </div>
 
-          {/* Zona y momento */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                {isEn ? 'Navigation zone' : 'Zona de navegación'}
-              </label>
-              <select
-                value={nav.zone}
-                onChange={(e) => updateNav({ zone: e.target.value as NavigationZone })}
-                className="w-full bg-ocean-950/60 border border-ocean-700/40 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition-colors appearance-none cursor-pointer"
-              >
+          {/* Zona */}
+          <div className="mb-6">
+            <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-2">
+              {isEn ? 'Navigation zone' : 'Zona de navegación'}
+            </label>
+              <div className="flex flex-wrap gap-1.5">
                 {ZONE_OPTIONS.map((z) => (
-                  <option
+                  <HintTooltip
                     key={z.value}
-                    value={z.value}
-                    title={t(`boatProfilePanel.hints.zones.${z.value}`)}
+                    label={z.value === 'other' ? (isEn ? 'Other' : 'Otra zona') : t(`boatProfilePanel.zones.${z.value}`)}
+                    text={t(`boatProfilePanel.hints.zones.${z.value}`)}
                   >
-                    {z.icon} {z.value === 'other' ? (isEn ? 'Other' : 'Otra zona') : t(`boatProfilePanel.zones.${z.value}`)}
-                  </option>
+                    <button
+                      onClick={() => updateNav({ zone: z.value })}
+                      aria-pressed={nav.zone === z.value}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs transition-all cursor-pointer ${
+                        nav.zone === z.value
+                          ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300'
+                          : 'bg-ocean-950/40 border-ocean-700/20 text-sail-500 hover:border-ocean-600/40'
+                      }`}
+                    >
+                      <span>{z.icon}</span>
+                      <span>{z.value === 'other' ? (isEn ? 'Other' : 'Otra zona') : t(`boatProfilePanel.zones.${z.value}`)}</span>
+                    </button>
+                  </HintTooltip>
                 ))}
-              </select>
+              </div>
               <p className="mt-1.5 text-[11px] leading-snug text-sail-600">
                 {nav.zone === 'other'
                   ? t('boatProfilePanel.hints.zones.other')
@@ -407,7 +413,10 @@ export default function BoatProfilePanel() {
                   className="mt-2 w-full bg-ocean-950/60 border border-cyan-500/30 focus:border-cyan-500/50 rounded-xl px-3 py-2 text-white text-xs placeholder-sail-700 outline-none transition-colors"
                 />
               )}
-            </div>
+          </div>
+
+          {/* Mes y hora */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
                 {isEn ? 'Month' : 'Mes'}

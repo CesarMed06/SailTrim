@@ -5,7 +5,8 @@
     "title2": "el trimado",
     "description": "Describe tu rumbo, viento y barco. La IA te guía en lenguaje marinero real sobre qué velas subir, cómo regularlas y por qué.",
     "cta": "Comenzar a trimar",
-    "howItWorks": "Cómo funciona"
+    "howItWorks": "Cómo funciona",
+    "scrollHint": "Bajar al paso 1"
   },
   "howItWorks": {
     "tagline": "Así de simple",
