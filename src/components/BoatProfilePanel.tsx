@@ -241,7 +241,7 @@ export default function BoatProfilePanel() {
                   <button
                     key={r.value}
                     onClick={() => updateProfile({ rigType: r.value })}
-                    title={r.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.rigTypes.${r.value}`)}
+                    title={`${r.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.rigTypes.${r.value}`)} — ${t(`boatProfilePanel.hints.rig.${r.value}`)}`}
                     className={`text-lg p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
                       profile.rigType === r.value
                         ? 'bg-cyan-500/15 border-cyan-500/40 scale-105'
@@ -276,7 +276,7 @@ export default function BoatProfilePanel() {
                   <button
                     key={m.value}
                     onClick={() => updateProfile({ hullMaterial: m.value })}
-                    title={m.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.materials.${m.value}`)}
+                    title={`${m.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.materials.${m.value}`)} — ${t(`boatProfilePanel.hints.materials.${m.value}`)}`}
                     className={`text-lg p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
                       profile.hullMaterial === m.value
                         ? 'bg-cyan-500/15 border-cyan-500/40 scale-105'
@@ -331,6 +331,7 @@ export default function BoatProfilePanel() {
                 <button
                   key={p.value}
                   onClick={() => updateNav({ priority: p.value })}
+                  title={`${p.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.priorities.${p.value}`)} — ${t(`boatProfilePanel.hints.priorities.${p.value}`)}`}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-l-4 text-sm font-medium transition-all duration-200 cursor-pointer ${
                     nav.priority === p.value
                       ? `bg-ocean-950/60 ${p.color} border-ocean-700/40 scale-105`
@@ -370,7 +371,11 @@ export default function BoatProfilePanel() {
                 className="w-full bg-ocean-950/60 border border-ocean-700/40 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-white text-sm outline-none transition-colors appearance-none cursor-pointer"
               >
                 {ZONE_OPTIONS.map((z) => (
-                  <option key={z.value} value={z.value}>
+                  <option
+                    key={z.value}
+                    value={z.value}
+                    title={t(`boatProfilePanel.hints.zones.${z.value}`)}
+                  >
                     {z.icon} {z.value === 'other' ? (isEn ? 'Other' : 'Otra zona') : t(`boatProfilePanel.zones.${z.value}`)}
                   </option>
                 ))}
@@ -437,6 +442,7 @@ export default function BoatProfilePanel() {
                   <button
                     key={tOpt.value}
                     onClick={() => updateNav({ timeOfDay: tOpt.value })}
+                  title={`${tOpt.value === 'other' ? (isEn ? 'Other' : 'Otro') : t(`boatProfilePanel.timeOfDay.${tOpt.value}`)} — ${t(`boatProfilePanel.hints.timeOfDay.${tOpt.value}`)}`}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all cursor-pointer ${
                       nav.timeOfDay === tOpt.value
                         ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300'

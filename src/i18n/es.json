@@ -446,8 +446,7 @@
       "midday": "Mediodía",
       "afternoon": "Tarde",
       "night": "Noche"
-    }
-  },
+    },
     "hints": {
       "rig": {
         "sloop": "Un solo palo y una mayor: el aparejo más común y el más fácil de trimar.",
@@ -492,7 +491,8 @@
         "night": "Poca visibilidad: cambios simples y seguros.",
         "other": "Indícanos el momento abajo."
       }
-    },
+    }
+  },
   "pwa": {
     "installPrompt": "¿Instalar SailTrim en tu dispositivo?",
     "installSubtitle": "Úsala como una app nativa, incluso sin conexión en alta mar.",

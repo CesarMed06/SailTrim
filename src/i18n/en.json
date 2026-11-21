@@ -446,8 +446,7 @@
       "midday": "Midday",
       "afternoon": "Afternoon",
       "night": "Night"
-    }
-  },
+    },
     "hints": {
       "rig": {
         "sloop": "One mast and a mainsail: the most common rig and the easiest to trim.",
@@ -492,7 +491,8 @@
         "night": "Poor visibility: keep changes simple and safe.",
         "other": "Tell me the moment below."
       }
-    },
+    }
+  },
   "pwa": {
     "installPrompt": "Install SailTrim on your device?",
     "installSubtitle": "Use it as a native app, even offline at sea.",
