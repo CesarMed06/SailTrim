@@ -252,6 +252,11 @@ export default function BoatProfilePanel() {
                   </button>
                 ))}
               </div>
+              <p className="mt-1.5 text-[10px] leading-snug text-sail-600">
+                {profile.rigType === 'other'
+                  ? t('boatProfilePanel.hints.rig.other')
+                  : t(`boatProfilePanel.hints.rig.${profile.rigType}`)}
+              </p>
               {profile.rigType === 'other' && (
                 <input
                   type="text"
@@ -282,6 +287,11 @@ export default function BoatProfilePanel() {
                   </button>
                 ))}
               </div>
+              <p className="mt-1.5 text-[10px] leading-snug text-sail-600">
+                {profile.hullMaterial === 'other'
+                  ? t('boatProfilePanel.hints.materials.other')
+                  : t(`boatProfilePanel.hints.materials.${profile.hullMaterial}`)}
+              </p>
               {profile.hullMaterial === 'other' && (
                 <input
                   type="text"
@@ -294,7 +304,7 @@ export default function BoatProfilePanel() {
             </div>
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                {isEn ? 'Year' : 'Año'}
+                {isEn ? 'Build year' : 'Año de botadura'}
               </label>
               <input
                 type="number"
@@ -332,6 +342,11 @@ export default function BoatProfilePanel() {
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-[11px] leading-snug text-sail-600">
+              {nav.priority === 'other'
+                ? t('boatProfilePanel.hints.priorities.other')
+                : t(`boatProfilePanel.hints.priorities.${nav.priority}`)}
+            </p>
             {nav.priority === 'other' && (
               <input
                 type="text"
@@ -360,6 +375,11 @@ export default function BoatProfilePanel() {
                   </option>
                 ))}
               </select>
+              <p className="mt-1.5 text-[11px] leading-snug text-sail-600">
+                {nav.zone === 'other'
+                  ? t('boatProfilePanel.hints.zones.other')
+                  : t(`boatProfilePanel.hints.zones.${nav.zone}`)}
+              </p>
               {nav.zone === 'other' && (
                 <input
                   type="text"
@@ -428,6 +448,11 @@ export default function BoatProfilePanel() {
                   </button>
                 ))}
               </div>
+              <p className="mt-1.5 text-[11px] leading-snug text-sail-600">
+                {nav.timeOfDay === 'other'
+                  ? t('boatProfilePanel.hints.timeOfDay.other')
+                  : t(`boatProfilePanel.hints.timeOfDay.${nav.timeOfDay}`)}
+              </p>
               {nav.timeOfDay === 'other' && (
                 <input
                   type="text"

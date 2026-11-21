@@ -448,6 +448,51 @@
       "night": "Night"
     }
   },
+    "hints": {
+      "rig": {
+        "sloop": "One mast and a mainsail: the most common rig and the easiest to trim.",
+        "ketch": "Two masts, the aft one shorter: spreads the sail and eases the helm.",
+        "yawl": "Two masts with a small one aft of the rudder: almost a sloop with a mizzen.",
+        "cutter": "One mast with two or three headsails: versatile in strong wind.",
+        "catamaran": "Two hulls and a lot of beam: no heel, but it needs its own sheet work.",
+        "schooner": "Two or more masts, the aft one equal or taller: classic reaching and running sail.",
+        "other": "Describe it below and I will take it into account."
+      },
+      "materials": {
+        "fiberglass": "Polyester or epoxy: the usual choice, stiff and easy to repair.",
+        "aluminum": "Light and tough, shrugs off knocks and corrosion; common on long-distance boats.",
+        "steel": "Very strong but heavy: you lose some speed and gain toughness.",
+        "wood": "Classic and heavy; the hull works more and asks for upkeep.",
+        "carbon": "The lightest and stiffest: responds to fine tuning, but costs.",
+        "other": "Describe it below and I will take it into account."
+      },
+      "priorities": {
+        "speed": "Go fast even if the boat heels and the sea turns uncomfortable.",
+        "comfort": "Sail flat and steady rather than chase tenths of a knot.",
+        "racing": "Racing: every adjustment counts, VMG and pointing rule.",
+        "safety": "Margin before performance: reef early and keep heel low.",
+        "passage": "Long passage: balance and little effort for the crew.",
+        "other": "Tell me below what you care about."
+      },
+      "zones": {
+        "mediterranean": "Thermal breezes, short sea and plenty of light summer air.",
+        "atlantic": "Long swell and shifting wind: trim for a built-up sea.",
+        "caribbean": "Steady trade winds and heat: consistent reaching breeze.",
+        "pacific": "Endless trades and long passages: prioritise durability.",
+        "cantabrian": "Strong wind and cross sea: reefing pays off.",
+        "baltic": "Light, puffy winds and little swell.",
+        "north_sea": "Cold, gusts and current: reef before you think you need to.",
+        "indian_ocean": "Powerful trades and long sea: demanding sailing.",
+        "other": "Name the area below."
+      },
+      "timeOfDay": {
+        "morning": "Breeze still light: soft trim and sails with shape.",
+        "midday": "The thermal at its peak: the strongest wind of the day.",
+        "afternoon": "Breeze settled in and the sea picked up.",
+        "night": "Poor visibility: keep changes simple and safe.",
+        "other": "Tell me the moment below."
+      }
+    },
   "pwa": {
     "installPrompt": "Install SailTrim on your device?",
     "installSubtitle": "Use it as a native app, even offline at sea.",

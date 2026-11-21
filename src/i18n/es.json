@@ -448,6 +448,51 @@
       "night": "Noche"
     }
   },
+    "hints": {
+      "rig": {
+        "sloop": "Un solo palo y una mayor: el aparejo más común y el más fácil de trimar.",
+        "ketch": "Dos palos, el de popa más bajo: reparte la vela y alivia el timón.",
+        "yawl": "Dos palos con uno pequeño a popa del timón: casi un sloop con mesana.",
+        "cutter": "Un palo con dos o tres foques por delante: versátil con viento fuerte.",
+        "catamaran": "Dos cascos y mucha manga: no escora, pero pide otro juego de escotas.",
+        "schooner": "Dos o más palos, el de popa igual o mayor: vela clásica de través y popa.",
+        "other": "Descríbelo abajo y lo tendré en cuenta."
+      },
+      "materials": {
+        "fiberglass": "Poliéster o epoxi: lo habitual, rígido y fácil de reparar.",
+        "aluminum": "Ligero y duro, aguanta golpes y corrosión; típico en barcos de altura.",
+        "steel": "Muy resistente pero pesado: resta algo de velocidad y gana aguante.",
+        "wood": "Clásico y pesado; el casco trabaja más y pide mantenimiento.",
+        "carbon": "El más ligero y rígido: responde al ajuste fino, pero cuesta.",
+        "other": "Descríbelo abajo y lo tendré en cuenta."
+      },
+      "priorities": {
+        "speed": "Ir rápido aunque el barco escore y el mar se ponga incómodo.",
+        "comfort": "Navegar plano y estable antes que ganar décimas.",
+        "racing": "Regata: cada ajuste cuenta, mandan la VMG y la altura.",
+        "safety": "Margen antes que rendimiento: rizos pronto y poca escora.",
+        "passage": "Travesía larga: equilibrio y poco esfuerzo para la tripulación.",
+        "other": "Cuéntanos abajo qué priorizas."
+      },
+      "zones": {
+        "mediterranean": "Brisas térmicas, mar corto y mucho verano flojo.",
+        "atlantic": "Oleaje largo y viento que rola: trim para mar formada.",
+        "caribbean": "Alisios constantes y calor: viento estable de través.",
+        "pacific": "Alisios largos y mucha travesía: prioriza resistencia.",
+        "cantabrian": "Viento fuerte y mar cruzada: merece la pena rizar antes.",
+        "baltic": "Vientos flojos con rachas y poco oleaje.",
+        "north_sea": "Frío, rachas y corriente: conviene rizar antes.",
+        "indian_ocean": "Alisios potentes y mar larga: navegación exigente.",
+        "other": "Indícanos la zona abajo."
+      },
+      "timeOfDay": {
+        "morning": "Brisa todavía floja: trim suave y velas con forma.",
+        "midday": "La térmica en su punto: el viento más fuerte del día.",
+        "afternoon": "Brisa establecida y mar levantado por la tarde.",
+        "night": "Poca visibilidad: cambios simples y seguros.",
+        "other": "Indícanos el momento abajo."
+      }
+    },
   "pwa": {
     "installPrompt": "¿Instalar SailTrim en tu dispositivo?",
     "installSubtitle": "Úsala como una app nativa, incluso sin conexión en alta mar.",
