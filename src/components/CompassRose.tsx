@@ -45,6 +45,14 @@ const SECTORS = [
 
 const TICK_ANGLES = Array.from({ length: 24 }, (_, i) => i * 15)
 
+const LABEL_R = 116
+const LABELS = [
+  { angle: 0, text: '0°' },
+  { angle: 90, text: '90°' },
+  { angle: 180, text: '180°' },
+  { angle: 270, text: '90°' },
+]
+
 function CompassRose({ angle, onChange }: CompassRoseProps) {
   const [dragging, setDragging] = useState(false)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -195,10 +203,26 @@ function CompassRose({ angle, onChange }: CompassRoseProps) {
           )
         })}
 
-        <text x={CENTER} y={CENTER - OUTER_R + 16} textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">0°</text>
-        <text x={CENTER + OUTER_R - 16} y={CENTER + 4} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="9" fontFamily="Inter, sans-serif">90°</text>
-        <text x={CENTER} y={CENTER + OUTER_R - 10} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="9" fontFamily="Inter, sans-serif">180°</text>
-        <text x={CENTER - OUTER_R + 16} y={CENTER + 4} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="9" fontFamily="Inter, sans-serif">90°</text>
+        {LABELS.map((label) => {
+          const pos = polarToCartesian(label.angle, LABEL_R)
+          return (
+            <text
+              key={`label-${label.angle}`}
+              x={pos.x}
+              y={pos.y + 3.5}
+              textAnchor="middle"
+              fill="rgba(226,232,240,0.85)"
+              stroke="rgba(2,8,23,0.9)"
+              strokeWidth="3"
+              paintOrder="stroke"
+              fontSize="10"
+              fontWeight="600"
+              fontFamily="Inter, sans-serif"
+            >
+              {label.text}
+            </text>
+          )
+        })}
 
         <WindArrow side="starboard" />
         {angle !== 0 && angle !== 180 && <WindArrow side="port" />}
