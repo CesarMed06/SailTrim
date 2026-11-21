@@ -1,4 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
+import {
+  BOAT_PROFILE_STORAGE as PROFILE_KEY,
+  CREW_CONFIG_STORAGE as CREW_KEY,
+  NAV_CONFIG_STORAGE as NAV_KEY,
+} from '../lib/constants'
 
 export type RigType = 'sloop' | 'ketch' | 'yawl' | 'cutter' | 'catamaran' | 'schooner' | 'other'
 export type HullMaterial = 'fiberglass' | 'aluminum' | 'steel' | 'wood' | 'carbon' | 'other'
@@ -61,10 +66,6 @@ const EMPTY_NAV: NavigationConfig = {
 }
 
 const EMPTY_CREW: CrewConfig = { count: 2, roles: '', notes: '' }
-
-const PROFILE_KEY = 'sailtrim_boat_profile'
-const NAV_KEY = 'sailtrim_nav_config'
-const CREW_KEY = 'sailtrim_crew_config'
 
 function load<T>(key: string, fallback: T): T {
   try {

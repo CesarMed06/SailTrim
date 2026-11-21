@@ -4,6 +4,7 @@ import type { LiveWind, TrimMode } from '../context/TrimContext'
 import { toWindAngle } from './wind-utils'
 import i18n, { getCurrentLanguage } from '../i18n'
 import { generateContent } from './gemini-client'
+import { buildBoatContext } from './boat-context'
 
 export interface EffectiveConditions {
   angle: WindAngle
@@ -99,15 +100,17 @@ function fixSpanishCaps(text: string): string {
 export function buildTrimPrompt(c: EffectiveConditions): string {
   const lang = getCurrentLanguage()
   const isEn = lang === 'en'
+  const boatContext = buildBoatContext(lang)
+  const boatBlock = boatContext ? `\n${boatContext}\n` : ''
   return isEn
     ? `Current navigation data:
 ${describeConditions(c)}
-
-With this data, give me the complete trim plan.`
+${boatBlock}
+With this data, give me the complete trim plan${boatContext ? ' for this boat' : ''}.`
     : `Datos actuales de navegación:
 ${describeConditions(c)}
-
-Con estos datos, dame el plan de trimado completo.`
+${boatBlock}
+Con estos datos, dame el plan de trimado completo${boatContext ? ' para este barco' : ''}.`
 }
 
 function getSystemPrompt(): string {
@@ -125,6 +128,7 @@ Style rules:
 - Be direct and concise. Maximum 400 words.
 - No loose asterisks or italics: only bold (**text**) for important items.
 - Write in lowercase after colons (:), except proper nouns.
+- If the prompt includes the sailor's boat details, tailor the plan to that specific boat: LOA, rig, hull and crew take precedence. Never invent measurements or gear that are not listed.
 
 ALWAYS respond in English with markdown and this exact section structure (use the same headings):
 ## 📋 Summary
@@ -155,6 +159,7 @@ Reglas de estilo:
 - Sé directo y conciso. Máximo 400 palabras.
 - No uses asteriscos sueltos ni cursiva: solo negrita (**texto**) para lo importante.
 - Escribe en minúscula la primera palabra después de dos puntos (:), salvo nombres propios.
+- Si el prompt incluye los datos del barco del navegante, adapta el plan a ese barco concreto: eslora, aparejo, casco y tripulación mandan. No inventes medidas ni equipos que no aparezcan.
 
 Responde SIEMPRE en español con markdown y esta estructura exacta de secciones (usa los mismos títulos):
 ## 📋 Resumen

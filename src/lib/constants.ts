@@ -48,3 +48,7 @@ export const WIND_ANGLE_LABELS: Record<number, { short: string; full: string }> 
 }
 
 export const GEMINI_API_KEY_STORAGE = 'sailtrim-gemini-key'
+
+export const BOAT_PROFILE_STORAGE = 'sailtrim_boat_profile'
+export const NAV_CONFIG_STORAGE = 'sailtrim_nav_config'
+export const CREW_CONFIG_STORAGE = 'sailtrim_crew_config'
