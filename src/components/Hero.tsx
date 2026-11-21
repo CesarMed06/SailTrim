@@ -34,6 +34,11 @@ function Hero() {
         </div>
       </div>
 
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at center, rgba(2,8,23,0.92) 0%, rgba(2,8,23,0.72) 36%, rgba(2,8,23,0.25) 60%, transparent 78%)' }}
+      />
+
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-ocean-950 to-transparent" />
 
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto animate-fade-in">
@@ -58,19 +63,19 @@ function Hero() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
-            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => document.getElementById('compass')?.scrollIntoView({ behavior: 'smooth' })}
             className="group relative px-8 py-3.5 bg-wind-500 hover:bg-wind-400 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-wind-500/25 hover:-translate-y-0.5"
           >
             {t('hero.cta')}
             <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
           </button>
 
-          <a
-            href="#how-it-works"
-            className="px-8 py-3.5 text-sail-500 hover:text-sail-300 font-medium rounded-xl border border-sail-800/50 hover:border-sail-600/50 transition-all duration-300"
+          <button
+            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-8 py-3.5 text-sail-500 hover:text-sail-300 font-medium rounded-xl border border-sail-800/50 hover:border-sail-600/50 transition-all duration-300 cursor-pointer"
           >
             {t('hero.howItWorks')}
-          </a>
+          </button>
         </div>
       </div>
 
