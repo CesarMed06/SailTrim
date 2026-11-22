@@ -57,7 +57,7 @@ Reglas:
 - Sé conciso y directo.
 - Usa negrita (**texto**) para los términos importantes.
 - No uses cursiva ni asteriscos sueltos.
-- Escribe en minúscula tras dos puntos (:), salvo nombres propios.
+- Empieza cada frase con mayúscula, también después de un punto. Tras dos puntos usa minúscula solo si lo que sigue es una lista o una aclaración breve; si sigue una frase completa, mayúscula.
 - Al final de tu respuesta, añade la sección ## 💭 Preguntas con 2-3 sugerencias de continuación en formato lista. No uses listas numeradas en las preguntas sugeridas.
 - Si usas una lista numerada en tu respuesta, escribe cada paso así: "1. texto" (número, punto, espacio, texto en la MISMA línea, nunca con saltos de línea entre el número y el texto).`
 
@@ -69,7 +69,7 @@ Rules:
 - Be concise and direct.
 - Use bold (**text**) for important terms.
 - No italics or loose asterisks.
-- Write in lowercase after colons (:), except proper nouns.
+- Start every sentence with a capital letter, including after a full stop. After a colon, use lowercase only for a list or a short clarification; if a full sentence follows, start it with a capital letter.
 - At the end of your response, add the ## 💭 Questions section with 2-3 follow-up suggestions in list format. Do not use numbered lists in the suggested questions.
 - If you use a numbered list in your response, write each step like this: "1. text" (number, period, space, text on the SAME line, never with line breaks between the number and the text).`
 

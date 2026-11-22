@@ -91,12 +91,6 @@ function describeConditions(c: EffectiveConditions): string {
   ].join('\n')
 }
 
-function fixSpanishCaps(text: string): string {
-  return text.replace(/(: )(\*\*)?([A-ZÁÉÍÓÚÑ])(?=[a-záéíóúñ])/g, (_match, space, bold, letter) =>
-    `${space}${bold ?? ''}${letter.toLowerCase()}`,
-  )
-}
-
 export function buildTrimPrompt(c: EffectiveConditions): string {
   const lang = getCurrentLanguage()
   const isEn = lang === 'en'
@@ -127,7 +121,7 @@ Style rules:
 - Do not introduce or greet. Do not mention your years of experience or use phrases like "hello skipper" or "ahoy". Start directly with the 📋 Summary section.
 - Be direct and concise. Maximum 400 words.
 - No loose asterisks or italics: only bold (**text**) for important items.
-- Write in lowercase after colons (:), except proper nouns.
+- Start every sentence with a capital letter, including after a full stop. After a colon, use lowercase only for a list or a short clarification; if a full sentence follows, start it with a capital letter.
 - If the prompt includes the sailor's boat details, tailor the plan to that specific boat: LOA, rig, hull and crew take precedence. Never invent measurements or gear that are not listed.
 
 ALWAYS respond in English with markdown and this exact section structure (use the same headings):
@@ -158,7 +152,7 @@ Reglas de estilo:
 - No te presentes ni saludes. No digas cuántos años de experiencia tienes, ni uses frases como "hola patrón", "ahoy" o "como instructor con 30 años". Empieza directamente con la sección 📋 Resumen.
 - Sé directo y conciso. Máximo 400 palabras.
 - No uses asteriscos sueltos ni cursiva: solo negrita (**texto**) para lo importante.
-- Escribe en minúscula la primera palabra después de dos puntos (:), salvo nombres propios.
+- Empieza cada frase con mayúscula, también después de un punto. Tras dos puntos usa minúscula solo si lo que sigue es una lista o una aclaración breve; si sigue una frase completa, mayúscula.
 - Si el prompt incluye los datos del barco del navegante, adapta el plan a ese barco concreto: eslora, aparejo, casco y tripulación mandan. No inventes medidas ni equipos que no aparezcan.
 
 Responde SIEMPRE en español con markdown y esta estructura exacta de secciones (usa los mismos títulos):
@@ -186,5 +180,5 @@ export async function analyzeTrim(c: EffectiveConditions, apiKey: string): Promi
   }
 
   const text = await generateContent({ apiKey, body })
-  return fixSpanishCaps(text)
+  return text
 }
