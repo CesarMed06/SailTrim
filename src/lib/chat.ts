@@ -156,27 +156,38 @@ export function stripSuggestedQuestions(content: string): string {
   return content
 }
 
-type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } }
+export type ChatPart = { text: string } | { inlineData: { mimeType: string; data: string } }
 
-function buildContents(
-  history: ChatEntry[],
-  conditions: EffectiveConditions,
-  isDiagnostic: boolean,
-): { role: string; parts: GeminiPart[] }[] {
-  const isEn = getCurrentLanguage() === 'en'
-  const prefix = isDiagnostic
-    ? (isEn ? 'Diagnostic mode. The sailor describes a symptom and expects you to figure out what is wrong and how to fix it. Current conditions:' : 'Modo diagnóstico. El navegante describe un síntoma y espera que averigües qué falla y cómo arreglarlo. Condiciones actuales:')
-    : (isEn ? 'Current boat conditions:' : 'Condiciones actuales del barco:')
-  const contextLine = `${prefix} ${describeConditionsBrief(conditions)}.`
-  const systemNote = {
-    role: 'user' as const,
-    parts: [{ text: contextLine }] as GeminiPart[],
+export const HISTORY_WINDOW = 12
+export const IMAGES_WINDOW = 2
+
+function recentHistory(history: ChatEntry[]): ChatEntry[] {
+  if (history.length <= HISTORY_WINDOW) return history
+  const slice = history.slice(-HISTORY_WINDOW)
+  const firstUser = slice.findIndex((m) => m.role === 'user')
+  return firstUser > 0 ? slice.slice(firstUser) : slice
+}
+
+function keepRecentImages(history: ChatEntry[]): ChatEntry[] {
+  let seen = 0
+  const kept: ChatEntry[] = []
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    const msg = history[i]
+    if (msg.role === 'user' && msg.images && msg.images.length > 0) {
+      seen += 1
+      kept.push(seen > IMAGES_WINDOW ? { ...msg, images: undefined } : msg)
+      continue
+    }
+    kept.push(msg)
   }
-  const response = { role: 'model' as const, parts: [{ text: isEn ? 'Understood.' : 'Entendido.' }] as GeminiPart[] }
-  const messages: { role: string; parts: GeminiPart[] }[] = [systemNote, response]
-  for (const msg of history) {
+  return kept.reverse()
+}
+
+export function buildHistoryMessages(history: ChatEntry[]): { role: string; parts: ChatPart[] }[] {
+  const messages: { role: string; parts: ChatPart[] }[] = []
+  for (const msg of keepRecentImages(recentHistory(history))) {
     const role = msg.role === 'user' ? 'user' : 'model'
-    const parts: GeminiPart[] = []
+    const parts: ChatPart[] = []
     if (msg.images && msg.images.length > 0 && msg.role === 'user') {
       for (const dataUrl of msg.images) {
         const mime = dataUrl.match(/^data:(image\/\w+);/)?.at(1) ?? 'image/jpeg'
@@ -190,6 +201,24 @@ function buildContents(
     messages.push({ role, parts })
   }
   return messages
+}
+
+function buildContents(
+  history: ChatEntry[],
+  conditions: EffectiveConditions,
+  isDiagnostic: boolean,
+): { role: string; parts: ChatPart[] }[] {
+  const isEn = getCurrentLanguage() === 'en'
+  const prefix = isDiagnostic
+    ? (isEn ? 'Diagnostic mode. The sailor describes a symptom and expects you to figure out what is wrong and how to fix it. Current conditions:' : 'Modo diagnóstico. El navegante describe un síntoma y espera que averigües qué falla y cómo arreglarlo. Condiciones actuales:')
+    : (isEn ? 'Current boat conditions:' : 'Condiciones actuales del barco:')
+  const contextLine = `${prefix} ${describeConditionsBrief(conditions)}.`
+  const systemNote = {
+    role: 'user' as const,
+    parts: [{ text: contextLine }] as ChatPart[],
+  }
+  const response = { role: 'model' as const, parts: [{ text: isEn ? 'Understood.' : 'Entendido.' }] as ChatPart[] }
+  return [systemNote, response, ...buildHistoryMessages(history)]
 }
 
 export async function sendChatMessage(
