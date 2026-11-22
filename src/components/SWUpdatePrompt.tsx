@@ -35,16 +35,19 @@ export default function SWUpdatePrompt() {
     }
     navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange)
 
-    let interval: ReturnType<typeof setInterval> | undefined
-    navigator.serviceWorker.ready.then((reg) => {
-      interval = setInterval(() => {
-        reg.update().catch(() => {})
-      }, 60 * 60 * 1000)
-    })
+    const checkForUpdates = () => {
+      navigator.serviceWorker.ready
+        .then((reg) => reg.update().catch(() => {}))
+        .catch(() => {})
+    }
+    checkForUpdates()
+    const interval = setInterval(checkForUpdates, 5 * 60 * 1000)
+    window.addEventListener('focus', checkForUpdates)
 
     return () => {
       navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange)
-      if (interval) clearInterval(interval)
+      window.removeEventListener('focus', checkForUpdates)
+      clearInterval(interval)
     }
   }, [])
 
