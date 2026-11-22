@@ -2,6 +2,7 @@ import i18n, { getCurrentLanguage } from '../i18n'
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
 const DEFAULT_TIMEOUT_MS = 45_000
+const RETRY_DELAY_MS = 1_500
 
 export const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'] as const
 
@@ -26,6 +27,7 @@ interface GenerateContentOptions {
   apiKey: string
   body: unknown
   timeoutMs?: number
+  retryDelayMs?: number
 }
 
 function extractText(payload: GeminiPayload): string {
@@ -35,21 +37,11 @@ function extractText(payload: GeminiPayload): string {
   return text.trim()
 }
 
-export async function generateContent({
-  apiKey,
-  body,
-  timeoutMs = DEFAULT_TIMEOUT_MS,
-}: GenerateContentOptions): Promise<string> {
-  if (!apiKey.trim()) throw new GeminiError('auth')
+function requestModel(model: string, apiKey: string, body: unknown, timeoutMs: number): Promise<string> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
 
-  let lastError: GeminiError = new GeminiError('unknown')
-  let rateLimited = false
-  let serverFailed = false
-
-  for (const model of GEMINI_MODELS) {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), timeoutMs)
-
+  return (async () => {
     try {
       const response = await fetch(`${ENDPOINT}/${model}:generateContent`, {
         method: 'POST',
@@ -63,20 +55,9 @@ export async function generateContent({
 
       const payload = (await response.json().catch(() => ({}))) as GeminiPayload
 
-      if (response.status === 404) {
-        lastError = new GeminiError('unknown')
-        continue
-      }
-      if (response.status === 429) {
-        rateLimited = true
-        lastError = new GeminiError('rateLimit')
-        continue
-      }
-      if (response.status >= 500) {
-        serverFailed = true
-        lastError = new GeminiError('server')
-        continue
-      }
+      if (response.status === 404) throw new GeminiError('unknown')
+      if (response.status === 429) throw new GeminiError('rateLimit')
+      if (response.status >= 500) throw new GeminiError('server')
       if (!response.ok) {
         const detail = payload.error?.message ?? ''
         if (response.status === 401 || response.status === 403 || (response.status === 400 && /api key/i.test(detail))) {
@@ -86,10 +67,7 @@ export async function generateContent({
       }
 
       const text = extractText(payload)
-      if (!text) {
-        lastError = new GeminiError('empty')
-        continue
-      }
+      if (!text) throw new GeminiError('empty')
       return text
     } catch (error) {
       if (error instanceof GeminiError) throw error
@@ -98,9 +76,40 @@ export async function generateContent({
     } finally {
       clearTimeout(timer)
     }
+  })()
+}
+
+async function tryModels(apiKey: string, body: unknown, timeoutMs: number): Promise<string> {
+  let lastError: GeminiError = new GeminiError('unknown')
+
+  for (const model of GEMINI_MODELS) {
+    try {
+      return await requestModel(model, apiKey, body, timeoutMs)
+    } catch (error) {
+      if (!(error instanceof GeminiError) || error.code === 'auth' || error.code === 'network' || error.code === 'timeout') {
+        throw error
+      }
+      lastError = error
+    }
   }
 
-  if (rateLimited) throw new GeminiError('rateLimit')
-  if (serverFailed) throw new GeminiError('server')
   throw lastError
+}
+
+export async function generateContent({
+  apiKey,
+  body,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
+  retryDelayMs = RETRY_DELAY_MS,
+}: GenerateContentOptions): Promise<string> {
+  if (!apiKey.trim()) throw new GeminiError('auth')
+
+  try {
+    return await tryModels(apiKey, body, timeoutMs)
+  } catch (error) {
+    const retryable = error instanceof GeminiError && (error.code === 'rateLimit' || error.code === 'server' || error.code === 'empty')
+    if (!retryable) throw error
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
+    return tryModels(apiKey, body, timeoutMs)
+  }
 }

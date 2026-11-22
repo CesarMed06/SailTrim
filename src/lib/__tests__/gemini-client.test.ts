@@ -74,11 +74,32 @@ describe('generateContent', () => {
     expect(mock).not.toHaveBeenCalled()
   })
 
-  it('reports a rate limit once every model is exhausted', async () => {
+  it('retries once after a transient rate limit', async () => {
+    const mock = useFetch(
+      vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(429, {}))
+        .mockResolvedValueOnce(jsonResponse(429, {}))
+        .mockResolvedValueOnce(jsonResponse(429, {}))
+        .mockResolvedValue(answer('second chance')),
+    )
+
+    await expect(generateContent({ apiKey: 'k', body: {}, retryDelayMs: 0 })).resolves.toBe('second chance')
+    expect(mock).toHaveBeenCalledTimes(GEMINI_MODELS.length + 1)
+  })
+
+  it('reports a rate limit once every model is exhausted twice', async () => {
     const mock = useFetch(vi.fn().mockResolvedValue(jsonResponse(429, {})))
 
-    await expect(generateContent({ apiKey: 'k', body: {} })).rejects.toMatchObject({ code: 'rateLimit' })
-    expect(mock).toHaveBeenCalledTimes(GEMINI_MODELS.length)
+    await expect(generateContent({ apiKey: 'k', body: {}, retryDelayMs: 0 })).rejects.toMatchObject({ code: 'rateLimit' })
+    expect(mock).toHaveBeenCalledTimes(GEMINI_MODELS.length * 2)
+  })
+
+  it('does not retry an authentication failure', async () => {
+    const mock = useFetch(vi.fn().mockResolvedValue(jsonResponse(403, {})))
+
+    await expect(generateContent({ apiKey: 'k', body: {}, retryDelayMs: 0 })).rejects.toMatchObject({ code: 'auth' })
+    expect(mock).toHaveBeenCalledTimes(1)
   })
 
   it('reports a network failure when fetch rejects', async () => {
