@@ -118,6 +118,7 @@
     "apiError": "Error contacting the AI skipper",
     "retry": "Retry",
     "storageFull": "Browser storage is full: the oldest chats were removed to save this one. Export the ones you want to keep.",
+    "waiting": "The skipper is thinking… {{seconds}}s",
     "ok": "Ok",
     "attachImage": "Attach image",
     "imagePlaceholder": "Add a comment to the image…",

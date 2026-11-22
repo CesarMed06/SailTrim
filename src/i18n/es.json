@@ -118,6 +118,7 @@
     "apiError": "Error al contactar con el patrón IA",
     "retry": "Reintentar",
     "storageFull": "El almacenamiento del navegador está lleno: se han borrado los chats más antiguos para guardar el actual. Exporta los que quieras conservar.",
+    "waiting": "El patrón está pensando… {{seconds}} s",
     "ok": "Ok",
     "attachImage": "Adjuntar imagen",
     "imagePlaceholder": "Añade un comentario a la imagen…",

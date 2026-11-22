@@ -47,6 +47,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
   const [error, setError] = useState('')
   const [canRetry, setCanRetry] = useState(false)
   const [streamingText, setStreamingText] = useState('')
+  const [elapsed, setElapsed] = useState(0)
   const failedRef = useRef<{ chatId: string; messages: ChatEntry[] } | null>(null)
   const [tone, setTone] = useState<ChatTone>(activeChat?.tone ?? 'casual')
   const [fullscreen, setFullscreen] = useState(false)
@@ -118,6 +119,16 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       setError('')
     }
   }, [activeChat?.id])
+
+  useEffect(() => {
+    if (!loading) {
+      setElapsed(0)
+      return
+    }
+    const start = Date.now()
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 1000)
+    return () => clearInterval(id)
+  }, [loading])
 
   const pushStream = useCallback((text: string) => {
     streamBuffer.current = text
@@ -502,6 +513,11 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
           <div className="flex justify-start animate-slide-up">
             <div className={`rounded-2xl px-4 py-3 ${colors.bubble}`}>
               <LoadingDots />
+              {elapsed > 0 && (
+                <p className="mt-1 text-[11px] text-sail-600">
+                  {t('chat.waiting', { seconds: elapsed })}
+                </p>
+              )}
             </div>
           </div>
         )}
