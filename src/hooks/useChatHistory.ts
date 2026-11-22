@@ -33,12 +33,31 @@ function loadConversations(): Conversation[] {
   }
 }
 
-function saveConversations(chats: Conversation[]) {
+export const MAX_CHATS = 40
+
+function saveConversations(chats: Conversation[]): boolean {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(chats))
+    return true
   } catch {
-    // localStorage full — silently fail
+    return false
   }
+}
+
+export function trimChats(chats: Conversation[]): Conversation[] {
+  if (chats.length <= MAX_CHATS) return chats
+  const pinned = chats.filter((c) => c.pinned)
+  const rest = chats
+    .filter((c) => !c.pinned)
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+  const keep = new Set([...pinned, ...rest].slice(0, MAX_CHATS).map((c) => c.id))
+  return chats.filter((c) => keep.has(c.id))
+}
+
+function oldestUnpinned(chats: Conversation[]): Conversation | undefined {
+  return chats
+    .filter((c) => !c.pinned)
+    .sort((a, b) => a.updatedAt - b.updatedAt)[0]
 }
 
 function loadActiveId(): string | null {
@@ -75,9 +94,19 @@ function autoTitle(messages: ChatEntry[]): string {
 export function useChatHistory() {
   const [chats, setChats] = useState<Conversation[]>(() => loadConversations())
   const [activeId, setActiveId] = useState<string | null>(() => loadActiveId())
+  const [storageFull, setStorageFull] = useState(false)
 
   useEffect(() => {
-    saveConversations(chats)
+    let next = trimChats(chats)
+    let saved = saveConversations(next)
+    while (!saved) {
+      const victim = oldestUnpinned(next)
+      if (!victim) break
+      next = next.filter((c) => c.id !== victim.id)
+      saved = saveConversations(next)
+    }
+    setStorageFull(!saved)
+    if (next !== chats) setChats(next)
   }, [chats])
 
   useEffect(() => {
@@ -195,6 +224,7 @@ export function useChatHistory() {
     activeChat,
     activeId,
     hasAnyChats,
+    storageFull,
     createChat,
     updateMessages,
     deleteChat,

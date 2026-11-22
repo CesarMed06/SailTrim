@@ -35,9 +35,10 @@ interface ChatPanelProps {
   onUpdateSettings: (id: string, settings: { tone?: ChatTone; diagnostic?: boolean }) => void
   onClearChat: () => void
   onToggleSidebar: () => void
+  storageFull?: boolean
 }
 
-function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpdateSettings, onClearChat, onToggleSidebar }: ChatPanelProps) {
+function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpdateSettings, onClearChat, onToggleSidebar, storageFull = false }: ChatPanelProps) {
   const { conditions, mode, liveWind } = useTrim()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -539,6 +540,12 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
           diagnostic={diagnostic}
           onSelect={handleSuggestion}
         />
+      )}
+
+      {storageFull && (
+        <div className="px-5 py-2 bg-amber-500/10 border-t border-amber-500/20 text-amber-300/90 text-xs">
+          {t('chat.storageFull')}
+        </div>
       )}
 
       <ChatInput

@@ -9,6 +9,7 @@ export default function ChatSection() {
     activeChat,
     activeId,
     hasAnyChats,
+    storageFull,
     createChat,
     updateMessages,
     deleteChat,
@@ -49,6 +50,7 @@ export default function ChatSection() {
           }
         }}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        storageFull={storageFull}
       />
     </>
   )

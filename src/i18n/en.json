@@ -117,6 +117,7 @@
     "noKeyError": "Set up your Gemini key in the panel above to use the chat.",
     "apiError": "Error contacting the AI skipper",
     "retry": "Retry",
+    "storageFull": "Browser storage is full: the oldest chats were removed to save this one. Export the ones you want to keep.",
     "ok": "Ok",
     "attachImage": "Attach image",
     "imagePlaceholder": "Add a comment to the image…",
