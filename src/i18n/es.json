@@ -116,6 +116,7 @@
     "removeImage": "Eliminar imagen",
     "noKeyError": "Configura tu clave de Gemini en el panel de arriba para usar el chat.",
     "apiError": "Error al contactar con el patrón IA",
+    "retry": "Reintentar",
     "ok": "Ok",
     "attachImage": "Adjuntar imagen",
     "imagePlaceholder": "Añade un comentario a la imagen…",

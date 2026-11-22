@@ -44,6 +44,8 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
   const [diagnostic, setDiagnostic] = useState(activeChat?.diagnostic ?? false)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [error, setError] = useState('')
+  const [canRetry, setCanRetry] = useState(false)
+  const failedRef = useRef<{ chatId: string; messages: ChatEntry[] } | null>(null)
   const [tone, setTone] = useState<ChatTone>(activeChat?.tone ?? 'casual')
   const [fullscreen, setFullscreen] = useState(false)
   const [pendingImages, setPendingImages] = useState<string[]>([])
@@ -198,12 +200,34 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       const finalMessages = [...updatedMessages, { role: 'assistant' as const, content }]
       onUpdateMessages(chatId, finalMessages)
       setSuggestions(sug)
+      failedRef.current = null
+      setCanRetry(false)
     } catch (err) {
+      failedRef.current = { chatId, messages: updatedMessages }
+      setCanRetry(true)
       setError(err instanceof Error ? err.message : t('chat.apiError'))
     } finally {
       setLoading(false)
     }
   }, [input, pendingImages, loading, activeId, activeChat?.messages, effective, diagnostic, tone, onCreateChat, onUpdateMessages, t])
+
+  const retry = useCallback(async () => {
+    const failed = failedRef.current
+    if (!failed || loading) return
+    setError('')
+    setLoading(true)
+    try {
+      const { content, suggestions: sug } = await sendChatMessage(failed.messages, effective, diagnostic, tone)
+      onUpdateMessages(failed.chatId, [...failed.messages, { role: 'assistant' as const, content }])
+      setSuggestions(sug)
+      failedRef.current = null
+      setCanRetry(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('chat.apiError'))
+    } finally {
+      setLoading(false)
+    }
+  }, [loading, effective, diagnostic, tone, onUpdateMessages, t])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -257,6 +281,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       onClearChat()
       setSuggestions([])
       setError('')
+      setCanRetry(false)
       setPendingImages([])
       try {
         localStorage.removeItem(`sailtrim_draft_${activeId}`)
@@ -453,12 +478,25 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
           <div className="flex justify-center">
             <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5 text-sm text-red-400 max-w-sm text-center">
               {error}
-              <button
-                onClick={() => setError('')}
-                className="ml-3 text-red-300 hover:text-red-200 font-medium underline underline-offset-2"
-              >
-                {t('chat.ok')}
-              </button>
+              <div className="mt-2 flex items-center justify-center gap-4">
+                {canRetry && (
+                  <button
+                    onClick={retry}
+                    className="text-red-200 hover:text-white font-medium underline underline-offset-2"
+                  >
+                    {t('chat.retry')}
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setError('')
+                    setCanRetry(false)
+                  }}
+                  className="text-red-300 hover:text-red-200 font-medium underline underline-offset-2"
+                >
+                  {t('chat.ok')}
+                </button>
+              </div>
             </div>
           </div>
         )}

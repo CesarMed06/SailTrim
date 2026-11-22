@@ -1,7 +1,7 @@
 import i18n, { getCurrentLanguage } from '../i18n'
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
-const DEFAULT_TIMEOUT_MS = 45_000
+const DEFAULT_TIMEOUT_MS = 25_000
 const RETRY_DELAY_MS = 1_500
 
 export const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'] as const
@@ -86,7 +86,7 @@ async function tryModels(apiKey: string, body: unknown, timeoutMs: number): Prom
     try {
       return await requestModel(model, apiKey, body, timeoutMs)
     } catch (error) {
-      if (!(error instanceof GeminiError) || error.code === 'auth' || error.code === 'network' || error.code === 'timeout') {
+      if (!(error instanceof GeminiError) || error.code === 'auth' || error.code === 'network') {
         throw error
       }
       lastError = error

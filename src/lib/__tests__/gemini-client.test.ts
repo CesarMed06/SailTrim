@@ -108,6 +108,18 @@ describe('generateContent', () => {
     await expect(generateContent({ apiKey: 'k', body: {} })).rejects.toMatchObject({ code: 'network' })
   })
 
+  it('falls back to the next model when a model times out', async () => {
+    const mock = useFetch(
+      vi
+        .fn()
+        .mockRejectedValueOnce(Object.assign(new Error('aborted'), { name: 'AbortError' }))
+        .mockResolvedValueOnce(answer('faster model')),
+    )
+
+    await expect(generateContent({ apiKey: 'k', body: {} })).resolves.toBe('faster model')
+    expect(mock).toHaveBeenCalledTimes(2)
+  })
+
   it('maps an aborted request to a timeout', async () => {
     useFetch(vi.fn().mockRejectedValue(Object.assign(new Error('aborted'), { name: 'AbortError' })))
 
