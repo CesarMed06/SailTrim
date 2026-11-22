@@ -18,8 +18,7 @@ const STEP_ICONS = [
   ),
   (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M8.2 12.2l2.6 2.6 4.4-5.2" />
+      <path d="M4.5 12.4l4.8 4.8L19.5 7" />
     </svg>
   ),
 ]
