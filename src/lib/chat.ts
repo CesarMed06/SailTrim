@@ -1,7 +1,7 @@
 import { getApiKey } from './gemini'
 import type { EffectiveConditions } from './gemini'
 import i18n, { getCurrentLanguage } from '../i18n'
-import { generateContent } from './gemini-client'
+import { generateContent, generateContentStream } from './gemini-client'
 import { buildBoatContext } from './boat-context'
 
 export interface ChatEntry {
@@ -226,6 +226,7 @@ export async function sendChatMessage(
   conditions: EffectiveConditions,
   isDiagnostic: boolean,
   tone: ChatTone = 'casual',
+  onText?: (text: string) => void,
 ): Promise<{ content: string; suggestions: string[] }> {
   const apiKey = getApiKey()
   if (!apiKey) throw new Error(i18n.t('chat.noKeyError', { lng: getCurrentLanguage() }))
@@ -239,7 +240,9 @@ export async function sendChatMessage(
     generationConfig: { temperature: 0.7, maxOutputTokens: 4096, thinkingConfig: { thinkingLevel: 'low' } },
   }
 
-  const text = await generateContent({ apiKey, body })
+  const text = onText
+    ? await generateContentStream({ apiKey, body, onText })
+    : await generateContent({ apiKey, body })
   const suggestions = parseSuggestedQuestions(text)
   const content = stripSuggestedQuestions(text)
   return { content, suggestions }

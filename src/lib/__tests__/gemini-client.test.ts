@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { GEMINI_MODELS, GeminiError, generateContent } from '../gemini-client'
+import { GEMINI_MODELS, GeminiError, generateContent, generateContentStream } from '../gemini-client'
 
 const realFetch = globalThis.fetch
 
@@ -23,6 +23,61 @@ function useFetch(mock: ReturnType<typeof vi.fn>) {
 afterEach(() => {
   globalThis.fetch = realFetch
   vi.restoreAllMocks()
+})
+
+function sseResponse(chunks: string[]): Response {
+  const encoder = new TextEncoder()
+  const body = new ReadableStream({
+    start(controller) {
+      for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+      controller.close()
+    },
+  })
+  return { ok: true, status: 200, body } as unknown as Response
+}
+
+describe('generateContentStream', () => {
+  it('delivers each chunk as it arrives and returns the full text', async () => {
+    useFetch(
+      vi.fn().mockResolvedValue(
+        sseResponse([
+          'data: {"candidates":[{"content":{"parts":[{"text":"Hola "}]}}]}\n\n',
+          'data: {"candidates":[{"content":{"parts":[{"text":"mundo"}]}}]}\n\n',
+        ]),
+      ),
+    )
+
+    const seen: string[] = []
+    const text = await generateContentStream({ apiKey: 'k', body: {}, onText: (t) => seen.push(t) })
+
+    expect(text).toBe('Hola mundo')
+    expect(seen).toEqual(['Hola ', 'Hola mundo'])
+  })
+
+  it('ignores thinking parts', async () => {
+    useFetch(
+      vi.fn().mockResolvedValue(
+        sseResponse([
+          'data: {"candidates":[{"content":{"parts":[{"text":"pensando","thought":true}]}}]}\n\n',
+          'data: {"candidates":[{"content":{"parts":[{"text":"Veleta"}]}}]}\n\n',
+        ]),
+      ),
+    )
+
+    const seen: string[] = []
+    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: (t) => seen.push(t) })).resolves.toBe('Veleta')
+    expect(seen).toEqual(['Veleta'])
+  })
+
+  it('falls back to the next model when the stream fails before any text', async () => {
+    useFetch(
+      vi.fn()
+        .mockResolvedValueOnce(jsonResponse(429, {}))
+        .mockResolvedValueOnce(sseResponse(['data: {"candidates":[{"content":{"parts":[{"text":"ok"}]}}]}\n\n'])),
+    )
+
+    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).resolves.toBe('ok')
+  })
 })
 
 describe('generateContent', () => {

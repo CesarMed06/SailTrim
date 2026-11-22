@@ -45,12 +45,15 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [error, setError] = useState('')
   const [canRetry, setCanRetry] = useState(false)
+  const [streamingText, setStreamingText] = useState('')
   const failedRef = useRef<{ chatId: string; messages: ChatEntry[] } | null>(null)
   const [tone, setTone] = useState<ChatTone>(activeChat?.tone ?? 'casual')
   const [fullscreen, setFullscreen] = useState(false)
   const [pendingImages, setPendingImages] = useState<string[]>([])
   const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null)
   const chatRef = useRef<HTMLDivElement>(null)
+  const streamBuffer = useRef('')
+  const streamTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const focusQueued = useRef(false)
@@ -106,7 +109,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
 
   useEffect(() => {
     scrollDown()
-  }, [messages, scrollDown])
+  }, [messages, streamingText, scrollDown])
 
   useEffect(() => {
     if (activeChat && activeChat.messages.length === 0) {
@@ -114,6 +117,22 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       setError('')
     }
   }, [activeChat?.id])
+
+  const pushStream = useCallback((text: string) => {
+    streamBuffer.current = text
+    if (streamTimer.current) return
+    streamTimer.current = setTimeout(() => {
+      streamTimer.current = null
+      setStreamingText(streamBuffer.current)
+    }, 120)
+  }, [])
+
+  const stopStream = useCallback(() => {
+    if (streamTimer.current) clearTimeout(streamTimer.current)
+    streamTimer.current = null
+    streamBuffer.current = ''
+    setStreamingText('')
+  }, [])
 
   const maxImages = getMaxImages()
 
@@ -189,6 +208,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     const updatedMessages = [...currentMessages, userMsg]
     onUpdateMessages(chatId, updatedMessages)
     setLoading(true)
+    setStreamingText('')
 
     try {
       const { content, suggestions: sug } = await sendChatMessage(
@@ -196,6 +216,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
         effective,
         diagnostic,
         tone,
+        pushStream,
       )
       const finalMessages = [...updatedMessages, { role: 'assistant' as const, content }]
       onUpdateMessages(chatId, finalMessages)
@@ -207,9 +228,10 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       setCanRetry(true)
       setError(err instanceof Error ? err.message : t('chat.apiError'))
     } finally {
+      stopStream()
       setLoading(false)
     }
-  }, [input, pendingImages, loading, activeId, activeChat?.messages, effective, diagnostic, tone, onCreateChat, onUpdateMessages, t])
+  }, [input, pendingImages, loading, activeId, activeChat?.messages, effective, diagnostic, tone, onCreateChat, onUpdateMessages, pushStream, stopStream, t])
 
   const retry = useCallback(async () => {
     const failed = failedRef.current
@@ -217,7 +239,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     setError('')
     setLoading(true)
     try {
-      const { content, suggestions: sug } = await sendChatMessage(failed.messages, effective, diagnostic, tone)
+      const { content, suggestions: sug } = await sendChatMessage(failed.messages, effective, diagnostic, tone, pushStream)
       onUpdateMessages(failed.chatId, [...failed.messages, { role: 'assistant' as const, content }])
       setSuggestions(sug)
       failedRef.current = null
@@ -225,9 +247,10 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     } catch (err) {
       setError(err instanceof Error ? err.message : t('chat.apiError'))
     } finally {
+      stopStream()
       setLoading(false)
     }
-  }, [loading, effective, diagnostic, tone, onUpdateMessages, t])
+  }, [loading, effective, diagnostic, tone, onUpdateMessages, pushStream, stopStream, t])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -466,7 +489,15 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
           />
         ))}
 
-        {loading && (
+        {streamingText && (
+          <MessageBubble
+            msg={{ role: 'assistant', content: streamingText }}
+            bubbleClass={colors.bubble}
+            onImageClick={() => {}}
+          />
+        )}
+
+        {loading && !streamingText && (
           <div className="flex justify-start animate-slide-up">
             <div className={`rounded-2xl px-4 py-3 ${colors.bubble}`}>
               <LoadingDots />
