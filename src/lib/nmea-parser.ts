@@ -34,10 +34,10 @@ export function parseNmeaSentence(sentence: string): ParsedWind | null {
   if (talker === '$WIMWV' || talker === '$IIMWV' || talker === '$SIMWV') {
     if (fields.length < 6) return null
 
-    const angle = parseFloat(fields[1])
+    const angle = parseFloat(fields[1] ?? '')
     const reference = fields[2]
-    const speed = parseFloat(fields[3])
-    const units = fields[4]
+    const speed = parseFloat(fields[3] ?? '')
+    const units = fields[4] ?? ''
     const status = fields[5]?.trim()
 
     if (isNaN(angle) || isNaN(speed)) return null
@@ -59,9 +59,9 @@ export function parseNmeaSentence(sentence: string): ParsedWind | null {
   if (talker === '$WIVWT' || talker === '$IIVWT') {
     if (fields.length < 6) return null
 
-    const angle = parseFloat(fields[1])
-    const speed = parseFloat(fields[3])
-    const units = fields[4]
+    const angle = parseFloat(fields[1] ?? '')
+    const speed = parseFloat(fields[3] ?? '')
+    const units = fields[4] ?? ''
 
     if (isNaN(angle) || isNaN(speed)) return null
 

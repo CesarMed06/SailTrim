@@ -355,7 +355,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
   const randomIdxRef = useRef(Math.floor(Math.random() * 6))
   const randomPlaceholder = useMemo(() => {
     const arr = placeholders
-    return arr.length > 0 ? arr[randomIdxRef.current % arr.length] || arr[0] : ''
+    return arr.length > 0 ? arr[randomIdxRef.current % arr.length] || arr[0] || '' : ''
   }, [placeholders])
   const toneLabels = useMemo(() => {
     const labels = t('chat.tones', { returnObjects: true }) as Record<string, string>

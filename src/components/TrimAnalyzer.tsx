@@ -51,7 +51,7 @@ function MarkdownText({ text }: { text: string }) {
                 {numbered[1]}.
               </span>
               <span>
-                <GlossaryInlineMd text={numbered[2]} />
+                <GlossaryInlineMd text={numbered[2] ?? ''} />
               </span>
             </div>
           )

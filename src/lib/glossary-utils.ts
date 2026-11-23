@@ -36,6 +36,7 @@ export function detectTermsInText(text: string): { word: string; entry: Glossary
   let match: RegExpExecArray | null
   while ((match = regex.exec(text)) !== null) {
     const word = match[1]
+    if (!word) continue
     const entry = findTerm(word)
     if (entry) {
       results.push({ word, entry, index: match.index })

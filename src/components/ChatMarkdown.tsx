@@ -4,10 +4,11 @@ function mergeNumberedLines(lines: string[]): string[] {
   const merged: string[] = []
   let i = 0
   while (i < lines.length) {
-    const line = lines[i]
+    const line = lines[i] ?? ''
+    const next = lines[i + 1]
     const soloNum = line.match(/^(\d+)[.)]\s*$/)
-    if (soloNum && i + 1 < lines.length && lines[i + 1].trim() && !/^\d+[.)]\s*$/.test(lines[i + 1])) {
-      merged.push(`${soloNum[1]}. ${lines[i + 1]}`)
+    if (soloNum && next && next.trim() && !/^\d+[.)]\s*$/.test(next)) {
+      merged.push(`${soloNum[1]}. ${next}`)
       i += 2
       continue
     }
@@ -57,7 +58,7 @@ export function ChatMarkdown({ text }: { text: string }) {
                 {numbered[1]}.
               </span>
               <span>
-                <GlossaryInlineMd text={numbered[2]} />
+                <GlossaryInlineMd text={numbered[2] ?? ''} />
               </span>
             </div>
           )

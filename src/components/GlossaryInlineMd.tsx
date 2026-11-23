@@ -9,6 +9,7 @@ function GlossaryAwareText({ text }: { text: string }) {
 
   while ((match = regex.exec(text)) !== null) {
     const word = match[1]
+    if (!word) continue
     const entry = findTerm(word)
     if (match.index > lastIndex) {
       const plain = text.slice(lastIndex, match.index)

@@ -140,7 +140,8 @@ export function parseSuggestedQuestions(content: string): string[] {
       if (q) questions.push(q)
     } else {
       const numbered = trimmed.match(/^\d+[.)]\s+(.+)/)
-      if (numbered) questions.push(numbered[1].trim())
+      const q = numbered?.[1]
+      if (q) questions.push(q.trim())
     }
   }
   return questions.slice(0, 3)
@@ -173,6 +174,7 @@ function keepRecentImages(history: ChatEntry[]): ChatEntry[] {
   const kept: ChatEntry[] = []
   for (let i = history.length - 1; i >= 0; i -= 1) {
     const msg = history[i]
+    if (!msg) continue
     if (msg.role === 'user' && msg.images && msg.images.length > 0) {
       seen += 1
       kept.push(seen > IMAGES_WINDOW ? { ...msg, images: undefined } : msg)

@@ -42,7 +42,7 @@ function BeaufortPicker({ value, onChange }: BeaufortPickerProps) {
     const rect = trackRef.current.getBoundingClientRect()
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
     const idx = Math.round(ratio * 12)
-    return FORCES[idx]
+    return FORCES[idx] ?? value
   }, [value])
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {

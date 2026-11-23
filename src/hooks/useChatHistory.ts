@@ -164,7 +164,7 @@ export function useChatHistory() {
     setActiveId((current) => {
       if (current !== id) return current
       const remaining = chats.filter((c) => c.id !== id)
-      return remaining.length > 0 ? remaining[0].id : null
+      return remaining[0]?.id ?? null
     })
   }, [chats])
 

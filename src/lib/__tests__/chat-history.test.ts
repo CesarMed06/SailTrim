@@ -17,7 +17,7 @@ describe('buildHistoryMessages', () => {
     }
     const messages = buildHistoryMessages(history)
     expect(messages).toHaveLength(HISTORY_WINDOW)
-    expect(messages[0].role).toBe('user')
+    expect(messages[0]?.role).toBe('user')
     expect(messages.at(-1)?.parts[0]).toEqual({ text: 'respuesta 29' })
   })
 
