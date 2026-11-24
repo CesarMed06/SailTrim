@@ -1,5 +1,5 @@
 import type { ChatEntry } from '../lib/chat'
-import { ChatMarkdown } from './ChatMarkdown'
+import { MarkdownText } from './MarkdownText'
 import { ImageThumbnail } from './ImageThumbnail'
 import { MessageCopyButton } from './MessageCopyButton'
 
@@ -37,7 +37,7 @@ export function MessageBubble({ msg, bubbleClass, onImageClick }: MessageBubbleP
           </div>
         ) : (
           <>
-            <ChatMarkdown text={msg.content} />
+            <MarkdownText text={msg.content} />
             <MessageCopyButton text={msg.content} />
           </>
         )}

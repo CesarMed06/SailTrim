@@ -1,48 +1,57 @@
 import { GlossaryInlineMd } from './GlossaryInlineMd'
+import { mergeNumberedLines } from '../lib/markdown'
 
-function mergeNumberedLines(lines: string[]): string[] {
-  const merged: string[] = []
-  let i = 0
-  while (i < lines.length) {
-    const line = lines[i] ?? ''
-    const next = lines[i + 1]
-    const soloNum = line.match(/^(\d+)[.)]\s*$/)
-    if (soloNum && next && next.trim() && !/^\d+[.)]\s*$/.test(next)) {
-      merged.push(`${soloNum[1]}. ${next}`)
-      i += 2
-      continue
-    }
-    merged.push(line)
-    i++
-  }
-  return merged
+type Variant = 'chat' | 'panel'
+
+const STYLES: Record<
+  Variant,
+  { gap: string; h4: string; h3: string; bullet: string }
+> = {
+  chat: {
+    gap: 'space-y-2',
+    h4: 'text-sm font-semibold text-sail-300 pt-1',
+    h3: 'text-base font-bold text-cyan-300 pt-2 first:pt-0',
+    bullet: 'gap-2',
+  },
+  panel: {
+    gap: 'space-y-3',
+    h4: 'text-base font-display font-semibold text-sail-300 pt-2',
+    h3: 'text-lg font-display font-bold text-cyan-300 pt-3 first:pt-0',
+    bullet: 'gap-2.5',
+  },
 }
 
-export function ChatMarkdown({ text }: { text: string }) {
-  const rawLines = text.split(/\r?\n/)
-  const lines = mergeNumberedLines(rawLines)
+export function MarkdownText({
+  text,
+  variant = 'chat',
+}: {
+  text: string
+  variant?: Variant
+}) {
+  const styles = STYLES[variant]
+  const lines = mergeNumberedLines(text.split(/\r?\n/))
 
   return (
-    <div className="space-y-2">
+    <div className={styles.gap}>
       {lines.map((line, i) => {
         if (!line.trim()) return <div key={i} />
         if (line.startsWith('### ')) {
           return (
-            <h4 key={i} className="text-sm font-semibold text-sail-300 pt-1">
+            <h4 key={i} className={styles.h4}>
               <GlossaryInlineMd text={line.slice(4)} />
             </h4>
           )
         }
         if (line.startsWith('## ')) {
           return (
-            <h3 key={i} className="text-base font-bold text-cyan-300 pt-2 first:pt-0">
+            <h3 key={i} className={styles.h3}>
               <GlossaryInlineMd text={line.slice(3)} />
             </h3>
           )
         }
         if (line.startsWith('- ') || line.startsWith('* ')) {
           return (
-            <div key={i} className="flex gap-2 text-sail-500 leading-relaxed">
+            <div key={i} className={`flex ${styles.bullet} text-sail-500 leading-relaxed`}>
               <span className="text-cyan-500/70 shrink-0 mt-0.5">▸</span>
               <span>
                 <GlossaryInlineMd text={line.slice(2)} />
@@ -53,7 +62,7 @@ export function ChatMarkdown({ text }: { text: string }) {
         const numbered = line.match(/^(\d+)[.)]\s+(.*)$/)
         if (numbered) {
           return (
-            <div key={i} className="flex gap-2.5 text-sail-500 leading-relaxed">
+            <div key={i} className={`flex ${styles.bullet} text-sail-500 leading-relaxed`}>
               <span className="text-cyan-500/70 shrink-0 mt-0.5 font-mono text-xs w-5 text-right">
                 {numbered[1]}.
               </span>
