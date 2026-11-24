@@ -79,7 +79,7 @@ function load<T>(key: string, fallback: T): T {
 function save(key: string, value: unknown) {
   try {
     localStorage.setItem(key, JSON.stringify(value))
-  } catch { /* localStorage full — silently degrade */ }
+  } catch {}
 }
 
 export function useBoatProfile() {

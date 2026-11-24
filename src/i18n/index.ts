@@ -10,7 +10,6 @@ function getInitialLang(): string {
     const stored = localStorage.getItem(LANG_KEY)
     if (stored === 'en' || stored === 'es') return stored
   } catch {
-    // localStorage not available
   }
 
   if (typeof navigator !== 'undefined') {
@@ -35,7 +34,6 @@ export function switchLanguage(lang: 'es' | 'en') {
   try {
     localStorage.setItem(LANG_KEY, lang)
   } catch {
-    // localStorage not available
   }
 }
 

@@ -76,7 +76,6 @@ function saveActiveId(id: string | null) {
       localStorage.removeItem(ACTIVE_KEY)
     }
   } catch {
-    // silently fail
   }
 }
 

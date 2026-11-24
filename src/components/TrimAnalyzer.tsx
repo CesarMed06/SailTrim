@@ -150,7 +150,6 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
-      // clipboard not available
     }
   }, [result])
 

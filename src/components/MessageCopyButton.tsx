@@ -11,7 +11,6 @@ export function MessageCopyButton({ text }: { text: string }) {
       setDone(true)
       setTimeout(() => setDone(false), 1500)
     } catch {
-      // clipboard not available
     }
   }, [text])
 

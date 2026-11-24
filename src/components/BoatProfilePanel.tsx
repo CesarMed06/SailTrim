@@ -157,7 +157,6 @@ export default function BoatProfilePanel() {
             </button>
           </div>
 
-          {/* Nombre y modelo */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
@@ -185,7 +184,6 @@ export default function BoatProfilePanel() {
             </div>
           </div>
 
-          {/* Dimensiones */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
@@ -231,7 +229,6 @@ export default function BoatProfilePanel() {
             </div>
           </div>
 
-          {/* Aparejo, material, año */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
@@ -327,10 +324,8 @@ export default function BoatProfilePanel() {
             </div>
           </div>
 
-          {/* Separador */}
           <div className="border-t border-ocean-800/30 my-6" />
 
-          {/* Prioridad */}
           <div className="mb-6">
             <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-2">
               {isEn ? 'Navigation priority' : 'Prioridad de navegación'}
@@ -372,7 +367,6 @@ export default function BoatProfilePanel() {
             )}
           </div>
 
-          {/* Zona */}
           <div className="mb-6">
             <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-2">
               {isEn ? 'Navigation zone' : 'Zona de navegación'}
@@ -415,7 +409,6 @@ export default function BoatProfilePanel() {
               )}
           </div>
 
-          {/* Mes y hora */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
@@ -497,10 +490,8 @@ export default function BoatProfilePanel() {
             </div>
           </div>
 
-          {/* Separador */}
           <div className="border-t border-ocean-800/30 my-6" />
 
-          {/* Tripulación */}
           <div className="mb-6">
             <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-2">
               {isEn ? 'Crew' : 'Tripulación'}
@@ -553,7 +544,6 @@ export default function BoatProfilePanel() {
             </div>
           </div>
 
-          {/* Botón guardar */}
           <button
             onClick={saveAll}
             className="w-full py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold rounded-xl transition-all duration-300 active:scale-[0.98] cursor-pointer shadow-lg shadow-cyan-500/10"

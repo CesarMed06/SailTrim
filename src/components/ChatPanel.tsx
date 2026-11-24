@@ -207,7 +207,6 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
     try {
       localStorage.removeItem(`sailtrim_draft_${activeId ?? 'new'}`)
     } catch {
-      // ignore
     }
 
     let chatId = activeId
@@ -294,7 +293,6 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
         localStorage.removeItem(draftKey)
       }
     } catch {
-      // ignore
     }
   }, [input, pendingImages, activeId])
 
@@ -321,7 +319,6 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       try {
         localStorage.removeItem(`sailtrim_draft_${activeId}`)
       } catch {
-        // ignore
       }
     }
   }, [activeId, onClearChat])
