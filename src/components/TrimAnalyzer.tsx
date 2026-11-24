@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTrim } from '../context/TrimContext'
-import { analyzeTrim, getApiKey, getEffectiveConditions } from '../lib/gemini'
+import { analyzeTrimStream, getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { MarkdownText } from './MarkdownText'
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
@@ -23,14 +23,19 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
   const [status, setStatus] = useState<Status>('idle')
   const [result, setResult] = useState('')
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const [auto, setAuto] = useState(false)
   const [intervalSec, setIntervalSec] = useState(60)
   const [copied, setCopied] = useState(false)
   const [resultKey, setResultKey] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
+  const [streaming, setStreaming] = useState(false)
+  const [elapsed, setElapsed] = useState(0)
   const loadingRef = useRef(false)
   const autoRef = useRef(auto)
   const statusRef = useRef(status)
+  const streamBuffer = useRef('')
+  const streamTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -40,6 +45,12 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
   useEffect(() => {
     statusRef.current = status
   }, [status])
+
+  useEffect(() => {
+    return () => {
+      if (streamTimer.current) clearTimeout(streamTimer.current)
+    }
+  }, [])
 
   const effective = useMemo(
     () => getEffectiveConditions(conditions, mode, liveWind),
@@ -57,6 +68,16 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
   }, [liveWind])
 
   const hasData = mode === 'manual' || liveWind !== null
+
+  useEffect(() => {
+    if (!loadingRef.current) {
+      setElapsed(0)
+      return
+    }
+    const start = Date.now()
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 1000)
+    return () => clearInterval(id)
+  }, [status, streaming])
 
   const runAnalysis = useCallback(async () => {
     if (loadingRef.current) return
@@ -76,18 +97,43 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       setStatus('loading')
     }
     setError('')
+    setWarning('')
+    setStreaming(true)
+    setResultKey((k) => k + 1)
+    streamBuffer.current = ''
+    const stopStream = () => {
+      if (streamTimer.current) clearTimeout(streamTimer.current)
+      streamTimer.current = null
+    }
     try {
-      const text = await analyzeTrim(current, apiKey)
+      const text = await analyzeTrimStream(current, apiKey, (partial) => {
+        streamBuffer.current = partial
+        if (streamTimer.current) return
+        streamTimer.current = setTimeout(() => {
+          streamTimer.current = null
+          setResult(streamBuffer.current)
+          setStatus('success')
+        }, 120)
+      })
+      stopStream()
       setResult(text)
-      setResultKey((k) => k + 1)
       setStatus('success')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error inesperado al analizar')
-      setResult('')
-      setStatus('error')
+      stopStream()
+      const partial = streamBuffer.current
+      if (partial) {
+        setResult(partial)
+        setStatus('success')
+        setWarning(err instanceof Error ? err.message : 'El plan se cortó antes de terminar.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Error inesperado al analizar')
+        setResult('')
+        setStatus('error')
+      }
     } finally {
       loadingRef.current = false
       setRefreshing(false)
+      setStreaming(false)
     }
   }, [onOpenApiKey])
 
@@ -176,6 +222,9 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
           </div>
           <p className="mt-5 text-cyan-300 font-semibold animate-pulse">{t('trimAnalyzer.consulting')}</p>
           <p className="text-sail-600 text-sm mt-1">{t('trimAnalyzer.analyzingDetail')}</p>
+          {elapsed > 0 && (
+            <p className="text-sail-600 text-xs mt-3">{t('trimAnalyzer.waiting', { seconds: elapsed })}</p>
+          )}
         </div>
       )}
 
@@ -211,14 +260,18 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
                 </svg>
                 {t('trimAnalyzer.planTitle')}
               </span>
-              {(auto || refreshing) && (
+              {(auto || refreshing || streaming) && (
                 <span className="flex items-center gap-1.5 text-[10px] font-medium text-sail-600">
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${
-                      refreshing ? 'bg-amber-400 animate-ping' : 'bg-green-400 animate-pulse'
+                      streaming ? 'bg-cyan-400 animate-ping' : refreshing ? 'bg-amber-400 animate-ping' : 'bg-green-400 animate-pulse'
                     }`}
                   />
-                  {refreshing ? t('trimAnalyzer.updating') : t('trimAnalyzer.updatesEvery', { interval: formatInterval(intervalSec) })}
+                  {streaming
+                    ? t('trimAnalyzer.writing')
+                    : refreshing
+                      ? t('trimAnalyzer.updating')
+                      : t('trimAnalyzer.updatesEvery', { interval: formatInterval(intervalSec) })}
                 </span>
               )}
             </div>
@@ -244,6 +297,14 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
             <MarkdownText text={result} variant="panel" />
           </div>
 
+          {warning && (
+            <p className="mt-5 flex items-start gap-2 text-amber-400/90 text-xs leading-relaxed">
+              <span className="shrink-0">⚠</span>
+              {warning}
+            </p>
+          )}
+
+          {!streaming && (
           <div className="mt-7 pt-4 border-t border-ocean-800/20 flex items-center justify-between text-xs">
             <span className="text-sail-700">
               {t('trimAnalyzer.basedOn')} ·{' '}
@@ -256,6 +317,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
               {t('trimAnalyzer.reanalyze')}
             </button>
           </div>
+          )}
         </div>
       )}
 

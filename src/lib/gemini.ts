@@ -3,7 +3,7 @@ import { GEMINI_API_KEY_STORAGE } from './constants'
 import type { LiveWind, TrimMode } from '../context/TrimContext'
 import { toWindAngle } from './wind-utils'
 import i18n, { getCurrentLanguage } from '../i18n'
-import { generateContent } from './gemini-client'
+import { generateContentStream } from './gemini-client'
 import { buildBoatContext } from './boat-context'
 
 export interface EffectiveConditions {
@@ -172,13 +172,16 @@ Notas de seguridad específicas para estas condiciones.
 Usa listas con guiones y negrita para lo importante.`
 }
 
-export async function analyzeTrim(c: EffectiveConditions, apiKey: string): Promise<string> {
+export function analyzeTrimStream(
+  c: EffectiveConditions,
+  apiKey: string,
+  onText: (text: string) => void,
+): Promise<string> {
   const body = {
     system_instruction: { parts: [{ text: getSystemPrompt() }] },
     contents: [{ role: 'user', parts: [{ text: buildTrimPrompt(c) }] }],
-    generationConfig: { temperature: 0.6, maxOutputTokens: 4096, thinkingConfig: { thinkingLevel: 'low' } },
+    generationConfig: { temperature: 0.6, maxOutputTokens: 32768, thinkingConfig: { thinkingLevel: 'low' } },
   }
 
-  const text = await generateContent({ apiKey, body })
-  return text
+  return generateContentStream({ apiKey, body, timeoutMs: 60_000, onText })
 }

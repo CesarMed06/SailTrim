@@ -6,7 +6,7 @@ const RETRY_DELAY_MS = 1_500
 
 export const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'] as const
 
-export type GeminiErrorCode = 'auth' | 'rateLimit' | 'timeout' | 'network' | 'empty' | 'server' | 'unknown'
+export type GeminiErrorCode = 'auth' | 'rateLimit' | 'timeout' | 'network' | 'empty' | 'server' | 'truncated' | 'blocked' | 'unknown'
 
 export class GeminiError extends Error {
   readonly code: GeminiErrorCode
@@ -19,7 +19,7 @@ export class GeminiError extends Error {
 }
 
 interface GeminiPayload {
-  candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[]
+  candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[]
   error?: { message?: string }
 }
 
@@ -138,6 +138,7 @@ async function streamModel(
     const decoder = new TextDecoder()
     let buffer = ''
     let text = ''
+    let finishReason = ''
 
     while (true) {
       const { done, value } = await reader.read()
@@ -152,19 +153,27 @@ async function streamModel(
         if (!data) continue
         try {
           const payload = JSON.parse(data) as GeminiPayload
+          if (payload.error) throw new GeminiError('server')
+          const reason = payload.candidates?.[0]?.finishReason
+          if (reason) finishReason = reason
           const parts = payload.candidates?.[0]?.content?.parts ?? []
           for (const part of parts) {
             if (part.thought || !part.text) continue
             text += part.text
             onText(text)
           }
-        } catch {
+        } catch (error) {
+          if (error instanceof GeminiError) throw error
           continue
         }
       }
     }
 
     if (!text.trim()) throw new GeminiError('empty')
+    if (finishReason === 'SAFETY' || finishReason === 'RECITATION' || finishReason === 'PROHIBITED_CONTENT') {
+      throw new GeminiError('blocked')
+    }
+    if (finishReason !== 'STOP') throw new GeminiError('truncated')
     return text
   } catch (error) {
     if (error instanceof GeminiError) throw error
@@ -196,7 +205,14 @@ export async function generateContentStream({
       try {
         return await streamModel(model, apiKey, body, timeoutMs, emit)
       } catch (error) {
-        if (!(error instanceof GeminiError) || error.code === 'auth' || error.code === 'network' || emitted) throw error
+        if (
+          !(error instanceof GeminiError) ||
+          error.code === 'auth' ||
+          error.code === 'network' ||
+          error.code === 'timeout' ||
+          emitted
+        )
+          throw error
         lastError = error
       }
     }

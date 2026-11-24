@@ -25,11 +25,17 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-function sseResponse(chunks: string[]): Response {
+function sseResponse(chunks: string[], finish = 'STOP'): Response {
   const encoder = new TextEncoder()
+  const events =
+    finish && !chunks.some((chunk) => chunk.includes('finishReason'))
+      ? [...chunks, `data: {"candidates":[{"finishReason":"${finish}"}]}
+
+`]
+      : chunks
   const body = new ReadableStream({
     start(controller) {
-      for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+      for (const chunk of events) controller.enqueue(encoder.encode(chunk))
       controller.close()
     },
   })
@@ -179,5 +185,64 @@ describe('generateContent', () => {
     useFetch(vi.fn().mockRejectedValue(Object.assign(new Error('aborted'), { name: 'AbortError' })))
 
     await expect(generateContent({ apiKey: 'k', body: {} })).rejects.toMatchObject({ code: 'timeout' })
+  })
+})
+
+describe('generateContentStream timeouts', () => {
+  it('does not walk through every model when a stream times out', async () => {
+    const mock = useFetch(
+      vi.fn().mockRejectedValue(Object.assign(new Error('aborted'), { name: 'AbortError' })),
+    )
+
+    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
+      code: 'timeout',
+    })
+    expect(mock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('generateContentStream finish reasons', () => {
+  it('reports a plan cut by the token limit instead of presenting it as finished', async () => {
+    useFetch(
+      vi.fn().mockResolvedValue(
+        sseResponse([
+          'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
+          'data: {"candidates":[{"content":{"parts":[{"text":" a medias"}]},"finishReason":"MAX_TOKENS"}]}\n\n',
+        ]),
+      ),
+    )
+
+    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
+      code: 'truncated',
+    })
+  })
+})
+
+describe('generateContentStream interruptions', () => {
+  it('reports an error sent in the middle of the stream', async () => {
+    useFetch(
+      vi.fn().mockResolvedValue(
+        sseResponse([
+          'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
+          'data: {"error":{"message":"model overloaded"}}\n\n',
+        ]),
+      ),
+    )
+
+    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
+      code: 'server',
+    })
+  })
+
+  it('treats a stream that ends without a finish reason as cut', async () => {
+    useFetch(
+      vi.fn().mockResolvedValue(
+        sseResponse(['data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n'], ''),
+      ),
+    )
+
+    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
+      code: 'truncated',
+    })
   })
 })
