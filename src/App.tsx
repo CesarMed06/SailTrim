@@ -57,11 +57,12 @@ function AppInner() {
   return (
     <div className="min-h-screen bg-ocean-950 text-white">
       <a
-        href="#main"
+        href="#paso1"
         className="skip-link rounded-xl bg-cyan-500 px-4 py-2 font-semibold text-ocean-950 shadow-lg"
       >
         {t('a11y.skip')}
       </a>
+      <LanguageSwitcher />
       <SEO />
       {!online && <OfflineBanner />}
       <main id="main" tabIndex={-1}>
@@ -75,7 +76,6 @@ function AppInner() {
         <SimulationPanel isRunning={isRunning} wind={wind} onToggle={toggle} />
         <NMEAPanel />
       </main>
-      <LanguageSwitcher />
       <PWAInstallPrompt />
       <SWUpdatePrompt />
       <Footer />
@@ -91,4 +91,4 @@ function App() {
   )
 }
 
-export default App
+export default App
