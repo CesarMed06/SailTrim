@@ -1,4 +1,7 @@
 {
+  "a11y": {
+    "skip": "Saltar al contenido"
+  },
   "hero": {
     "badge": "Asistente IA de trimado",
     "title1": "Domina",
@@ -89,6 +92,7 @@
     "writing": "escribiendo el plan…",
     "waiting": "El patrón está pensando… {{seconds}} s",
     "updatesEvery": "se actualiza cada {{interval}}",
+    "intervalLabel": "Intervalo de análisis continuo",
     "copied": "✓ Copiado",
     "copy": "Copiar",
     "basedOn": "Basado en las condiciones actuales",
@@ -113,6 +117,7 @@
     "emptyConsultas": "Pregunta cualquier cosa sobre trimado, maniobras o tu barco. El patrón IA conoce tus condiciones actuales.",
     "emptyDiagnostic": "Describe un síntoma y el patrón diagnosticará qué falla en el trimado.",
     "sendAria": "Enviar mensaje",
+    "inputLabel": "Mensaje para el patrón",
     "suggestions": "Sugerencias:",
     "copyMessage": "Copiar mensaje",
     "removeImage": "Eliminar imagen",

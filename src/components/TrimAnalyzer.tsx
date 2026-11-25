@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTrim } from '../context/TrimContext'
+import { useTrim } from '../context/trim-context'
 import { analyzeTrimStream, getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { MarkdownText } from './MarkdownText'
 
@@ -191,8 +191,8 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
               <select
                 value={intervalSec}
                 onChange={(e) => setIntervalSec(Number(e.target.value))}
-                aria-label="Intervalo de análisis continuo"
-                className="bg-ocean-950/70 border border-ocean-700/40 rounded-xl px-3 py-3.5 text-sm text-sail-300 focus:outline-none focus:border-green-500/40 transition-all"
+                aria-label={t('trimAnalyzer.intervalLabel')}
+                className="bg-ocean-950/70 border border-ocean-700/40 rounded-xl px-3 py-3.5 text-sm text-sail-300 focus:border-green-500/40 transition-all"
               >
                 {INTERVAL_OPTIONS.map((sec) => (
                   <option key={sec} value={sec} className="bg-ocean-900">
@@ -214,7 +214,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       )}
 
       {status === 'loading' && !result && (
-        <div className="mt-6 bg-ocean-950/60 border border-ocean-800/30 rounded-2xl py-14 flex flex-col items-center justify-center animate-fade-in">
+        <div role="status" aria-live="polite" className="mt-6 bg-ocean-950/60 border border-ocean-800/30 rounded-2xl py-14 flex flex-col items-center justify-center animate-fade-in">
           <div className="relative w-16 h-16">
             <div className="absolute inset-0 rounded-full border-4 border-ocean-800 border-t-cyan-400 animate-spin" />
             <div className="absolute inset-0 flex items-center justify-center text-2xl">⛵</div>
@@ -222,7 +222,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
           <p className="mt-5 text-cyan-300 font-semibold animate-pulse">{t('trimAnalyzer.consulting')}</p>
           <p className="text-sail-600 text-sm mt-1">{t('trimAnalyzer.analyzingDetail')}</p>
           {elapsed > 0 && (
-            <p className="text-sail-600 text-xs mt-3">{t('trimAnalyzer.waiting', { seconds: elapsed })}</p>
+            <p aria-hidden="true" className="text-sail-600 text-xs mt-3">{t('trimAnalyzer.waiting', { seconds: elapsed })}</p>
           )}
         </div>
       )}

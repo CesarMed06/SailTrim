@@ -1,4 +1,7 @@
 {
+  "a11y": {
+    "skip": "Skip to content"
+  },
   "hero": {
     "badge": "AI Trim Assistant",
     "title1": "Master",
@@ -89,6 +92,7 @@
     "writing": "writing the plan…",
     "waiting": "The skipper is thinking… {{seconds}}s",
     "updatesEvery": "updates every {{interval}}",
+    "intervalLabel": "Continuous analysis interval",
     "copied": "✓ Copied",
     "copy": "Copy",
     "basedOn": "Based on current conditions",
@@ -113,6 +117,7 @@
     "emptyConsultas": "Ask anything about trim, maneuvers, or your boat. The AI skipper knows your current conditions.",
     "emptyDiagnostic": "Describe a symptom and the skipper will diagnose what's wrong with your trim.",
     "sendAria": "Send message",
+    "inputLabel": "Message to the skipper",
     "suggestions": "Suggestions:",
     "copyMessage": "Copy message",
     "removeImage": "Remove image",

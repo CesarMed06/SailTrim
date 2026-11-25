@@ -60,9 +60,10 @@ export function ChatInput({
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder={pendingImages.length > 0 ? t('chat.imagePlaceholder') : placeholder}
+          aria-label={t('chat.inputLabel')}
           rows={2}
           disabled={loading}
-          className="flex-1 resize-none bg-ocean-950/60 border border-ocean-800/30 focus:border-cyan-500/40 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-sail-200 placeholder-sail-700 disabled:opacity-50 transition-all"
+          className="flex-1 resize-none bg-ocean-950/60 border border-ocean-800/30 focus:border-cyan-500/40 rounded-xl px-4 py-2.5 text-sm text-sail-200 placeholder-sail-700 disabled:opacity-50 transition-all"
         />
         <input
           ref={fileInputRef}

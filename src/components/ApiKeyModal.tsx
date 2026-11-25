@@ -116,7 +116,7 @@ function ApiKeyModal({ open, onClose, onOpenGuide }: ApiKeyModalProps) {
             aria-label={t('apiKeyModal.inputLabel')}
             autoComplete="off"
             spellCheck={false}
-            className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 pr-12 font-mono text-sm text-sail-200 placeholder:text-sail-700 focus:outline-none focus:border-wind-500/50 focus:ring-1 focus:ring-wind-500/30 transition-all"
+            className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 pr-12 font-mono text-sm text-sail-200 placeholder:text-sail-700 focus:border-wind-500/50 focus:ring-1 focus:ring-wind-500/30 transition-all"
           />
           <button
             type="button"

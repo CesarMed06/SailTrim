@@ -82,7 +82,7 @@ function Hero() {
       <button
         onClick={() => document.getElementById('compass')?.scrollIntoView({ behavior: 'smooth' })}
         aria-label={t('hero.scrollHint')}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-sail-600 hover:text-sail-300 transition-colors cursor-pointer"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex h-11 w-11 scroll-mb-6 items-center justify-center rounded-full text-sail-600 hover:text-sail-300 transition-colors cursor-pointer"
       >
         <svg className="scroll-dot w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 9l6 6 6-6" />

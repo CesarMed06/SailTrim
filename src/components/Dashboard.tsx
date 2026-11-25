@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTrim, type TrimMode } from '../context/TrimContext'
+import { useTrim, type TrimMode } from '../context/trim-context'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import ApiKeyModal from './ApiKeyModal'
 import ApiKeyGuide from './ApiKeyGuide'

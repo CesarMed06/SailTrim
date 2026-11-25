@@ -29,6 +29,15 @@ i18n.use(initReactI18next).init({
   returnObjects: true,
 })
 
+function syncDocumentLanguage(lang: string) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = lang
+  }
+}
+
+i18n.on('languageChanged', syncDocumentLanguage)
+syncDocumentLanguage(i18n.language)
+
 export function switchLanguage(lang: 'es' | 'en') {
   i18n.changeLanguage(lang)
   try {

@@ -1,6 +1,6 @@
 import type { BeaufortForce, BoatType, ExperienceLevel, TrimConditions, WindAngle } from '../types'
 import { GEMINI_API_KEY_STORAGE } from './constants'
-import type { LiveWind, TrimMode } from '../context/TrimContext'
+import type { LiveWind, TrimMode } from '../context/trim-context'
 import { toWindAngle } from './wind-utils'
 import i18n, { getCurrentLanguage } from '../i18n'
 import { generateContentStream } from './gemini-client'

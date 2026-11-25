@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useTrim } from '../context/TrimContext'
+import { useTrim } from '../context/trim-context'
 import BoatTypeSelector from './BoatTypeSelector'
 import BeaufortPicker from './BeaufortPicker'
 import ExperienceToggle from './ExperienceToggle'

@@ -1,28 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import type { BeaufortForce, BoatType, ExperienceLevel, TrimConditions, WindAngle } from '../types'
-
-export type TrimMode = 'manual' | 'demo' | 'live'
-
-export interface LiveWind {
-  direction: number
-  speedKnots: number
-  force: BeaufortForce
-}
-
-interface TrimContextValue {
-  conditions: TrimConditions
-  setWindAngle: (angle: WindAngle) => void
-  setBoatType: (boat: BoatType) => void
-  setWindForce: (force: BeaufortForce) => void
-  setExperience: (level: ExperienceLevel) => void
-  setSeaState: (state?: 'calm' | 'moderate' | 'rough') => void
-  mode: TrimMode
-  setMode: (mode: TrimMode) => void
-  liveWind: LiveWind | null
-  setLiveWind: (wind: LiveWind | null) => void
-}
-
-const TrimContext = createContext<TrimContextValue | null>(null)
+import { TrimContext, type LiveWind, type TrimMode } from './trim-context'
 
 export function TrimProvider({ children }: { children: ReactNode }) {
   const [conditions, setConditions] = useState<TrimConditions>({
@@ -73,10 +51,4 @@ export function TrimProvider({ children }: { children: ReactNode }) {
       {children}
     </TrimContext.Provider>
   )
-}
-
-export function useTrim() {
-  const ctx = useContext(TrimContext)
-  if (!ctx) throw new Error('useTrim debe usarse dentro de TrimProvider')
-  return ctx
 }

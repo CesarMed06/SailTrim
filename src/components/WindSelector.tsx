@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { WindAngle } from '../types'
-import { useTrim } from '../context/TrimContext'
+import { useTrim } from '../context/trim-context'
 import CompassRose from './CompassRose'
 
 function WindSelector() {

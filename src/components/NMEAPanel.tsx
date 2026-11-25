@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNmeaConnection } from '../hooks/useNmeaConnection'
 import { processFeedBuffer, generateFakeNmeaSentence, generateFakeSignalKDelta } from '../lib/nmea-parser'
-import { useTrim } from '../context/TrimContext'
+import { useTrim } from '../context/trim-context'
 import type { ParsedWind, NmeaFeedLine } from '../types'
 
 const SIM_INTERVAL_MS = 1500
@@ -154,7 +154,7 @@ function NMEAPanel() {
                 placeholder={t('nmea.urlPlaceholder')}
                 aria-label={t('nmea.urlLabel')}
                 disabled={isConnected || isSimulating}
-                className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 font-mono text-sm text-sail-300 placeholder:text-sail-700 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-ocean-950/80 border border-ocean-800/50 rounded-xl px-4 py-3 font-mono text-sm text-sail-300 placeholder:text-sail-700 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <div className="flex gap-2">

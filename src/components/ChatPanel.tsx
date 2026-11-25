@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTrim } from '../context/TrimContext'
+import { useTrim } from '../context/trim-context'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import { sendChatMessage, type ChatEntry, type ChatTone } from '../lib/chat'
 import type { Conversation } from '../hooks/useChatHistory'
@@ -63,13 +63,15 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
   const skipSave = useRef(false)
   const { t } = useTranslation()
 
-  const messages = activeChat?.messages ?? []
+  const messages = useMemo(() => activeChat?.messages ?? [], [activeChat?.messages])
 
   useEffect(() => {
-    if (activeChat) {
-      setDiagnostic(activeChat.diagnostic)
-      setTone(activeChat.tone)
-    }
+    if (!activeChat) return
+    setDiagnostic(activeChat.diagnostic)
+    setTone(activeChat.tone)
+  }, [activeChat])
+
+  useEffect(() => {
     const draftKey = `sailtrim_draft_${activeChat?.id ?? 'new'}`
     try {
       const raw = localStorage.getItem(draftKey)
@@ -118,7 +120,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
       setSuggestions([])
       setError('')
     }
-  }, [activeChat?.id])
+  }, [activeChat])
 
   useEffect(() => {
     if (!loading) {
@@ -386,7 +388,7 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
             value={tone}
             onChange={(e) => setTone(e.target.value as ChatTone)}
             aria-label={t('chat.toneLabel')}
-            className="bg-ocean-950/70 border border-ocean-700/40 rounded-xl px-2.5 py-1.5 text-xs text-sail-400 focus:outline-none focus:border-cyan-500/40 transition-all"
+            className="bg-ocean-950/70 border border-ocean-700/40 rounded-xl px-2.5 py-1.5 text-xs text-sail-400 focus:border-cyan-500/40 transition-all"
           >
             {Object.entries(toneLabels).map(([key, label]) => (
               <option key={key} value={key} className="bg-ocean-900">
@@ -507,11 +509,11 @@ function ChatPanel({ activeChat, activeId, onCreateChat, onUpdateMessages, onUpd
         )}
 
         {loading && !streamingText && (
-          <div className="flex justify-start animate-slide-up">
+          <div role="status" aria-live="polite" className="flex justify-start animate-slide-up">
             <div className={`rounded-2xl px-4 py-3 ${colors.bubble}`}>
               <LoadingDots />
               {elapsed > 0 && (
-                <p className="mt-1 text-[11px] text-sail-600">
+                <p aria-hidden="true" className="mt-1 text-[11px] text-sail-600">
                   {t('chat.waiting', { seconds: elapsed })}
                 </p>
               )}
