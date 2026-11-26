@@ -200,7 +200,8 @@ export async function generateContentStream({
     onText(text)
   }
 
-  for (let pass = 0; pass < 2; pass += 1) {
+  const attempt = async (): Promise<string> => {
+    lastError = new GeminiError('unknown')
     for (const model of GEMINI_MODELS) {
       try {
         return await streamModel(model, apiKey, body, timeoutMs, emit)
@@ -216,16 +217,31 @@ export async function generateContentStream({
         lastError = error
       }
     }
-
-    const retryable = lastError.code === 'rateLimit' || lastError.code === 'server' || lastError.code === 'empty'
-    if (pass === 0 && retryable) {
-      await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
-      continue
-    }
     throw lastError
   }
 
-  throw lastError
+  try {
+    return await attempt()
+  } catch (error) {
+    if (!(error instanceof GeminiError)) throw error
+
+    if (emitted) {
+      const cutRetryable =
+        error.code === 'truncated' ||
+        error.code === 'server' ||
+        error.code === 'network' ||
+        error.code === 'timeout'
+      if (!cutRetryable) throw error
+      emitted = false
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
+      return attempt()
+    }
+
+    const retryable = error.code === 'rateLimit' || error.code === 'server' || error.code === 'empty'
+    if (!retryable) throw error
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
+    return attempt()
+  }
 }
 
 export async function generateContent({

@@ -204,7 +204,7 @@ describe('generateContentStream timeouts', () => {
 describe('generateContentStream finish reasons', () => {
   it('reports a plan cut by the token limit instead of presenting it as finished', async () => {
     useFetch(
-      vi.fn().mockResolvedValue(
+      vi.fn().mockImplementation(() =>
         sseResponse([
           'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
           'data: {"candidates":[{"content":{"parts":[{"text":" a medias"}]},"finishReason":"MAX_TOKENS"}]}\n\n',
@@ -221,7 +221,7 @@ describe('generateContentStream finish reasons', () => {
 describe('generateContentStream interruptions', () => {
   it('reports an error sent in the middle of the stream', async () => {
     useFetch(
-      vi.fn().mockResolvedValue(
+      vi.fn().mockImplementation(() =>
         sseResponse([
           'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
           'data: {"error":{"message":"model overloaded"}}\n\n',
@@ -236,7 +236,7 @@ describe('generateContentStream interruptions', () => {
 
   it('treats a stream that ends without a finish reason as cut', async () => {
     useFetch(
-      vi.fn().mockResolvedValue(
+      vi.fn().mockImplementation(() =>
         sseResponse(['data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n'], ''),
       ),
     )
@@ -244,5 +244,67 @@ describe('generateContentStream interruptions', () => {
     await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
       code: 'truncated',
     })
+  })
+
+  it('restarts the stream once when it is cut after some text', async () => {
+    const fetchMock = useFetch(
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          sseResponse([
+            'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
+            'data: {"candidates":[{"content":{"parts":[{"text":" cortado"}]},"finishReason":"MAX_TOKENS"}]}\n\n',
+          ]),
+        )
+        .mockResolvedValueOnce(
+          sseResponse(['data: {"candidates":[{"content":{"parts":[{"text":"## Resumen completo"}]}}]}\n\n']),
+        ),
+    )
+
+    const seen: string[] = []
+    const text = await generateContentStream({
+      apiKey: 'k',
+      body: {},
+      retryDelayMs: 0,
+      onText: (partial) => seen.push(partial),
+    })
+
+    expect(text).toBe('## Resumen completo')
+    expect(seen).toEqual(['## Resumen', '## Resumen cortado', '## Resumen completo'])
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps the last partial text and reports the cut when the retry is cut too', async () => {
+    const fetchMock = useFetch(
+      vi.fn().mockImplementation(() =>
+        sseResponse([
+          'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
+          'data: {"candidates":[{"content":{"parts":[{"text":" a medias"}]},"finishReason":"MAX_TOKENS"}]}\n\n',
+        ]),
+      ),
+    )
+
+    const seen: string[] = []
+    await expect(
+      generateContentStream({ apiKey: 'k', body: {}, retryDelayMs: 0, onText: (partial) => seen.push(partial) }),
+    ).rejects.toMatchObject({ code: 'truncated' })
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(seen.at(-1)).toBe('## Resumen a medias')
+  })
+
+  it('does not retry a stream stopped for safety', async () => {
+    const fetchMock = useFetch(
+      vi.fn().mockImplementation(() =>
+        sseResponse([
+          'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]},"finishReason":"SAFETY"}]}\n\n',
+        ]),
+      ),
+    )
+
+    await expect(generateContentStream({ apiKey: 'k', body: {}, retryDelayMs: 0, onText: () => {} })).rejects.toMatchObject({
+      code: 'blocked',
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })
