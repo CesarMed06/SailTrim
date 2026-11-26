@@ -57,7 +57,7 @@ function AppInner() {
   return (
     <div className="min-h-screen bg-ocean-950 text-white">
       <a
-        href="#paso1"
+        href="#compass"
         className="skip-link rounded-xl bg-cyan-500 px-4 py-2 font-semibold text-ocean-950 shadow-lg"
       >
         {t('a11y.skip')}

@@ -38,6 +38,10 @@ body {
   transform: translateY(0);
 }
 
+#compass:focus {
+  outline: none;
+}
+
 #root {
   min-height: 100vh;
 }

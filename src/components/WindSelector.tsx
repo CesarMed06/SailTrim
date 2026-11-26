@@ -9,7 +9,7 @@ function WindSelector() {
   const angle = conditions.windAngle
 
   return (
-    <section id="compass" className="relative py-24 px-4">
+    <section id="compass" tabIndex={-1} className="relative scroll-mt-6 py-24 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <span className="text-wind-400 text-sm font-semibold tracking-widest uppercase">
