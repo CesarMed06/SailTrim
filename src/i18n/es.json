@@ -70,6 +70,8 @@
     "viento": "Viento",
     "mar": "Mar",
     "nivel": "Nivel",
+    "editHint": "Toca una condición para cambiarla",
+    "done": "Listo",
     "keyConfigured": "Clave de Gemini configurada",
     "keyMissing": "Falta tu clave de Gemini",
     "keySubtitle": "Gratis e ilimitado: cada navegante usa su propia clave (1.500 consultas/día)",

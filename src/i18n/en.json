@@ -70,6 +70,8 @@
     "viento": "Wind",
     "mar": "Sea",
     "nivel": "Level",
+    "editHint": "Tap a condition to change it",
+    "done": "Done",
     "keyConfigured": "Gemini key configured",
     "keyMissing": "Gemini key missing",
     "keySubtitle": "Free & unlimited: each sailor uses their own key (1,500 queries/day)",

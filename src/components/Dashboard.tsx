@@ -4,7 +4,12 @@ import { useTrim, type TrimMode } from '../context/trim-context'
 import { getApiKey, getEffectiveConditions } from '../lib/gemini'
 import ApiKeyModal from './ApiKeyModal'
 import ApiKeyGuide from './ApiKeyGuide'
+import BoatTypeSelector from './BoatTypeSelector'
+import BeaufortPicker from './BeaufortPicker'
+import ExperienceToggle from './ExperienceToggle'
+import SeaStateSelector from './SeaStateSelector'
 import TrimAnalyzer from './TrimAnalyzer'
+import type { WindAngle } from '../types'
 
 const MODES: { value: TrimMode; icon: string; labelKey: string; descKey: string }[] = [
   { value: 'manual', icon: '🎛️', labelKey: 'manual', descKey: 'manual' },
@@ -24,16 +29,30 @@ const MODE_DOT: Record<TrimMode, string> = {
   live: 'bg-green-400',
 }
 
+const ANGLE_PRESETS: WindAngle[] = [0, 30, 45, 90, 135, 180]
+
+type ConditionKey = 'boat' | 'angle' | 'wind' | 'sea' | 'level'
+
+const EDITOR_TITLES: Record<ConditionKey, string> = {
+  boat: 'dashboard.barco',
+  angle: 'dashboard.angulo',
+  wind: 'dashboard.viento',
+  sea: 'dashboard.mar',
+  level: 'dashboard.nivel',
+}
+
 interface DashboardProps {
   simulationRunning: boolean
   onToggleSimulation: () => void
 }
 
 function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
-  const { conditions, mode, setMode, liveWind } = useTrim()
+  const { conditions, mode, setMode, liveWind, setWindAngle, setBoatType, setWindForce, setExperience, setSeaState } =
+    useTrim()
   const [apiModalOpen, setApiModalOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [keyConfigured, setKeyConfigured] = useState(() => !!getApiKey())
+  const [editing, setEditing] = useState<ConditionKey | null>(null)
   const prevMode = useRef(mode)
   const { t } = useTranslation()
 
@@ -48,6 +67,10 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
     }
     prevMode.current = mode
   }, [mode, simulationRunning, onToggleSimulation])
+
+  useEffect(() => {
+    if (mode !== 'manual') setEditing(null)
+  }, [mode])
 
   useEffect(() => {
     setKeyConfigured(!!getApiKey())
@@ -77,11 +100,11 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
   const seaText = t(getSeaLabelKey())
 
   const chips = [
-    { icon: '🚢', label: t('dashboard.barco'), value: boatLabel },
-    { icon: '🧭', label: t('dashboard.angulo'), value: `${effective.angle}° ${angleLabel}` },
-    { icon: '💨', label: t('dashboard.viento'), value: windText },
-    { icon: '🌊', label: t('dashboard.mar'), value: seaText },
-    { icon: '🎓', label: t('dashboard.nivel'), value: expLabel },
+    { key: 'boat' as const, icon: '🚢', label: t('dashboard.barco'), value: boatLabel },
+    { key: 'angle' as const, icon: '🧭', label: t('dashboard.angulo'), value: `${effective.angle}° ${angleLabel}` },
+    { key: 'wind' as const, icon: '💨', label: t('dashboard.viento'), value: windText },
+    { key: 'sea' as const, icon: '🌊', label: t('dashboard.mar'), value: seaText },
+    { key: 'level' as const, icon: '🎓', label: t('dashboard.nivel'), value: expLabel },
   ]
 
   return (
@@ -157,21 +180,103 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-              {chips.map((chip) => (
-                <div
-                  key={chip.label}
-                  className="bg-ocean-900/60 rounded-xl p-3 border border-ocean-800/20 text-center"
-                >
-                  <span className="text-lg block mb-1">{chip.icon}</span>
-                  <span className="text-[10px] text-sail-700 uppercase tracking-wider block">
-                    {chip.label}
-                  </span>
-                  <span className="text-xs font-semibold text-sail-200 block mt-0.5 leading-snug">
-                    {chip.value}
-                  </span>
-                </div>
-              ))}
+              {chips.map((chip) => {
+                const editable = mode === 'manual'
+                const active = editing === chip.key
+                const inner = (
+                  <>
+                    <span className="text-lg block mb-1">{chip.icon}</span>
+                    <span className="text-[10px] text-sail-700 uppercase tracking-wider block">
+                      {chip.label}
+                    </span>
+                    <span className="text-xs font-semibold text-sail-200 block mt-0.5 leading-snug">
+                      {chip.value}
+                    </span>
+                  </>
+                )
+                if (!editable) {
+                  return (
+                    <div
+                      key={chip.key}
+                      className="bg-ocean-900/60 rounded-xl p-3 border border-ocean-800/20 text-center"
+                    >
+                      {inner}
+                    </div>
+                  )
+                }
+                return (
+                  <button
+                    key={chip.key}
+                    type="button"
+                    onClick={() => setEditing(active ? null : chip.key)}
+                    aria-expanded={active}
+                    className={`rounded-xl p-3 border text-center w-full transition-all duration-300 active:scale-[0.98] ${
+                      active
+                        ? 'bg-cyan-500/10 border-cyan-500/40 shadow-lg shadow-cyan-500/10'
+                        : 'bg-ocean-900/60 border-ocean-800/20 hover:bg-ocean-900 hover:border-ocean-700/50'
+                    }`}
+                  >
+                    {inner}
+                  </button>
+                )
+              })}
             </div>
+
+            {mode === 'manual' && (
+              <p className="mt-3 text-[11px] text-sail-700 text-center">{t('dashboard.editHint')}</p>
+            )}
+
+            {mode === 'manual' && editing && (
+              <div className="mt-3 rounded-xl border border-cyan-500/20 bg-ocean-900/40 p-4 animate-fade-in">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
+                    {t(EDITOR_TITLES[editing])}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setEditing(null)}
+                    className="text-xs font-semibold text-sail-600 hover:text-sail-300 transition-colors"
+                  >
+                    {t('dashboard.done')}
+                  </button>
+                </div>
+                {editing === 'boat' && (
+                  <BoatTypeSelector value={conditions.boatType} onChange={setBoatType} />
+                )}
+                {editing === 'angle' && (
+                  <div
+                    className="flex flex-wrap justify-center gap-2"
+                    role="group"
+                    aria-label={t('dashboard.angulo')}
+                  >
+                    {ANGLE_PRESETS.map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        aria-pressed={conditions.windAngle === preset}
+                        onClick={() => setWindAngle(preset)}
+                        className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-300 ${
+                          conditions.windAngle === preset
+                            ? 'bg-wind-500/20 border-wind-500/50 text-wind-300'
+                            : 'border-ocean-700/40 text-sail-500 hover:text-sail-300 hover:border-ocean-600/50'
+                        }`}
+                      >
+                        {preset}°
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {editing === 'wind' && (
+                  <BeaufortPicker value={conditions.windForce} onChange={setWindForce} />
+                )}
+                {editing === 'sea' && (
+                  <SeaStateSelector value={conditions.seaState} onChange={setSeaState} />
+                )}
+                {editing === 'level' && (
+                  <ExperienceToggle value={conditions.experience} onChange={setExperience} />
+                )}
+              </div>
+            )}
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-ocean-950/40 rounded-2xl border border-ocean-800/20 px-5 py-4">
