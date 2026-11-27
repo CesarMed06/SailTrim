@@ -211,13 +211,21 @@
   "aiErrors": {
     "auth": "Tu clave de Gemini no es válida o no tiene permiso. Revísala en el panel de configuración.",
     "rateLimit": "Has alcanzado el límite de consultas de Gemini. Espera un minuto y reinténtalo.",
+    "length": "El plan llegó al límite de longitud del modelo. Vuelve a analizar para recibirlo completo.",
     "timeout": "Gemini tardó demasiado en responder. Reinténtalo.",
     "truncated": "El plan se cortó antes de terminar. Vuelve a analizar para completarlo.",
     "blocked": "Gemini bloqueó la respuesta. Prueba a cambiar las condiciones.",
     "network": "Sin conexión con Gemini. Comprueba tu conexión a internet.",
     "empty": "El modelo devolvió una respuesta vacía. Reinténtalo.",
     "server": "Los servidores de Gemini no están disponibles ahora mismo. Reinténtalo en unos segundos.",
-    "unknown": "No se pudo contactar con Gemini. Reinténtalo."
+    "unknown": "No se pudo contactar con Gemini. Reinténtalo.",
+    "cut": {
+      "length": "El plan se cortó en el límite de longitud del modelo. Lo de arriba es válido; vuelve a analizar para completarlo.",
+      "safety": "Gemini detuvo el plan por sus filtros de seguridad. Lo de arriba es lo que llegó; cambia las condiciones y vuelve a analizar.",
+      "service": "El servicio de Gemini falló a mitad del plan. Lo de arriba es lo que llegó; vuelve a analizar en unos segundos.",
+      "connection": "Se perdió la conexión a mitad del plan. Revisa tu red y vuelve a analizar.",
+      "other": "El plan se cortó antes de terminar. Lo de arriba es lo que llegó; vuelve a analizar para completarlo."
+    }
   },
   "apiKeyModal": {
     "badge": "IA Gratuita",

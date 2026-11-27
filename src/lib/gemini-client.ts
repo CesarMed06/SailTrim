@@ -6,7 +6,7 @@ const RETRY_DELAY_MS = 1_500
 
 export const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'] as const
 
-export type GeminiErrorCode = 'auth' | 'rateLimit' | 'timeout' | 'network' | 'empty' | 'server' | 'truncated' | 'blocked' | 'unknown'
+export type GeminiErrorCode = 'auth' | 'rateLimit' | 'length' | 'timeout' | 'network' | 'empty' | 'server' | 'truncated' | 'blocked' | 'unknown'
 
 export class GeminiError extends Error {
   readonly code: GeminiErrorCode
@@ -16,6 +16,25 @@ export class GeminiError extends Error {
     this.name = 'GeminiError'
     this.code = code
   }
+}
+
+export type CutReason = 'length' | 'safety' | 'service' | 'connection' | 'other'
+
+const CUT_REASON_BY_CODE: Partial<Record<GeminiErrorCode, CutReason>> = {
+  length: 'length',
+  blocked: 'safety',
+  server: 'service',
+  network: 'connection',
+  timeout: 'connection',
+}
+
+export function cutReason(error: unknown): CutReason {
+  if (!(error instanceof GeminiError)) return 'other'
+  return CUT_REASON_BY_CODE[error.code] ?? 'other'
+}
+
+export function describeCut(error: unknown): string {
+  return String(i18n.t(`aiErrors.cut.${cutReason(error)}`, { lng: getCurrentLanguage() }))
 }
 
 interface GeminiPayload {
@@ -173,6 +192,7 @@ async function streamModel(
     if (finishReason === 'SAFETY' || finishReason === 'RECITATION' || finishReason === 'PROHIBITED_CONTENT') {
       throw new GeminiError('blocked')
     }
+    if (finishReason === 'MAX_TOKENS') throw new GeminiError('length')
     if (finishReason !== 'STOP') throw new GeminiError('truncated')
     return text
   } catch (error) {

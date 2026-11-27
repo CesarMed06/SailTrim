@@ -211,13 +211,21 @@
   "aiErrors": {
     "auth": "Your Gemini key is invalid or lacks permission. Check it in the settings panel.",
     "rateLimit": "You have reached the Gemini rate limit. Wait a minute and try again.",
+    "length": "The plan reached the model's length limit. Analyze again to receive it complete.",
     "timeout": "Gemini took too long to respond. Try again.",
     "truncated": "The plan stopped before it was finished. Analyze again to complete it.",
     "blocked": "Gemini blocked the answer. Try changing the conditions.",
     "network": "No connection to Gemini. Check your internet connection.",
     "empty": "The model returned an empty response. Try again.",
     "server": "Gemini servers are unavailable right now. Try again in a few seconds.",
-    "unknown": "Could not reach Gemini. Try again."
+    "unknown": "Could not reach Gemini. Try again.",
+    "cut": {
+      "length": "The plan stopped at the model's length limit. What you see above is valid; analyze again to complete it.",
+      "safety": "Gemini stopped the plan with its safety filters. What you see above is what arrived; change the conditions and analyze again.",
+      "service": "The Gemini service failed halfway through the plan. What you see above is what arrived; analyze again in a few seconds.",
+      "connection": "The connection dropped halfway through the plan. Check your network and analyze again.",
+      "other": "The plan stopped before it finished. What you see above is what arrived; analyze again to complete it."
+    }
   },
   "apiKeyModal": {
     "badge": "Free AI",

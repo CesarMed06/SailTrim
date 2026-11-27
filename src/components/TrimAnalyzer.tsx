@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTrim } from '../context/trim-context'
 import { analyzeTrimStream, getApiKey, getEffectiveConditions } from '../lib/gemini'
+import { describeCut } from '../lib/gemini-client'
 import { MarkdownText } from './MarkdownText'
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
@@ -124,7 +125,7 @@ function TrimAnalyzer({ onOpenApiKey }: TrimAnalyzerProps) {
       if (partial) {
         setResult(partial)
         setStatus('success')
-        setWarning(err instanceof Error ? err.message : 'El plan se cortó antes de terminar.')
+        setWarning(describeCut(err))
       } else {
         setError(err instanceof Error ? err.message : 'Error inesperado al analizar')
         setResult('')

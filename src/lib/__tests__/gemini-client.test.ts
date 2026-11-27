@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { GEMINI_MODELS, GeminiError, generateContent, generateContentStream } from '../gemini-client'
+import { GEMINI_MODELS, GeminiError, describeCut, generateContent, generateContentStream } from '../gemini-client'
 
 const realFetch = globalThis.fetch
 
@@ -202,8 +202,8 @@ describe('generateContentStream timeouts', () => {
 })
 
 describe('generateContentStream finish reasons', () => {
-  it('reports a plan cut by the token limit instead of presenting it as finished', async () => {
-    useFetch(
+  it('reports the token limit as its own reason and does not retry it', async () => {
+    const fetchMock = useFetch(
       vi.fn().mockImplementation(() =>
         sseResponse([
           'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
@@ -212,9 +212,10 @@ describe('generateContentStream finish reasons', () => {
       ),
     )
 
-    await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
-      code: 'truncated',
-    })
+    await expect(
+      generateContentStream({ apiKey: 'k', body: {}, retryDelayMs: 0, onText: () => {} }),
+    ).rejects.toMatchObject({ code: 'length' })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -253,7 +254,7 @@ describe('generateContentStream interruptions', () => {
         .mockResolvedValueOnce(
           sseResponse([
             'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
-            'data: {"candidates":[{"content":{"parts":[{"text":" cortado"}]},"finishReason":"MAX_TOKENS"}]}\n\n',
+            'data: {"candidates":[{"content":{"parts":[{"text":" cortado"}]},"finishReason":"OTHER"}]}\n\n',
           ]),
         )
         .mockResolvedValueOnce(
@@ -279,7 +280,7 @@ describe('generateContentStream interruptions', () => {
       vi.fn().mockImplementation(() =>
         sseResponse([
           'data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n',
-          'data: {"candidates":[{"content":{"parts":[{"text":" a medias"}]},"finishReason":"MAX_TOKENS"}]}\n\n',
+          'data: {"candidates":[{"content":{"parts":[{"text":" a medias"}]},"finishReason":"OTHER"}]}\n\n',
         ]),
       ),
     )
@@ -306,5 +307,20 @@ describe('generateContentStream interruptions', () => {
       code: 'blocked',
     })
     expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('describeCut', () => {
+  it('explains each way a plan can stop', () => {
+    const reasons = (['length', 'blocked', 'server', 'timeout', 'truncated'] as const).map((code) =>
+      describeCut(new GeminiError(code)),
+    )
+
+    expect(new Set(reasons).size).toBe(5)
+    expect(reasons[0]).toMatch(/l[íi]mite|limit/i)
+  })
+
+  it('falls back to a generic reason for an unexpected error', () => {
+    expect(describeCut(new Error('boom'))).toBe(describeCut(new GeminiError('unknown')))
   })
 })
