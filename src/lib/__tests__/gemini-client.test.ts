@@ -189,15 +189,29 @@ describe('generateContent', () => {
 })
 
 describe('generateContentStream timeouts', () => {
-  it('does not walk through every model when a stream times out', async () => {
+  it('falls back to the next model when a stream stalls before any text', async () => {
     const mock = useFetch(
-      vi.fn().mockRejectedValue(Object.assign(new Error('aborted'), { name: 'AbortError' })),
+      vi
+        .fn()
+        .mockRejectedValueOnce(Object.assign(new Error('aborted'), { name: 'AbortError' }))
+        .mockResolvedValueOnce(
+          sseResponse(['data: {"candidates":[{"content":{"parts":[{"text":"## Resumen"}]}}]}\n\n']),
+        ),
     )
+
+    const text = await generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })
+
+    expect(text).toBe('## Resumen')
+    expect(mock).toHaveBeenCalledTimes(2)
+  })
+
+  it('reports a timeout only once every model stalls before any text', async () => {
+    const mock = useFetch(vi.fn().mockRejectedValue(Object.assign(new Error('aborted'), { name: 'AbortError' })))
 
     await expect(generateContentStream({ apiKey: 'k', body: {}, onText: () => {} })).rejects.toMatchObject({
       code: 'timeout',
     })
-    expect(mock).toHaveBeenCalledTimes(1)
+    expect(mock).toHaveBeenCalledTimes(GEMINI_MODELS.length)
   })
 })
 

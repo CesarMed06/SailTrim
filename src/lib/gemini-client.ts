@@ -2,6 +2,7 @@ import i18n, { getCurrentLanguage } from '../i18n'
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models'
 const DEFAULT_TIMEOUT_MS = 25_000
+const FIRST_CHUNK_TIMEOUT_MS = 30_000
 const RETRY_DELAY_MS = 1_500
 
 export const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'] as const
@@ -123,10 +124,12 @@ async function streamModel(
   onText: (text: string) => void,
 ): Promise<string> {
   const controller = new AbortController()
-  let timer = setTimeout(() => controller.abort(), idleTimeoutMs)
+  const firstChunkTimeoutMs = Math.min(FIRST_CHUNK_TIMEOUT_MS, idleTimeoutMs)
+  let received = false
+  let timer = setTimeout(() => controller.abort(), firstChunkTimeoutMs)
   const resetTimer = () => {
     clearTimeout(timer)
-    timer = setTimeout(() => controller.abort(), idleTimeoutMs)
+    timer = setTimeout(() => controller.abort(), received ? idleTimeoutMs : firstChunkTimeoutMs)
   }
 
   try {
@@ -162,6 +165,7 @@ async function streamModel(
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
+      received = true
       resetTimer()
       buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
@@ -226,14 +230,9 @@ export async function generateContentStream({
       try {
         return await streamModel(model, apiKey, body, timeoutMs, emit)
       } catch (error) {
-        if (
-          !(error instanceof GeminiError) ||
-          error.code === 'auth' ||
-          error.code === 'network' ||
-          error.code === 'timeout' ||
-          emitted
-        )
+        if (!(error instanceof GeminiError) || error.code === 'auth' || error.code === 'network' || emitted) {
           throw error
+        }
         lastError = error
       }
     }
