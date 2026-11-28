@@ -380,10 +380,20 @@
     "advanced": "Avanzado"
   },
   "seaState": {
-    "calm": "Calma",
-    "moderate": "Moderada",
-    "rough": "Gruesa",
     "none": "—"
+  },
+  "douglas": {
+    "scale": "Escala Douglas",
+    "0": { "label": "Calma", "height": "0 m", "description": "Mar como un espejo" },
+    "1": { "label": "Rizada", "height": "0–0,1 m", "description": "Olas muy pequeñas, sin espuma" },
+    "2": { "label": "Marejadilla", "height": "0,1–0,5 m", "description": "Olas cortas, crestas vítreas" },
+    "3": { "label": "Marejada", "height": "0,5–1,25 m", "description": "Olas pequeñas con algunos borreguitos" },
+    "4": { "label": "Fuerte marejada", "height": "1,25–2,5 m", "description": "Olas moderadas, borreguitos frecuentes" },
+    "5": { "label": "Gruesa", "height": "2,5–4 m", "description": "Olas grandes, espuma abundante" },
+    "6": { "label": "Muy gruesa", "height": "4–6 m", "description": "Olas muy grandes, crestas de espuma" },
+    "7": { "label": "Arbolada", "height": "6–9 m", "description": "Mar arbolada, espuma arrastrada" },
+    "8": { "label": "Montañosa", "height": "9–14 m", "description": "Olas muy altas y largas" },
+    "9": { "label": "Enorme", "height": "> 14 m", "description": "Olas excepcionalmente altas" }
   },
   "windAngles": {
     "0": { "short": "Proa", "full": "Proa al viento" },

@@ -1,5 +1,5 @@
 import { useCallback, useState, type ReactNode } from 'react'
-import type { BeaufortForce, BoatType, ExperienceLevel, TrimConditions, WindAngle } from '../types'
+import type { BeaufortForce, BoatType, DouglasScale, ExperienceLevel, TrimConditions, WindAngle } from '../types'
 import { TrimContext, type LiveWind, type TrimMode } from './trim-context'
 
 export function TrimProvider({ children }: { children: ReactNode }) {
@@ -29,7 +29,7 @@ export function TrimProvider({ children }: { children: ReactNode }) {
     setConditions((prev) => ({ ...prev, experience }))
   }, [])
 
-  const setSeaState = useCallback((seaState?: 'calm' | 'moderate' | 'rough') => {
+  const setSeaState = useCallback((seaState?: DouglasScale) => {
     setConditions((prev) => ({ ...prev, seaState }))
   }, [])
 

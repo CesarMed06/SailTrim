@@ -6,6 +6,8 @@ export type BoatType = 'monohull' | 'catamaran' | 'trimaran' | 'cruiser' | 'race
 
 export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced'
 
+export type DouglasScale = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
 export type SailPoint =
   | 'close_hauled'
   | 'close_reach'
@@ -18,7 +20,7 @@ export interface TrimConditions {
   windForce: BeaufortForce
   windAngle: WindAngle
   experience: ExperienceLevel
-  seaState?: 'calm' | 'moderate' | 'rough'
+  seaState?: DouglasScale
   sailInventory?: string[]
 }
 

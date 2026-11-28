@@ -184,7 +184,7 @@ export default function BoatProfilePanel() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
                 {isEn ? 'Length (m)' : 'Eslora (m)'}
@@ -223,6 +223,20 @@ export default function BoatProfilePanel() {
                 min="0"
                 value={profile.draftMeters ?? ''}
                 onChange={(e) => updateProfile({ draftMeters: e.target.value ? parseFloat(e.target.value) : null })}
+                placeholder="—"
+                className="w-full bg-ocean-950/60 border border-ocean-700/40 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-white text-sm placeholder-sail-700 outline-none transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+                {isEn ? 'Depth (m)' : 'Puntal (m)'}
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                value={profile.depthMeters ?? ''}
+                onChange={(e) => updateProfile({ depthMeters: e.target.value ? parseFloat(e.target.value) : null })}
                 placeholder="—"
                 className="w-full bg-ocean-950/60 border border-ocean-700/40 focus:border-cyan-500/50 rounded-xl px-4 py-2.5 text-white text-sm placeholder-sail-700 outline-none transition-colors"
               />
@@ -310,7 +324,7 @@ export default function BoatProfilePanel() {
             </div>
             <div>
               <label className="block text-sail-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                {isEn ? 'Build year' : 'Año de botadura'}
+                {isEn ? 'Build year' : 'Año de construcción'}
               </label>
               <input
                 type="number"

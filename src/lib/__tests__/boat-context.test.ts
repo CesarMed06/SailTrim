@@ -13,6 +13,7 @@ const profile = {
   lengthMeters: 10.3,
   beamMeters: 3.4,
   draftMeters: 1.8,
+  depthMeters: 1.4,
   rigType: 'sloop',
   rigTypeOther: '',
   hullMaterial: 'fiberglass',
@@ -65,7 +66,7 @@ describe('buildBoatContext', () => {
     expect(context).toContain('BARCO DEL NAVEGANTE:')
     expect(context).toContain('- Nombre: Tramontana')
     expect(context).toContain('- Modelo: Bavaria 34')
-    expect(context).toContain('- Dimensiones: eslora 10.3m, manga 3.4m, calado 1.8m')
+    expect(context).toContain('- Dimensiones: eslora 10.3m, manga 3.4m, calado 1.8m, puntal 1.4m')
     expect(context).toContain('- Aparejo: sloop')
     expect(context).toContain('- Casco: fiberglass')
     expect(context).toContain('- Año: 2008')
@@ -83,7 +84,7 @@ describe('buildBoatContext', () => {
     const context = buildBoatContext('en')
     expect(context).toContain("THE SAILOR'S BOAT:")
     expect(context).toContain('- Name: Tramontana')
-    expect(context).toContain('- Dimensions: LOA 10.3m, beam 3.4m, draft 1.8m')
+    expect(context).toContain('- Dimensions: LOA 10.3m, beam 3.4m, draft 1.8m, depth 1.4m')
     expect(context).toContain('- Rig: sloop')
     expect(context).toContain('- Crew: 2 people')
   })

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { BeaufortForce, BoatType, ExperienceLevel, TrimConditions, WindAngle } from '../types'
+import type { BeaufortForce, BoatType, DouglasScale, ExperienceLevel, TrimConditions, WindAngle } from '../types'
 
 export type TrimMode = 'manual' | 'demo' | 'live'
 
@@ -15,7 +15,7 @@ interface TrimContextValue {
   setBoatType: (boat: BoatType) => void
   setWindForce: (force: BeaufortForce) => void
   setExperience: (level: ExperienceLevel) => void
-  setSeaState: (state?: 'calm' | 'moderate' | 'rough') => void
+  setSeaState: (state?: DouglasScale) => void
   mode: TrimMode
   setMode: (mode: TrimMode) => void
   liveWind: LiveWind | null

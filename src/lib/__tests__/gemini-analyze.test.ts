@@ -31,7 +31,7 @@ const conditions = {
   speedKnots: 12,
   boatType: 'monohull',
   experience: 'intermediate',
-  seaState: 'calm',
+  seaState: 3,
   mode: 'manual',
 } as const
 

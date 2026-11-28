@@ -33,11 +33,13 @@ export function buildBoatContext(lang: Lang = getCurrentLanguage()): string {
   const length = typeof profile.lengthMeters === 'number' ? profile.lengthMeters : 0
   const beam = typeof profile.beamMeters === 'number' ? profile.beamMeters : 0
   const draft = typeof profile.draftMeters === 'number' ? profile.draftMeters : 0
-  if (length || beam || draft) {
+  const depth = typeof profile.depthMeters === 'number' ? profile.depthMeters : 0
+  if (length || beam || draft || depth) {
     const dims: string[] = []
     if (length) dims.push(`${isEn ? 'LOA' : 'eslora'} ${length}m`)
     if (beam) dims.push(`${isEn ? 'beam' : 'manga'} ${beam}m`)
     if (draft) dims.push(`${isEn ? 'draft' : 'calado'} ${draft}m`)
+    if (depth) dims.push(`${isEn ? 'depth' : 'puntal'} ${depth}m`)
     lines.push(`${isEn ? '- Dimensions' : '- Dimensiones'}: ${dims.join(', ')}`)
   }
 

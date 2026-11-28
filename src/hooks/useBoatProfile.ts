@@ -17,6 +17,7 @@ export interface BoatProfile {
   lengthMeters: number | null
   beamMeters: number | null
   draftMeters: number | null
+  depthMeters: number | null
   rigType: RigType
   rigTypeOther: string
   hullMaterial: HullMaterial
@@ -47,6 +48,7 @@ const EMPTY_PROFILE: BoatProfile = {
   lengthMeters: null,
   beamMeters: null,
   draftMeters: null,
+  depthMeters: null,
   rigType: 'sloop',
   rigTypeOther: '',
   hullMaterial: 'fiberglass',

@@ -380,10 +380,20 @@
     "advanced": "Advanced"
   },
   "seaState": {
-    "calm": "Calm",
-    "moderate": "Moderate",
-    "rough": "Rough",
     "none": "—"
+  },
+  "douglas": {
+    "scale": "Douglas scale",
+    "0": { "label": "Calm", "height": "0 m", "description": "Sea like a mirror" },
+    "1": { "label": "Rippled", "height": "0–0.1 m", "description": "Very small waves, no foam" },
+    "2": { "label": "Smooth", "height": "0.1–0.5 m", "description": "Short waves, glassy crests" },
+    "3": { "label": "Slight", "height": "0.5–1.25 m", "description": "Small waves, some whitecaps" },
+    "4": { "label": "Moderate", "height": "1.25–2.5 m", "description": "Moderate waves, frequent whitecaps" },
+    "5": { "label": "Rough", "height": "2.5–4 m", "description": "Large waves, abundant foam" },
+    "6": { "label": "Very rough", "height": "4–6 m", "description": "Very large waves, foam crests" },
+    "7": { "label": "High", "height": "6–9 m", "description": "High sea, blown foam" },
+    "8": { "label": "Very high", "height": "9–14 m", "description": "Very high, long waves" },
+    "9": { "label": "Phenomenal", "height": "> 14 m", "description": "Exceptionally high waves" }
   },
   "windAngles": {
     "0": { "short": "Head to wind", "full": "Head to wind" },

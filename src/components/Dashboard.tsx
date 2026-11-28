@@ -91,13 +91,7 @@ function Dashboard({ simulationRunning, onToggleSimulation }: DashboardProps) {
       ? `${effective.speedKnots.toFixed(1)} kn · F${effective.force}`
       : `${beaufortInfo?.windSpeed || ''} · F${effective.force}`
 
-  const getSeaLabelKey = () => {
-    if (effective.seaState === 'calm') return 'seaState.calm'
-    if (effective.seaState === 'moderate') return 'seaState.moderate'
-    if (effective.seaState === 'rough') return 'seaState.rough'
-    return 'seaState.none'
-  }
-  const seaText = t(getSeaLabelKey())
+  const seaText = effective.seaState === undefined ? t('seaState.none') : t(`douglas.${effective.seaState}.label`)
 
   const chips = [
     { key: 'boat' as const, icon: '🚢', label: t('dashboard.barco'), value: boatLabel },

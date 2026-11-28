@@ -1,4 +1,4 @@
-import type { BeaufortForce, BoatType, ExperienceLevel, TrimConditions, WindAngle } from '../types'
+import type { BeaufortForce, BoatType, DouglasScale, ExperienceLevel, TrimConditions, WindAngle } from '../types'
 import { GEMINI_API_KEY_STORAGE } from './constants'
 import type { LiveWind, TrimMode } from '../context/trim-context'
 import { toWindAngle } from './wind-utils'
@@ -12,7 +12,7 @@ export interface EffectiveConditions {
   speedKnots: number | null
   boatType: BoatType
   experience: ExperienceLevel
-  seaState?: 'calm' | 'moderate' | 'rough'
+  seaState?: DouglasScale
   mode: TrimMode
 }
 
@@ -67,13 +67,12 @@ function describeConditions(c: EffectiveConditions): string {
   const windAngleData = i18n.t(`windAngles.${c.angle}`, { lng: lang, returnObjects: true }) as { short: string; full: string }
   const angle = windAngleData?.full ?? `${c.angle}°`
   const sea =
-    c.seaState === 'calm'
-      ? i18n.t('seaState.calm', { lng: lang })
-      : c.seaState === 'moderate'
-        ? i18n.t('seaState.moderate', { lng: lang })
-        : c.seaState === 'rough'
-          ? i18n.t('seaState.rough', { lng: lang })
-          : isEn ? 'not specified' : 'no especificado'
+    c.seaState !== undefined
+      ? (() => {
+          const d = i18n.t(`douglas.${c.seaState}`, { lng: lang, returnObjects: true }) as { label: string; height: string }
+          return `${d.label} (Douglas ${c.seaState}, ${d.height})`
+        })()
+      : isEn ? 'not specified' : 'no especificado'
   const wind = c.speedKnots !== null ? `${c.speedKnots.toFixed(1)} ${isEn ? 'knots' : 'nudos'}` : (beaufort?.windSpeed || '')
   const source =
     c.mode === 'manual'
